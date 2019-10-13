@@ -1,0 +1,109 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Motiv/view/motiv/motiv/index.phtml');
+ 
+$title = 'Motive';
+$this->headTitle($title);
+?>
+<div>
+<div class="rightside_motiv">
+<div class="rightside_top">
+<?php 
+echo $this->form()->openTag($this->selectform);
+echo '<p>' . $this->formRow($this->selectform->get('ortid')) . '</p>';
+echo '<p>' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo $this->formSubmit($this->selectform->get('submit'));
+echo $this->form()->closeTag();
+?>
+</div>
+<hr class="selectform">
+<div class="motiv_map" id="motiv_map" style="width:100%; height:100%"></div>
+<div class="rightside_bottom">
+<hr class="selectform">
+<p><a href="<?php echo $this->url('motiv', array('action'=>'add'));?>">Motiv hinzufügen</a></p>
+<p>Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?></p>
+<h3><?php echo $this->escapeHtml($title); ?></h3></div>
+</div>
+<div class="leftside_motiv">
+<table class="table">
+<tr>
+<th>Motiv</th>
+<th>Ort</th>
+<th class="coords">Breite</th>
+<th class="coords">Länge</th>
+<th>Link</th>
+<th>Zoom</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($this->paginator as $motiv) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($motiv->id);?>">
+<td><?php echo $this->escapeHtml($motiv->motiv);?></td>
+<td><?php echo $this->escapeHtml($motiv->ort);?></td>
+<?php
+echo '<td class="coords"><span id="lat_' . $motiv->id . '">';
+
+$laenge = 0.0;
+$breite = 0.0;
+
+if (($motiv->laenge <> '0' || $motiv->breite <> '0') && $motiv->laenge <> '' && $motiv->breite <> '')
+{
+	$laenge = number_format((float)((int)$motiv->laenge / 10000.0), 4);
+	$breite = number_format((float)((int)$motiv->breite / 10000.0), 4);
+	
+	echo $this->escapeHtml($breite);
+	echo '</span></td><td class="coords"><span id="lng_' . $motiv->id . '">';
+	echo $this->escapeHtml($laenge);
+}
+else
+{
+	echo '</span></td><td class="coords"><span id="lng_' . $motiv->id . '">';
+}
+?>
+</span></td>
+<td><?php echo $this->escapeHtml($motiv->link);?></td>
+<td>
+<?php
+if ($motiv->mapzoom <> '0') // || $motiv->mapzoom <> '')
+{
+    echo $motiv->mapzoom;
+}
+?>
+</td>
+<td>
+<a href="<?php echo $this->url('motiv', array('action'=>'edit', 'id' => $motiv->id));?>">Edit</a>
+<a href="<?php echo $this->url('motiv', array('action'=>'delete', 'id' => $motiv->id));?>">Del</a>
+<?php 
+if (($motiv->ortlaenge <> '0' || $motiv->ortbreite <> '0') && $motiv->ortlaenge <> '' && $motiv->ortbreite <> '')
+{
+	$laenge = number_format((float)((int)$motiv->ortlaenge / 100.0), 2);
+	$breite = number_format((float)((int)$motiv->ortbreite / 100.0), 2);
+
+	echo '<a href="javascript:motiv_mapGotoCity(' . $laenge . ',' . $breite . ');">Map</a> ';
+    echo '<a href="javascript:motiv_getCoordinates(' . $motiv->id . ');">Geo</a>';
+}
+?>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<?php
+if ($this->paginator->count() > 1)
+{
+	echo $this->paginationControl(
+	    $this->paginator,
+	    'sliding',
+	    array('partial/paginator.phtml', 'Motiv'),
+	    array(
+	        'route' => 'motiv',
+	    )
+	);
+}
+?>
+</div>
+<div style="clear:both"></div>
+</div>
+<?php
+require_once(realpath(__DIR__ . '/../../../../private/ofa_Local.php'));
+$this->headScript()->appendFile($google_maps_api);
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_motiv.js');
+?>

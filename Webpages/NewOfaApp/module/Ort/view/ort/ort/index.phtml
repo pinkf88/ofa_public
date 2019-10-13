@@ -1,0 +1,97 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Ort/view/ort/ort/index.phtml');
+ 
+$title = 'Orte';
+$this->headTitle($title);
+?>
+<div>
+<div class="rightside_ort">
+<div class="rightside_top">
+<?php 
+echo $this->form()->openTag($this->selectform);
+echo '<p>' . $this->formRow($this->selectform->get('landid')) . '</p>';
+echo '<p>' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo $this->formSubmit($this->selectform->get('submit'));
+echo $this->form()->closeTag();
+?>
+</div>
+<hr class="selectform">
+<div class="ort_map" id="ort_map" style="width:100%; height:100%"></div>
+<div class="rightside_bottom">
+<hr class="selectform">
+<p><a href="<?php echo $this->url('ort', array('action'=>'add'));?>">Ort hinzufügen</a></p>
+<p>Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?></p>
+<h3><?php echo $this->escapeHtml($title); ?></h3></div>
+</div>
+<div class="leftside_ort">
+<table class="table">
+<tr>
+<th>Ort</th>
+<th>Land</th>
+<th class="coords">Breite</th>
+<th class="coords">Länge</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($this->paginator as $ort) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($ort->id);?>">
+<td><?php echo $this->escapeHtml($ort->ort);?></td>
+<td><?php echo $this->escapeHtml($ort->land);?></td>
+<?php
+echo '<td class="coords"><span id="lng_' . $ort->id . '">';
+$laenge = 0.0;
+$breite = 0.0;
+
+if (($ort->laenge <> '0' || $ort->breite <> '0') && $ort->laenge <> '' && $ort->breite <> '')
+{
+	$laenge = number_format((float)((int)$ort->laenge / 100.0), 2);
+	$breite = number_format((float)((int)$ort->breite / 100.0), 2);
+	
+	echo $this->escapeHtml($breite);
+	echo '</span></td><td class="coords"><span id="lat_' . $ort->id . '">';
+	echo $this->escapeHtml($laenge);
+}
+else
+{
+	echo '</span></td><td class="coords"><span id="lat_' . $ort->id . '">';
+}
+?>
+</span></td>
+<td>
+<a href="<?php echo $this->url('ort', array('action'=>'edit', 'id' => $ort->id));?>">Edit</a>
+<a href="<?php echo $this->url('ort', array('action'=>'delete', 'id' => $ort->id));?>">Del</a>
+<?php 
+echo '<a href="javascript:ort_getCoordinates(' . $ort->id . ', \'' . $ort->ort . '\');">Geo</a> ';
+echo '<span id="ort_mapgoto_' . $ort->id . '">';
+        
+if ($laenge <> 0.0 && $breite <> 0.0)
+{
+	echo '<a href="javascript:ort_mapGotoCoordinates(' . $laenge . ', ' . $breite . ');">Map</a>';
+}
+?>
+</span>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<?php
+if ($this->paginator->count() > 1)
+{
+	echo $this->paginationControl(
+	    $this->paginator,
+	    'sliding',
+	    array('partial/paginator.phtml', 'Ort'),
+	    array(
+	        'route' => 'ort',
+	    )
+	);
+}
+?>
+</div>
+<div style="clear:both"></div>
+</div>
+<?php
+require_once(realpath(__DIR__ . '/../../../../private/ofa_Local.php'));
+$this->headScript()->appendFile($google_maps_api);
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_ort.js');
+?>

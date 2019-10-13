@@ -1,0 +1,153 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Serie/view/serie/serie/index.phtml');
+
+function date_mysql2german($datum)
+{
+    if ($datum == '')
+        return '';
+
+    $d = explode("-", $datum);
+
+    return sprintf("%02d.%02d.%04d", $d[2], $d[1], $d[0]);
+}
+
+$title = 'Serien';
+$this->headTitle($title);
+?>
+<div id="serie_normal" class="serie_normal">
+<div class="rightside_serie">
+<div class="scroll-pane serie_bilder">
+<ul id="bilderliste">
+</ul>
+</div>
+<div class="rightside">
+<div class="rightside_top">
+<?php
+echo $this->form()->openTag($this->selectform);
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('suchtext')) . '</p>';
+echo '<p>' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo $this->formSubmit($this->selectform->get('submit'));
+echo '<hr>';
+echo '<p>' . $this->formRow($this->selectform->get('webid')) . '</p>';
+echo $this->form()->closeTag();
+?>
+<hr class="selectform">
+</div>
+<div class="rightside_information">
+<span id="serieinformation"></span>
+<textarea id="serie_log" class="serie_log"></textarea>
+</div>
+<div class="rightside_bottom">
+<hr class="selectform">
+<p><span id="serie_info"></span></p>
+<p>
+    <a href="javascript:serie_controlBild('info');"><span class="ui-icon ui-icon-info"></span></a> |
+    <a href="javascript:serie_controlBild('previous');"><span class="ui-icon ui-icon-seek-prev"></span></a> |
+	<a href="javascript:serie_controlBild('stop');"><span class="ui-icon ui-icon-stop"></span></a> |
+	<a href="javascript:serie_controlBild('pause');"><span class="ui-icon ui-icon-pause"></span></a> |
+	<a href="javascript:serie_controlBild('next');"><span class="ui-icon ui-icon-seek-next"></span></a>
+</p>
+<hr class="selectform">
+<p>
+<a href="javascript:serie_controlBild('update');">Datenbank aktualisieren</a> |
+<a href="<?php echo $this->url('serie', array('action'=>'add'));?>">Serie hinzufügen</a>
+</p>
+<p>
+Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
+</p>
+<h3><?php echo $this->escapeHtml($title); ?></h3>
+</div>
+</div>
+</div>
+<div class="leftside_serie">
+<table class="table">
+<tr>
+<th>Serie</th>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+<?php foreach ($this->paginator as $serie) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($serie->id);?>">
+<td><?php
+if ($serie->zusatz == 'SUBCAPTION') {
+    echo '<i>' . $this->escapeHtml($serie->serie) . '</i>';
+} else {
+    echo $this->escapeHtml($serie->serie);
+}
+?></td>
+<td><?php echo $this->escapeHtml($serie->id);?></td>
+<td class="datum">
+<?php
+echo $this->escapeHtml(date_mysql2german($serie->labelcheck));
+?>
+</td>
+<td class="editing">
+<a href="<?php echo $this->url('serie', array('action' => 'edit', 'id' => $serie->id));?>">Edit</a>
+<a href="<?php echo $this->url('serie', array('action' => 'delete', 'id' => $serie->id));?>">Del</a>
+<a href="javascript:serie_showBilderGrid('<?php echo $serie->id;?>');">Sort</a>
+<a href="javascript:serie_vision('<?php echo $serie->id;?>');">Vision</a>
+<a href="javascript:serie_showBilderTable('<?php echo $serie->id;?>');">Label</a>
+<a href="javascript:serie_addToWeb('<?php echo $serie->id;?>');">Web</a>
+<a href="javascript:serie_playSerie('<?php echo $serie->id;?>',1);">Play</a>
+<a href="javascript:serie_playSerie('<?php echo $serie->id;?>',2);">Rnd</a>
+<a href="javascript:serie_playSerie('<?php echo $serie->id;?>',3);">Long</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<hr>
+<?php
+if ($this->paginator->count() > 1)
+{
+    echo $this->paginationControl($this->paginator, 'sliding', array(
+            'partial/paginator.phtml',
+            'Serie'
+    ), array(
+            'route' => 'serie',
+	    )
+	);
+}
+?>
+</div>
+<div style="clear: both"></div>
+</div>
+<div id="serie_sort" class="serie_sort">
+<iframe id="frame_sort" src="/frames/serie_sort.php" class="frame_sort"></iframe>
+</div>
+<div id="serie_label" class="serie_label">
+<iframe id="frame_label" src="/frames/serie_label.php" class="frame_label"></iframe>
+</div>
+<div id="bildzusatzdialog" title="Zusatzinformation">
+<form>
+<fieldset>
+<input type="hidden" name="serieid">
+<input type="hidden" name="bildid">
+<p><label for="name">Zusatz</label></p>
+<textarea class="zusatz text ui-widget-content ui-corner-all" name="seriebild_zusatz"></textarea>
+</fieldset>
+</form>
+</div>
+<div id="webseriedialog" title="Webserie">
+<form>
+<fieldset>
+<input type="hidden" name="webid">
+<input type="hidden" name="serieid">
+<p class="dialoglabel" ><label for="titel">Titel</label></p>
+<input type="text" class="text ui-widget-content ui-corner-all" name="webserie_titel"></textarea>
+<p class="dialoglabel"><label for="pfad">Pfad (ohne "/")</label></p>
+<input type="text" class="text ui-widget-content ui-corner-all" name="webserie_pfad"></textarea>
+</fieldset>
+</form>
+</div>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery.jscrollpane.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/js/fancybox/jquery.fancybox.css');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery-ui.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.mousewheel.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.jscrollpane.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/fancybox/jquery.fancybox.js');
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_serie.js');
+?>

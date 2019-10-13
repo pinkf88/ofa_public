@@ -1,0 +1,10 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Motiv/view/motiv/motiv/add.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Motiv hinzufügen',
+		'url' => 'motiv',
+		'action' => 'add',
+		));

@@ -1,0 +1,11 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Motiv/view/motiv/motiv/edit.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Motiv bearbeiten',
+		'url' => 'motiv',
+		'action' => 'edit',
+		'id' => $this->id,
+));

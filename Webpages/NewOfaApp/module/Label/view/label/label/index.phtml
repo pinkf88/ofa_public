@@ -1,0 +1,48 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Label/view/label/label/index.phtml');
+ 
+$title = 'Label';
+$this->headTitle($title);
+?>
+<div>
+<div class="rightside">
+<div class="rightside_top">
+</div>
+<div class="rightside_bottom">
+<p>
+<a href="<?php echo $this->url('label', array('action'=>'add'));?>">Label hinzufügen</a>
+</p>
+<p>
+Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
+</p>
+<h3><?php echo $this->escapeHtml($title); ?></h3></div>
+</div>
+<div class="leftside">
+<table class="table">
+<tr>
+<th>Label (Englisch)</th>
+<th>Label (Deutsch)</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($this->paginator as $label) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($label->id);?>">
+<td><?php echo $this->escapeHtml($label->label_en);?></td>
+<td><?php echo $this->escapeHtml($label->label_de);?></td>
+<td><?php echo $this->escapeHtml($label->used);?></td>
+<td>
+<a href="<?php echo $this->url('label',
+array('action'=>'edit', 'id' => $label->id));?>">Edit</a>
+<a href="<?php echo $this->url('label',
+array('action'=>'delete', 'id' => $label->id));?>">Del</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+</div>
+<div style="clear:both"></div>
+</div>
+<?php
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_label.js');
+?>

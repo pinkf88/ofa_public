@@ -1,0 +1,11 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Label/view/label/label/edit.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Label bearbeiten',
+		'url' => 'label',
+		'action' => 'edit',
+		'id' => $this->id,
+));

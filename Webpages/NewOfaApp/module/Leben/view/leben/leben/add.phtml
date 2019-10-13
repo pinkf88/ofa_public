@@ -1,0 +1,10 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Leben/view/leben/leben/add.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Leben hinzufügen',
+		'url' => 'leben',
+		'action' => 'add',
+		));

@@ -1,0 +1,113 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Web/view/web/web/index.phtml');
+
+$title = 'Web';
+$this->headTitle($title);
+?>
+<div id="web_normal" class="web_normal">
+<div class="rightside_web">
+<div class="scroll-pane web_serien">
+<ul id="serienliste">
+</ul>
+</div>
+<div class="rightside">
+<div class="rightside_top">
+<?php
+echo $this->form()->openTag($this->selectform);
+echo '<p>' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo $this->formSubmit($this->selectform->get('submit'));
+echo '<hr>';
+echo $this->form()->closeTag();
+?>
+</div>
+<div class="rightside_information">
+<span id="webinformation"></span>
+</div>
+<div class="rightside_bottom">
+<p>
+<a href="<?php echo $this->url('web', array('action'=>'add'));?>">Web hinzufügen</a>
+</p>
+<p>
+Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
+</p>
+<h3><?php echo $this->escapeHtml($title); ?></h3>
+</div>
+</div>
+</div>
+<div class="leftside_web">
+<table class="table">
+<tr>
+<th>Web</th>
+<th>Nummer</th>
+<th></th>
+</tr>
+<?php foreach ($this->paginator as $web) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($web->id);?>">
+<td><?php echo $this->escapeHtml($web->web);?></td>
+<td><?php echo $this->escapeHtml($web->nummer);?></td>
+<td class="editing">
+<a href="<?php echo $this->url('web', array('action' => 'edit', 'id' => $web->id));?>">Edit</a>
+<a href="<?php echo $this->url('web', array('action' => 'delete', 'id' => $web->id));?>">Del</a>
+<a href="javascript:web_showSerienGrid('<?php echo $web->id;?>');">Sort</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<hr>
+<?php
+if ($this->paginator->count() > 1)
+{
+    echo $this->paginationControl($this->paginator, 'sliding', array(
+            'partial/paginator.phtml',
+            'Web'
+    ), array(
+            'route' => 'web',
+	    )
+	);
+}
+?>
+</div>
+<div style="clear: both"></div>
+</div>
+<div id="web_sort" class="web_sort">
+<iframe id="frame_sort" src="/frames/web_sort.php" class="frame_sort"></iframe>
+</div>
+<div id="webseriedialog" title="Webserie">
+<form>
+<fieldset>
+<input type="hidden" name="webid">
+<input type="hidden" name="serieid">
+<p><label for="titel">Titel</label></p>
+<input type="text" class="text ui-widget-content ui-corner-all" name="webserie_titel"></textarea>
+<p><label for="pfad">Pfad (ohne "/")</label></p>
+<input type="text" class="text ui-widget-content ui-corner-all" name="webserie_pfad"></textarea>
+</fieldset>
+</form>
+</div>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery.jscrollpane.css');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery-ui.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.mousewheel.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.jscrollpane.min.js');
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_web.js');
+
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(function()
+{
+	$('.scroll-pane').jScrollPane();
+    $('#serienliste').sortable();
+    $('#serienliste').disableSelection();
+
+    $('#serienliste').sortable({
+        update: function(event, ui)
+        {
+            web_updateSerienliste();
+        }
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+?>

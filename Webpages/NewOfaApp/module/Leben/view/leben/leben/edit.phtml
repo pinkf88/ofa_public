@@ -1,0 +1,11 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Leben/view/leben/leben/edit.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+        'form' => $this->form,
+        'title' => 'Leben bearbeiten',
+        'url' => 'leben',
+        'action' => 'edit',
+        'id' => $this->id,
+));

@@ -1,0 +1,68 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Land/view/land/land/index.phtml');
+ 
+$title = 'Länder';
+$this->headTitle($title);
+?>
+<div>
+<div class="rightside">
+<div class="rightside_top">
+<?php 
+echo $this->form()->openTag($this->selectform);
+echo '<p>' . $this->formRow($this->selectform->get('kontinentid')) . '</p>';
+echo '<p>' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo $this->formSubmit($this->selectform->get('submit'));
+echo $this->form()->closeTag();
+?>
+</div>
+<div class="rightside_bottom">
+<p>
+<a href="<?php echo $this->url('land', array('action'=>'add'));?>">Land hinzufügen</a>
+</p>
+<p>
+Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
+</p>
+<h3><?php echo $this->escapeHtml($title); ?></h3></div>
+</div>
+<div class="leftside">
+<table class="table">
+<tr>
+<th>Land</th>
+<th>Kurz</th>
+<th>Kontinent</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($this->paginator as $land) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($land->id);?>">
+<td><?php echo $this->escapeHtml($land->land);?></td>
+<td><?php echo $this->escapeHtml($land->kurz);?></td>
+<td><?php echo $this->escapeHtml($land->kontinent);?></td>
+<td>
+<a href="<?php echo $this->url('land',
+array('action'=>'edit', 'id' => $land->id));?>">Edit</a>
+<a href="<?php echo $this->url('land',
+array('action'=>'delete', 'id' => $land->id));?>">Del</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<?php
+if ($this->paginator->count() > 1)
+{
+	echo $this->paginationControl(
+	    $this->paginator,
+	    'sliding',
+	    array('partial/paginator.phtml', 'Land'),
+	    array(
+	        'route' => 'land',
+	    )
+	);
+}
+?>
+</div>
+<div style="clear:both"></div>
+</div>
+<?php
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_land.js');
+?>

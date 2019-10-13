@@ -1,0 +1,17 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Start/view/start/start/index.phtml');
+ 
+$title = 'Startseite';
+$this->headTitle($title);
+?>
+<h3><?php echo $this->escapeHtml($title); ?></h3>
+<p>
+Systeminfo: <?php echo php_uname(); ?>
+</p>
+<p style="margin-top: 15px">
+<span id='history'></span>
+</p>
+<?php
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_start.js');
+?>

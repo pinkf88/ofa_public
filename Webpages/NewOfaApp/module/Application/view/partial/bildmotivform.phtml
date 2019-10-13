@@ -1,0 +1,34 @@
+<h3>Motive</h3>
+<?php
+
+// $this->form->setAttribute('action', $this->url('javascript:BildMotive();'));
+
+$this->form->prepare();
+
+echo $this->form()->openTag($form);
+
+foreach ($form as $element) :
+
+	$class = '-motivliste';
+
+	if ($element->getAttribute('name') == 'aktualisieren')
+	{
+		$class = '-submit';
+	}
+	
+	print ('<div class="control-group' . $class . '">');
+
+	echo '<div class="controls">';
+	echo $this->formElement($element);
+
+	if ($element->getLabel() != "" && !($element->getAttribute('name') == 'aktualisieren'))
+		print ('<label class="control-label' . $class . '">' . $element->getLabel() . '</label>');
+
+	echo '</div>';
+	echo '</div>';
+	
+endforeach;
+
+echo $this->form()->closeTag();
+
+?>

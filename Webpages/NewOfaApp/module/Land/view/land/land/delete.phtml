@@ -1,0 +1,13 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Land/view/land/land/delete.phtml');
+
+echo $this->partial('partial/deleteform.phtml', array(
+        'title' => 'Länder',
+        'text' => $land->land,
+        'url' => $this->url('land', array(
+                'action' => 'delete',
+                'id' => $this->id
+        )),
+        'id' => $this->id
+));

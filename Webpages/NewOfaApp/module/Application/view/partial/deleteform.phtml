@@ -1,0 +1,22 @@
+<?php
+$this->headTitle($this->title);
+?>
+<h3><?php echo $this->escapeHtml($this->title); ?></h3>
+<p class="delete">
+'<?php echo $this->escapeHtml($this->text); ?>' löschen?
+</p>
+<p>
+<form action="<?php echo $this->url; ?>" method="post">
+	<div>
+		<input type="hidden" name="id" value="<?php
+if (strlen($this->id) > 10) {
+	echo $this->id;
+} else {
+	echo (int) $this->id;
+}
+?>" />
+		<input class="yesno" type="submit" name="del" value="Ja" /> <input
+			class="yesno" type="submit" name="del" value="Nein" />
+	</div>
+</form>
+</p>

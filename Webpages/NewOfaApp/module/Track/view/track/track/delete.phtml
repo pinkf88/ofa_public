@@ -1,0 +1,10 @@
+<?php
+echo $this->partial('partial/deleteform.phtml', array(
+        'title' => 'Tracks',
+        'text' => $track->titel,
+        'url' => $this->url('track', array(
+                'action' => 'delete',
+                'id' => $this->id
+        )),
+        'id' => $this->id
+));

@@ -1,0 +1,10 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Land/view/land/land/add.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Land hinzufügen',
+		'url' => 'land',
+		'action' => 'add',
+));

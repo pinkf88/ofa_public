@@ -1,0 +1,63 @@
+<?php
+$this->headTitle($this->title);
+
+echo '<h3>' . $this->escapeHtml($title) . '</h3>';
+
+if ($this->action == 'add')
+{
+	$this->form->setAttribute('action', $this->url(
+		$this->url,
+		array(
+			'action' => $this->action,
+		)
+	));
+}
+else
+{	
+	$form->setAttribute('action', $this->url(
+		$this->url,
+		array(
+			'action' => $this->action,
+			'id'     => $this->id,
+		)
+	));
+}
+
+$this->form->prepare();
+
+echo $this->form()->openTag($form);
+
+foreach ($form as $element) :
+
+	if ($element->getAttribute('type') != 'hidden')
+	{
+		print ('<div class="control-group ');
+	
+		if ($this->formElementErrors($element))
+			print ('error');
+	
+		print ('">');
+	
+		if ($element->getLabel() != "")
+			echo '<label class="control-label">' . $element->getLabel() . '</label>';
+	}
+	
+	if (!(($element->getAttribute('name') == 'submit2' || $element->getAttribute('name') == 'submit3') && $this->action == 'edit'))
+	{
+		echo '<div class="controls">';
+		echo $this->formElement($element);
+		
+		if ($this->formElementErrors($element))
+			echo '<span class="help-inline">' . $this->formElementErrors($element) . '</span>';
+		echo '</div>';
+	}
+		
+	if ($element->getAttribute('type') != 'hidden')
+	{
+		echo '</div>';
+	}
+
+endforeach;
+
+echo $this->form()->closeTag();
+echo '<a href="/' . $this->url . '">Abbrechen</a>';

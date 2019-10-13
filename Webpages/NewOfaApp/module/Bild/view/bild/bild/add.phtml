@@ -1,0 +1,10 @@
+<?php
+// $firephp = \FirePHP::getInstance(true);
+// $firephp->log('Bild/view/bild/bild/add.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Bild hinzufügen',
+		'url' => 'bild',
+		'action' => 'add',
+));

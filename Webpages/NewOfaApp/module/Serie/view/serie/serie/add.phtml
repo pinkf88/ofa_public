@@ -1,0 +1,10 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Serie/view/serie/serie/add.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Serie hinzufügen',
+		'url' => 'serie',
+		'action' => 'add',
+		));

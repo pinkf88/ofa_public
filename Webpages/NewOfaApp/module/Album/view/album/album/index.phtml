@@ -1,0 +1,174 @@
+<?php
+use Zend\Session\Container;
+
+$title = 'Alben';
+$owners = array("Alle", "JR", "EP");
+
+$this->headTitle($title);
+?>
+<div>
+<div class="rightside">
+<div id="rightside_top" class="rightside_top">
+<?php
+echo $this->form()->openTag($this->selectform);
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('ownerid')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('roomid')) . '</p>';
+echo '<hr class="selectform">';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('albumartist')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('suchtext')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo '<p class="selectform">' . $this->formSubmit($this->selectform->get('submit')) . '</p>';
+echo '<hr class="selectform">';
+echo $this->form()->closeTag();
+?>
+</div>
+<div class="rightside_information">
+<span id="albuminformation"></span>
+</div>
+<div class="rightside_bottom">
+<hr class="selectform">
+<p><span id="album_info"></span></p>
+<p>
+	<a href="javascript:album_controlTrack('info');"><span class="ui-icon ui-icon-info"></span></a> |
+	<a href="javascript:album_controlTrack('previous');"><span class="ui-icon ui-icon-seek-prev"></span></a> |
+	<a href="javascript:album_controlTrack('stop');"><span class="ui-icon ui-icon-stop"></span></a> |
+	<a href="javascript:album_controlTrack('pause');"><span class="ui-icon ui-icon-pause"></span></a> |
+	<a href="javascript:album_controlTrack('next');"><span class="ui-icon ui-icon-seek-next"></span></a>
+</p>
+<hr class="selectform">
+<p>
+<a href="javascript:album_controlTrack('new');">Neue Alben</a> |
+<a href="javascript:album_controlTrack('update');">DB aktualisieren</a> |
+<a href="<?php echo $this->url('album', array('action'=>'add'));?>">Album hinzufügen</a> |
+<span id="album_view_change"><a href="javascript:album_changeView('tabelle');">Tabelle</a></span>
+</p>
+<p>
+Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
+</p>
+<h3><?php echo $this->escapeHtml($title); ?></h3></div>
+</div>
+<div class="leftside">
+<div id="leftside_album_tabelle" class="leftside_album_tabelle">
+<table class="table">
+<tr>
+<th>Artist</th>
+<th>Album</th>
+<th>Jahr</th>
+<th>Anzahl</th>
+<th>Owner</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($this->paginator as $album) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($album->musicbrainz_albumid);?>">
+<td><?php echo $this->escapeHtml($album->albumartist);?></td>
+<td><?php echo $this->escapeHtml($album->album);?></td>
+<td>
+<?php
+$jahr = '';
+if ($album->year > 0) {
+	$jahr = '' . $album->year . ' ';
+}
+if ($album->originalyear > 0 && $album->originalyear != $album->year) {
+	$jahr .= '(' . $album->originalyear . ')';
+}
+echo $this->escapeHtml($jahr);
+?>
+</td>
+<td class="shortnumber"><?php echo $this->escapeHtml($album->anzahl);?></td>
+<td><span id="owner_<?php echo $album->musicbrainz_albumid;?>">
+<?php
+for ($i = 0; $i < count($owners); $i++) {
+	if ($album->ownerid == $i) {
+		echo '<b>' . $owners[$i] . '</b>';
+	} else {
+		echo '<a href="javascript:album_setOwner(\'' .  $album->musicbrainz_albumid . '\', '  . $i . ');">' . $owners[$i] . '</a>';
+	}
+
+	if ($i < count($owners) - 1) {
+		echo ' | ';
+	}
+}
+?>
+</span></td>
+<td>
+<a href="<?php echo $this->url('album',
+	array('action'=>'edit', 'musicbrainz_albumid' => $album->musicbrainz_albumid));?>">Edit</a>
+<a href="<?php echo $this->url('album',
+	array('action'=>'delete', 'id' => $album->musicbrainz_albumid));?>">Del</a>
+<a href="javascript:album_playAlbum('<?php echo $album->musicbrainz_albumid;?>');">Play</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<hr>
+<?php
+if ($this->paginator->count() > 1)
+{
+	echo $this->paginationControl(
+	    $this->paginator,
+	    'sliding',
+	    array('partial/paginator.phtml', 'Album'),
+	    array(
+	        'route' => 'album',
+	    )
+	);
+}
+?>
+</div>
+<div id="leftside_album_liste" class="leftside_album_liste">
+<div class="leftside_album_liste_artists">
+<ul id="artistliste"></ul>
+</div>
+<div class="leftside_album_liste_albums">
+<div id="sp_albumliste" class="albumliste scroll-pane">
+<ul id="albumliste"></ul>
+</div>
+</div>
+<div class="leftside_album_liste_tracks">
+<div id="sp_trackliste" class="trackliste scroll-pane">
+<ul id="trackliste"></ul>
+</div>
+</div>
+<div id="playlist_save_popup" class="playlist_save_popup">
+    <table id="playlist_save_popup_table">
+        <tr><td>Name:&nbsp;&nbsp;</td><td><input id="playlist_save_input" type="text"></td></tr>
+    </table>
+    <input type="button" value="Save" id="playlist_save_button" class="popup_button" />
+    <input type="button" value="Cancel" id="playlist_cancel_button" class="popup_button" />
+</div>
+<div class="leftside_album_liste_play">
+<div id="sp_playliste" class="playliste scroll-pane">
+<ul id="playliste"></ul>
+</div>
+<div id="playliste_links">
+<p>
+<a href="javascript:album_playPlaylist(1);">Play all</a> |
+<a href="javascript:album_playPlaylist(2);">Play random</a> |
+<a href="javascript:album_cleanPlaylist();">Clean</a> |
+<a href="javascript:album_sortPlaylist();">Sort</a>
+</p><p>
+<a href="javascript:album_loadPlaylist();">Load</a> |
+<a href="javascript:album_savePlaylist();">Save</a> |
+<a href="javascript:album_deletePlaylist();">Delete</a> |
+<a href="javascript:album_copyPlaylist();">Copy</a>
+</p><p>
+<select id="playlist_list"></select>&nbsp;&nbsp;
+</p>
+</div>
+</div>
+</div>
+</div>
+<div style="clear:both"></div>
+</div>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.theme.min.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/js/fancybox/jquery.fancybox.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery.jscrollpane.css');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery-ui.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.mousewheel.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.jscrollpane.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/fancybox/jquery.fancybox.js');
+$this->headScript()->appendFile($this->basePath() . '/js/js.cookie.js');
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_album.js');
+?>

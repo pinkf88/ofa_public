@@ -1,0 +1,1 @@
+Ich kenne den aktuellen Zustand nicht.

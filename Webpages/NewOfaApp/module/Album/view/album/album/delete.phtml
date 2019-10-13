@@ -1,0 +1,10 @@
+<?php
+echo $this->partial('partial/deleteform.phtml', array(
+        'title' => 'Alben',
+        'text' => $album->album,
+        'url' => $this->url('album', array(
+                'action' => 'delete',
+                'id' => $this->musicbrainz_albumid
+        )),
+        'id' => $this->musicbrainz_albumid
+));

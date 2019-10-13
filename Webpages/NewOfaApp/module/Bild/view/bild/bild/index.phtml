@@ -1,0 +1,215 @@
+<?php
+use Zend\Session\Container;
+
+function date_mysql2german($bild)
+{
+		$d = explode("-", $bild->datum);
+
+		if ($bild->jahrflag) {
+				return sprintf("%04d", $d[0]);
+		} else {
+				return sprintf("%02d.%02d.%04d", $d[2], $d[1], $d[0]);
+		}
+}
+
+$title = 'Bilder';
+$this->headTitle($title);
+?>
+<div id="bild_normal" class="bild_normal">
+<div class="rightside">
+<div class="rightside_top">
+<?php
+echo $this->form()->openTag($this->selectform);
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('bildtyp')) . $this->formRow($this->selectform->get('jahr')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('ortid')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('landid')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('nummer_von')) . $this->formRow($this->selectform->get('nummer_bis')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('suchtext')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('wertung_min')) . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo '<p class="selectform">' . $this->formSubmit($this->selectform->get('submit')) . '</p>';
+echo '<hr class="selectform">';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('serieid')) . '</p>';
+echo $this->form()->closeTag();
+?>
+<p><a href="javascript:bild_addAllToSerie();">Alle Bilder zur Serie hinzufügen</a></p>
+<hr class="selectform">
+<p><a href="javascript:bild_showBilderGrid();">Alle Bilder in Übersicht anzeigen</a></p>
+<p><a href="javascript:bild_playBilder(1);">Normal play</a> | <a href="javascript:bild_playBilder(2);">Random play</a> | <a href="javascript:bild_playBilder(3);">Long play</a></p>
+<hr class="selectform">
+</div>
+<div class="rightside_information">
+<span id="bildinformation"></span>
+</div>
+<div class="rightside_bottom">
+<hr class="selectform">
+<p>
+<a href="<?php echo $this->url('bild', array('action'=>'add'));?>">Bild hinzufügen</a>
+&nbsp;&nbsp;&nbsp;<a class="newinfo" href="javascript:bild_editInfo()">Neue Info</a>
+<?php
+if ($this->bildinfo != '')
+{
+    echo '<span id="bildinfo">(' . $this->bildinfo . ')</span>';
+}
+?>
+</p>
+<p>
+Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
+</p>
+<h3><?php echo $this->escapeHtml($title); ?></h3></div>
+</div>
+<div class="leftside">
+<table class="table">
+<tr>
+<th>
+<a href="<?php echo $this->url('bild', array('order_by' => 'nummer')); ?>">Nummer</a>
+</th>
+<th>
+<a href="<?php echo $this->url('bild', array('order_by' => 'datei')); ?>">Datei</a>
+</th>
+<th>
+<a href="<?php echo $this->url('bild', array('order_by' => 'datum')); ?>">Datum</a>
+</th>
+<th>Ort</th>
+<th>Land</th>
+<th>Beschreibung</th>
+<th>W</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($this->paginator as $bild) : ?>
+<tr class="firstline" id="<?php echo $this->escapeHtml($bild->id);?>">
+<td class="number"><?php echo $this->escapeHtml($bild->nummer);?></td>
+<td class="number">
+<?php
+if ($this->escapeHtml($bild->datei) != '0') {
+	echo $this->escapeHtml($bild->datei);
+}
+?></td>
+<td><?php echo $this->escapeHtml(date_mysql2german($bild));?></td>
+<td>
+<?php
+if ($bild->ohneort == 1) {
+    echo '<i>';
+}
+
+echo $this->escapeHtml($bild->ort);
+
+if ($bild->ohneort == 1) {
+    echo '</i>';
+}
+?>
+</td>
+<td>
+<?php
+if ($bild->ohneland == 1) {
+    echo '<i>';
+}
+
+echo $this->escapeHtml($bild->land);
+
+if ($bild->ohneland == 1) {
+    echo '</i>';
+}
+?>
+</td>
+<td>
+<?php
+if ($bild->ticket == 1) {
+    echo '<i>';
+}
+
+echo $this->escapeHtml($bild->beschreibung);
+
+if ($bild->ticket == 1) {
+    echo '</i>';
+}
+?>
+</td>
+<td>
+<?php
+echo '<span id="rat_' . $bild->id . '">';
+echo $this->escapeHtml($bild->wertung);
+echo '</span>' . "\n";
+?>
+</td>
+<td class="editing">
+<a href="<?php echo $this->url('bild',
+array('action'=>'edit', 'id' => $bild->id));?>">Edit</a>
+<a href="<?php echo $this->url('bild',
+array('action'=>'delete', 'id' => $bild->id));?>">Del</a>
+<a href="javascript:bild_addInfo('<?php echo $bild->id;?>');">Info</a>
+<?php
+if ($bild->polygon != "") {
+    echo '<b>';
+}
+
+echo '<a href="/poly.php?bildid=' . $bild->id . '">Poly</a>' . "\n";
+
+if ($bild->polygon != "") {
+    echo '</b>';
+}
+?>
+<a href="javascript:bild_addToSerie('<?php echo $bild->id;?>');">Serie</a>
+<a href="javascript:bild_editMotive('<?php echo $bild->id;?>');">Motive</a>
+</td>
+</tr>
+<?php
+if ($bild->bemerkung != '') {
+		echo '<tr class="secondline" id="' . $this->escapeHtml($bild->id) . '">';
+		echo '<td colspan="3" style="border-top: 0px; padding-top: 0px;"></td>';
+		echo '<td colspan="5" style="border-top: 0px; padding-top: 0px; white-space: pre-wrap;">' . $this->escapeHtml($bild->bemerkung) . '</td>';
+		echo '</tr>';
+}
+?>
+
+<?php endforeach; ?>
+</table>
+<hr>
+<?php
+if ($this->paginator->count() > 1) {
+		echo $this->paginationControl(
+	  		$this->paginator,
+	    	'sliding',
+	    	array('partial/paginator.phtml', 'Bild'),
+	    	array(
+	      	  'route' => 'bild',
+	    	)
+		);
+}
+?>
+</div>
+<div style="clear:both"></div>
+</div>
+<div id="bild_show" class="bild_show">
+<iframe id="frame_bild_show" src="/frames/bild_show.php" class="frame_bild_show"></iframe>
+</div>
+
+<div id="bildmotivedialog" title="Bildmotive">
+<div class="leftside_bildmotive">
+<form>
+<fieldset>
+<input type="hidden" name="bildid">
+<span id="motive"></span>
+</fieldset>
+</form>
+</div>
+<div class="rightside_bildmotive">
+<span id="bildmotive"></span>
+</div>
+</div>
+
+<div id="bildinfodialog" title="Bildmotive">
+<form>
+<fieldset>
+<p class="dialoglabel" ><label for="info">Info</label></p>
+<input type="text" class="text ui-widget-content ui-corner-all" name="bild_info"></textarea>
+</fieldset>
+</form>
+</div>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.theme.min.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/js/fancybox/jquery.fancybox.css');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery-ui.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/fancybox/jquery.fancybox.js');
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_bild.js');
+?>

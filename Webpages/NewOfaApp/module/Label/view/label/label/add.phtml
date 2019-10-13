@@ -1,0 +1,10 @@
+<?php
+$firephp = \FirePHP::getInstance(true);
+$firephp->log('Label/view/label/label/add.phtml');
+
+echo $this->partial('partial/inputform.phtml', array(
+		'form' => $this->form,
+		'title' => 'Label hinzufügen',
+		'url' => 'label',
+		'action' => 'add',
+));
