@@ -11,19 +11,11 @@
  * file.
  */
 
-// require_once(realpath(__DIR__ . '/../../vendor/firephp/FirePHPCore/FirePHP.php'));
-
-// use Zend\Log\Writer\FirePhp;
-
-// $firephp = \FirePHP::getInstance(true);
-// $firephp->log('global.php');
-
 
 return array(
     'db' => array(
         'driver'         => 'Pdo',
-        // 'dsn'            => 'mysql:dbname=myofa;host=192.168.2.227',
-        'dsn'            => 'mysql:dbname=myofa;host=DISKSTATION',
+        'dsn'            => 'mysql:dbname=ofa_pub;host=localhost',
         'driver_options' => array(
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),

@@ -11,5 +11,10 @@
         "path_ofa_backup": "c:/Backup/OfaPics/Bilder/",
         "path_hd": "c:/OfaPics/SerienHD/temp/",
         "suffix_z0": "z0"
+    },
+    "pics_2_db": {
+        "path_source_main": "c:/NeueOfaPics/",
+        "suffix_z0": "z0"
     }
+
 }

@@ -68,12 +68,6 @@ var con = mysql.createConnection({
     database: config.database.name
 });
 
-// console.log(con);
-
-String.prototype.replaceAt = function(index, replacement) {
-    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
-}
-
 function get_subpfad(nummer, jahr=0)
 {
     if (nummer > 10000000)
@@ -103,18 +97,25 @@ function get_subpfad1000(nummer, jahr=0)
 
 function check_db(file) {
     var file_temp = file;
+    var p20 = false;
 
     if (file.startsWith('go')) {
         // go3_2017_30018945
         file_temp = file.replace('_300', '_3');
+    } else  if (file.startsWith('p20')) {
+        p20 = true;
     }
 
     var datei = file_temp.replace(SUFFIX_Z0 + '.jpg', '').replace('5dii', '').replace('6dii', '')
-        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '').replace(/_/g, '');
+        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '').replace('p20','').replace(/_/g, '');
     // console.log(datei);
     
     var bild_sql = '';
     var bnummer = 0;
+
+    if (p20) {
+        datei = datei.substr(2);
+    }
 
     if (datei.startsWith('dia'))
     {

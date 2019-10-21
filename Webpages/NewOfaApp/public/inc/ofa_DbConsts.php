@@ -1,6 +1,6 @@
 <?php
 $db_ofa_server = "192.168.2.227";
-$db_ofa_database = "myofa";
+$db_ofa_database = "ofa_pub";
 $db_ofa_user = "user";
 $db_ofa_password = "passwd";
 
