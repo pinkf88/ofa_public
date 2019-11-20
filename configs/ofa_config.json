@@ -1,0 +1,36 @@
+{
+    "database":
+    {
+        "host":         "127.0.0.1",
+        "user":         "user",
+        "password":     "passwd",
+        "database":     "myofa",
+        "dateStrings":  true
+    },
+    "mailserver":
+    {
+        "user":         "jr@jr.xyz",
+        "password":     "passwd",
+        "host":         "smtp.jr.xyz",
+        "ssl":          true
+    },
+    "apps":
+    {
+        "convert": {
+            "path_source_main":     "/source_main/",
+            "path_ofa":             "/ofa/",
+            "path_ofa_backup":      "/ofa_backup/",
+            "path_hd":              "/hd/",
+            "suffix_z0":            "z0"
+        },
+        "pics_2_db": {
+            "path_source_main":     "/source_main/",
+            "suffix_z0":            "z0"
+        }
+    },
+    "other":
+    {
+        "address_from":     "jr@jr.xyz",
+        "address_to":       "jr@jr.xyz"
+    }
+}

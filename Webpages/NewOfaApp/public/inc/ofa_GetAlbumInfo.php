@@ -67,7 +67,7 @@ $albumdaten .= '<p class=\"mblink\"><a href=\"https://musicbrainz.org/release/' 
 $bilddaten = '';
 
 if ($pic == 1 && $albumartist != '') {
-    $albumartist = preg_replace("/'/", "", preg_replace("/!/", "", preg_replace("/\//", "", preg_replace("/ /", "_", strtolower($albumartist)))));
+    $albumartist = preg_replace("/\./", "", preg_replace("/'/", "", preg_replace("/!/", "", preg_replace("/\//", "", preg_replace("/ /", "_", strtolower($albumartist))))));
 
     $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"/covers/' . $albumartist . '/' . $albumid . '.jpg\">'
         . '<img class=\"mini\" src=\"/covers/' . $albumartist . '/' . $albumid . '.jpg\"></a><br>';

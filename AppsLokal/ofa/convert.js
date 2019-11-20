@@ -1,15 +1,15 @@
-var dir = require('node-dir');
-var fs = require('fs');
-var mysql = require('mysql');
-var Jimp = require('jimp');
-var config = require('./ofa_config.json');
+var dir         = require('node-dir');
+var fs          = require('fs');
+var database    = require('../../libs/lib_database.js');
+var Jimp        = require('jimp');
+var config      = require('../../configs/ofa_config.json');
 
 
-const PFAD_SOURCE_MAIN = config.convert.path_source_main;
-const PFAD_OFA = config.convert.path_ofa;
-const PFAD_OFA_BU = config.convert.path_ofa_backup;
-const PFAD_HD = config.convert.path_hd;
-const SUFFIX_Z0 = config.convert.suffix_z0;
+const PFAD_SOURCE_MAIN = config.apps.convert.path_source_main;
+const PFAD_OFA = config.apps.convert.path_ofa;
+const PFAD_OFA_BU = config.apps.convert.path_ofa_backup;
+const PFAD_HD = config.apps.convert.path_hd;
+const SUFFIX_Z0 = config.apps.convert.suffix_z0;
 
 const args = process.argv;
 // console.log(args);
@@ -61,12 +61,7 @@ var files_count = files_jpg.length;
 
 var bild_array = [];
 
-var con = mysql.createConnection({
-    host: config.database.host,
-    user: config.database.user,
-    password: config.database.password,
-    database: config.database.name
-});
+db_connection = database.connect();
 
 function get_subpfad(nummer, jahr=0)
 {
@@ -132,8 +127,13 @@ function check_db(file) {
         bild_sql = 'SELECT nummer FROM ofa_bild WHERE datei="' + datei + '" ';
     }
 
-    con.query(bild_sql, function (err, result) {
-        if (err) throw err;
+    db_connection.query(bild_sql, function (err, result) {
+        if (err) {
+            // throw err;
+            console.log('convert.js | check_db(): ERROR: ' + err.message);
+            console.log(bild_sql);
+            process.exit();
+        }
 
         if (result == null || result.length == 0) {
             console.log('Datei ' + file + ' NICHT in Datenbank vorhanden.');
@@ -258,7 +258,7 @@ function convert_bild(bild_no)
 function finish()
 {
     console.log('finish(): DB connection closed');
-    con.destroy();
+    database.disconnect(db_connection);
 }
 
 for (var i = 0; i < files_jpg.length; i++) {

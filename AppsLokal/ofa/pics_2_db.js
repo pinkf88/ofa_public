@@ -2,11 +2,12 @@ var dir = require('node-dir');
 var fs = require('fs');
 var mysql = require('mysql');
 var Jimp = require('jimp');
-var config = require('./ofa_config.json');
+var database    = require('../../libs/lib_database.js');
+var config = require('../../configs/ofa_config.json');
 
 
-const PFAD_SOURCE_MAIN = config.pics_2_db.path_source_main;
-const SUFFIX_Z0 = config.pics_2_db.suffix_z0;
+const PFAD_SOURCE_MAIN = config.apps.pics_2_db.path_source_main;
+const SUFFIX_Z0 = config.apps.pics_2_db.suffix_z0;
 
 const USE = 'node pics_2_db.js pics_path pic_number pic_date pic_location pic_description pic_remark. E.g. node pics_2_db.js bilder 1801001 2019-10-21 München Olympiapark "Im Hintergrund das BMW-Hochhaus."' 
 
@@ -23,6 +24,8 @@ if (args[2] == null) {
     PFAD_SOURCE += args[2] + '/';
 }
 
+console.log(PFAD_SOURCE);
+
 var files_all = null;
 
 try {
@@ -30,6 +33,7 @@ try {
 }
 catch(err) {
     console.log(PFAD_SOURCE + ' nicht vorhanden.')
+    // console.log(err.message);
     return;
 }
 
@@ -91,12 +95,7 @@ if (args[7] != null) {
     pic_remark = args[7];
 }
 
-var db_connection = mysql.createConnection({
-    host: config.database.host,
-    user: config.database.user,
-    password: config.database.password,
-    database: config.database.name
-});
+db_connection = database.connect();
 
 var pic_location_id = 0;
 var pic_location = '';
@@ -134,17 +133,17 @@ function check_and_add_db(file_no) {
         return;
     }
 
-    var file_temp = files_jpg[file_no].replace(/^.*[\\\/]/, '');
+    var file = files_jpg[file_no].replace(/^.*[\\\/]/, '');
     var p20 = false;
 
     if (file.startsWith('go')) {
         // go3_2017_30018945
-        file_temp = file.replace('_300', '_3');
-    } else  if (file.startsWith('p20')) {
+        file = file.replace('_300', '_3');
+    } else if (file.startsWith('p20')) {
         p20 = true;
     }
 
-    var datei = file_temp.replace(SUFFIX_Z0 + '.jpg', '').replace('5dii', '').replace('6dii', '')
+    var datei = file.replace(SUFFIX_Z0 + '.jpg', '').replace('5dii', '').replace('6dii', '')
         .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '').replace('p20','').replace(/_/g, '');
     // console.log(datei);
 
@@ -166,7 +165,7 @@ function check_and_add_db(file_no) {
                 + '(nummer, datei, datum, ortid, beschreibung, bemerkung) '
                 + 'VALUES ("' + pic_number + '", "' + datei + '", "' + pic_date + '", "' + pic_location_id + '", "' + pic_description + '", "' + pic_remark + '");';
 
-            con.query(sql_insert_bild, function (err, result) {
+            db_connection.query(sql_insert_bild, function (err, result) {
                 if (err) {
                     console.log('check_and_add_db(): Wrong SQL: ' + sql_insert_bild);
                     throw err;
@@ -187,6 +186,6 @@ function check_and_add_db(file_no) {
 function finish()
 {
     console.log('finish(): DB connection closed');
-    db_connection.destroy();
+    database.disconnect(db_connection);
     process.exit();
 }

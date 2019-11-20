@@ -50,7 +50,7 @@ $bilddaten = '';
 $bildurl = '';
 
 if ($pic == 1 && $albumartist != '') {
-    $albumartist_dir = preg_replace("/'/", "", preg_replace("/!/", "", preg_replace("/\//", "", preg_replace("/ /", "_", strtolower($albumartist)))));
+    $albumartist_dir = preg_replace("/\./", "", preg_replace("/'/", "", preg_replace("/!/", "", preg_replace("/\//", "", preg_replace("/ /", "_", strtolower($albumartist))))));
 
     $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"/covers/' . $albumartist_dir . '/' . $musicbrainz_albumid . '.jpg\">'
         . '<img class=\"mini\" src=\"/covers/' . $albumartist_dir . '/' . $musicbrainz_albumid . '.jpg\"></a><br>';
