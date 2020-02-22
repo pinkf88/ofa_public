@@ -10,10 +10,13 @@ $type = $_GET["type"];
 if ($type == 'track') {
     // Track
     if (isset($_GET["trackid"])) {
-        $response = \Httpful\Request::get('localhost:8085/audio?trackid=' . $_GET["trackid"])->send();
+        $response = \Httpful\Request::get('localhost:8085/audio?trackid=' . $_GET["trackid"] . '&runmode=' . $_GET["runmode"])->send();
     }
 } else if ($type == 'album') {
-    if (isset($_GET["albumid"])) {
+    if (isset($_GET["albumid"]) && isset($_GET["runtype"])) {
+        // Start playing album
+        $response = \Httpful\Request::get('localhost:8085/audio?albumid=' . $_GET["albumid"] . '&runtype=' . $_GET["runtype"])->send();
+    } else if (isset($_GET["albumid"])) {
         // Start playing album
         $response = \Httpful\Request::get('localhost:8085/audio?albumid=' . $_GET["albumid"])->send();
     } else if (isset($_GET["info"])) {

@@ -48,36 +48,6 @@ $(function() {
         });
     } else {
         album_listPlaylists();
-
-        $("#artist_search").on("input", function(e) {
-            var input = $(this);
-            var val = input.val().toLowerCase();
-
-            if (input.data("lastval") != val) {
-                input.data("lastval", val);
-                // console.log(val);
-
-                var elems = $(".media_album_artist_albums");
-                // console.log(elems);
-
-                for (var i = 0; i < elems.length; i++) {
-                    if (val == '' || elems[i].id.includes(val)) {
-                        elems[i].hidden = false;
-                    } else {
-                        elems[i].hidden = true;
-                    }
-                }
-
-                if (val == '') {
-                    $('.media_album_firstletter').show();
-                    $('.media_albums_intro_firstletters').show();
-                } else {
-                    $('.media_album_firstletter').hide();
-                    $('.media_albums_intro_firstletters').hide();
-                }
-            }
-
-        });
     }
 });
 
@@ -389,7 +359,7 @@ function album_setOwner(albumid, ownerid)
     });
 }
 
-function album_playAlbum(albumid)
+function album_playAlbum(albumid, runtype = 0)
 {
     var roomid = 1;
     
@@ -399,7 +369,7 @@ function album_playAlbum(albumid)
 
     $.ajax({
         type : "GET",
-        url : "inc/ofa_ControlMedia.php?type=album&albumid=" + albumid + "&roomid=" + roomid
+        url : "inc/ofa_ControlMedia.php?type=album&albumid=" + albumid + "&runtype=" + runtype + "&roomid=" + roomid
     }).done(function(data)
     {
         if (data != 'ERROR') {
@@ -434,7 +404,7 @@ function album_playArtist(artist, runtype)
     });
 }
 
-function album_playTrack(trackid)
+function album_playTrack(trackid, runmode = 0)
 {
     var roomid = 1;
     
@@ -445,7 +415,7 @@ function album_playTrack(trackid)
 
     $.ajax({
         type : "GET",
-        url : "inc/ofa_ControlMedia.php?type=track&trackid=" + trackid + "&roomid=" + roomid
+        url : "inc/ofa_ControlMedia.php?type=track&trackid=" + trackid + "&runmode=" + runmode + "&roomid=" + roomid
     }).done(function(data)
     {
         if (data != 'ERROR') {
@@ -467,7 +437,7 @@ function redrawScrollbars()
 
 var no_track_running_counter = 0;
 
-function album_controlTrack(todo)
+function album_controlTrack(todo, param = '')
 {
     var url = 'inc/ofa_ControlMedia.php?type=album&';
 
@@ -489,6 +459,10 @@ function album_controlTrack(todo)
         case 'next':
         case 'previous':
             url += 'goto=' + todo;
+            break;
+
+        case 'url':
+            url += 'goto=' + param;
             break;
 
         default:
@@ -902,7 +876,15 @@ function album_showAlbumInfo(info)
     if (info.title == undefined) {
         html = '<b>' + info + '</b>';
     } else {
-        html = '<b>' + info.title + '</b><br>' + info.artist + '<br><i>' + info.album + '</i>';
+        html = '<p><b>' + info.title + '</b><br>' + info.artist + '<br><i>' + info.album + '</i></p>';
+
+        if (info.next_tracks != undefined && info.next_tracks.length > 0) {
+            for (var i = 0; i < info.next_tracks.length; i++) {
+                html += '<p><a href="javascript:album_controlTrack(\'url\', \'' + info.next_tracks[i].url + '\');">'
+                    + info.next_tracks[i].list_no + ' | '+ info.next_tracks[i].title + '</a></p>';
+            }
+        }
+
         $('#control_cover').html('<img class="control_cover" src="' + info.image.url + '">');
     }
 

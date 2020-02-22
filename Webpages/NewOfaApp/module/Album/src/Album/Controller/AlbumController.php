@@ -127,7 +127,7 @@ class AlbumController extends AbstractActionController
             $select->where('ownerid="' . $ownerid . '"');
         }
 
-        $select->order(array('albumartistsort ASC', 'album ASC', 'year ASC'));
+        $select->order(array('albumartistsort ASC', 'year ASC', 'album ASC'));
 
         $paginator = $this->getAlbumTable()
             ->fetchAll($select);
