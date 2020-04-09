@@ -7,9 +7,6 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-// $firephp = \FirePHP::getInstance(true);
-// $firephp->log('module/Application/config/module.config.php');
-
 return array(
     'router' => array(
         'routes' => array(
@@ -53,16 +50,6 @@ return array(
                     ),
                 ),
             ),
-//        		'ticket' => array(
-//    				'type' => 'Zend\Mvc\Router\Http\Literal',
-//    				'options' => array(
-// 					'route'    => '/',
-// 					'defaults' => array(
-// 						'controller' => 'Ticket\Controller\Ticket',
-//     					'action'     => 'index',
-//     				),
-//     			),
-//        		),
             'serie' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
                 'options' => array(
@@ -139,6 +126,16 @@ return array(
                     'route'    => '/',
                     'defaults' => array(
                         'controller' => 'Track\Controller\Track',
+                        'action'     => 'index',
+                    ),
+                ),
+            ),
+            'playlist' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/',
+                    'defaults' => array(
+                        'controller' => 'Playlist\Controller\Playlist',
                         'action'     => 'index',
                     ),
                 ),

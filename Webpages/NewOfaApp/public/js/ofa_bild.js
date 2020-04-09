@@ -366,6 +366,15 @@ function bild_addInfo(bildid)
     });
 }
 
+function bild_showBildImportGrid()
+{
+    $('#frame_bild_import')[0].contentWindow.bildimport_fillGrid();
+
+    $('#bild_import').height($(window).height() - 70);
+    $('#bild_normal').hide();
+    $('#bild_import').show();
+}
+
 function bild_showBilderGrid()
 {
     $('#frame_bild_show')[0].contentWindow.bild_fillGrid(
@@ -391,10 +400,16 @@ function bild_hideBilderGrid()
     $('#bild_show').hide();
 }
 
+function bild_hideBildImportGrid()
+{
+    $('#bild_normal').show();
+    $('#bild_import').hide();
+}
+
 function bild_playBilder(runtype)
 {
     $.ajax({
-        url : "inc/ofa_ControlMedia.php?type=pictures"
+        url : "/inc/ofa_ControlMedia.php?type=pictures"
             + "&bildtyp=" + $("[name='bildtyp']")[0].value
             + "&jahr=" + $("[name='jahr']")[0].value
             + "&ortid=" + $("[name='ortid']")[0].value

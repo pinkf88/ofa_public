@@ -11,6 +11,7 @@ $this->headTitle($title);
 echo $this->form()->openTag($this->selectform);
 echo '<p class="selectform">' . $this->formRow($this->selectform->get('albumartist')) . '</p>';
 echo '<p class="selectform">' . $this->formRow($this->selectform->get('album')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('genre')) . '</p>';
 echo '<p class="selectform">' . $this->formRow($this->selectform->get('suchtext')) . '</p>';
 echo '<p class="selectform">' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
 echo '<p class="selectform">' . $this->formSubmit($this->selectform->get('submit')) . '</p>';
@@ -24,9 +25,6 @@ echo $this->form()->closeTag();
 <div class="rightside_bottom">
 <hr class="selectform">
 <p>
-<a href="<?php echo $this->url('track', array('action'=>'add'));?>">Track hinzufügen</a>
-</p>
-<p>
 Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 </p>
 <h3><?php echo $this->escapeHtml($title); ?></h3></div>
@@ -34,8 +32,8 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <div class="leftside">
 <table class="table">
 <tr>
-<th>Titel</th>
-<th>Artist</th>
+<th><a href="<?php echo $this->url('track', array('order_by' => 'title')); ?>">Titel</a></th>
+<th><a href="<?php echo $this->url('track', array('order_by' => 'artist')); ?>">Artist</a></th>
 <th>Album</th>
 <th>Nr</th>
 <th>Dauer</th>
@@ -70,11 +68,8 @@ echo $this->escapeHtml($album);
 <td><?php echo $this->escapeHtml($track->duration);?></td>
 <td><?php echo $this->escapeHtml($track->genre);?></td>
 <td>
-<a href="<?php echo $this->url('track',
-array('action'=>'edit', 'id' => $track->musicbrainz_trackid));?>">Edit</a>
-<a href="<?php echo $this->url('track',
-array('action'=>'delete', 'id' => $track->musicbrainz_trackid));?>">Del</a>
 <a href="javascript:track_playTrack('<?php echo $track->musicbrainz_trackid;?>');">Play</a>
+<a href="javascript:track_addToRunningTrack('<?php echo $track->musicbrainz_trackid;?>');">Add</a>
 </td>
 </tr>
 <?php endforeach; ?>

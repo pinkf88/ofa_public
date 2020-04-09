@@ -25,6 +25,7 @@ class TrackController extends AbstractActionController
     {
         $album = '';
         $albumartist = '';
+        $genre = '';
         $suchtext = '';
         $countperpage = 200;
 
@@ -36,6 +37,11 @@ class TrackController extends AbstractActionController
         if ($this->session->offsetExists('album'))
         {
             $album = $this->session->offsetGet('album');
+        }
+
+        if ($this->session->offsetExists('genre'))
+        {
+            $genre = $this->session->offsetGet('genre');
         }
 
         if ($this->session->offsetExists('suchtext'))
@@ -70,6 +76,15 @@ class TrackController extends AbstractActionController
                     $album = '';
                 }
 
+                if ($this->getRequest()->getPost('genre'))
+                {
+                    $genre = $this->getRequest()->getPost('genre');
+                }
+                else
+                {
+                    $genre = '';
+                }
+
                 if ($this->getRequest()->getPost('suchtext'))
                 {
                     $suchtext = $this->getRequest()->getPost('suchtext');
@@ -92,6 +107,7 @@ class TrackController extends AbstractActionController
 
         $this->session->offsetSet('albumartist', $albumartist);
         $this->session->offsetSet('album', $album);
+        $this->session->offsetSet('genre', $genre);
         $this->session->offsetSet('suchtext', $suchtext);
         $this->session->offsetSet('countperpage', $countperpage);
 
@@ -107,15 +123,31 @@ class TrackController extends AbstractActionController
             $select->where('musicbrainz_albumid="' . $album . '"');
         }
 
+        if (strlen($genre) > 0)
+        {
+            if ($genre == 2) {  // Live
+                $select->where('genre="Live"');
+            } else {
+                $select->where('genre<>"Live"');
+            }
+        }
+
         if (strlen($suchtext) > 0)
         {
             $select->where('title LIKE "%' . $suchtext . '%"');
         }
 
-        $select->order(array('albumartist ASC', 'originalyear ASC', 'year ASC', 'album ASC', 'discnumber ASC', 'track ASC'));
+        if ($this->params()->fromRoute('order_by') 
+            && $this->params()->fromRoute('order_by') == 'title')
+        {
+            $select->order(array('title ASC', 'album ASC', 'discnumber ASC', 'track ASC'));
+        }
+        else
+        {
+            $select->order(array('albumartist ASC', 'originalyear ASC', 'year ASC', 'album ASC', 'discnumber ASC', 'track ASC'));
+        }
 
-        $paginator = $this->getTrackTable()
-            ->fetchAll($select);
+        $paginator = $this->getTrackTable()->fetchAll($select);
 
         $paginator->setCurrentPageNumber((int) $this->params()->fromQuery('page', 1));
         $paginator->setItemCountPerPage($countperpage);
@@ -131,6 +163,10 @@ class TrackController extends AbstractActionController
             $selectform->get('album')->setValue($album);
         }
 
+        if (strlen($genre) > 0) {
+            $selectform->get('genre')->setValue($genre);
+        }
+
         if (strlen($suchtext) > 0) {
             $selectform->get('suchtext')->setValue($suchtext);
         }
@@ -143,6 +179,7 @@ class TrackController extends AbstractActionController
         ));
     }
 
+    /*
     public function addAction()
     {
         $dbAdapter = $this->getServiceLocator()
@@ -287,6 +324,7 @@ class TrackController extends AbstractActionController
                     ->getTrack($musicbrainz_albumid)
         );
     }
+    */
 
     public function getTrackTable()
     {

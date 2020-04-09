@@ -115,19 +115,28 @@ class AlbumController extends AbstractActionController
 
         if (strlen($albumartist) > 0)
         {
-            $select->where('albumartist="' . $albumartist . '"');
+            $select->where('albumartist="' . preg_replace('/"/', '\"', $albumartist) . '"');
         }
 
         if (strlen($suchtext) > 0)
         {
-            $select->where('album LIKE "%' . $suchtext . '%"');
+            $select->where('album LIKE "%' . preg_replace('/"/', '\"', $suchtext) . '%"');
         }
 
         if ($ownerid > 0) {
             $select->where('ownerid="' . $ownerid . '"');
         }
 
-        $select->order(array('albumartistsort ASC', 'year ASC', 'album ASC'));
+        if ($this->params()->fromRoute('order_by')) {
+            if ($this->params()->fromRoute('order_by') == 'album') {
+                $select->order(array('album ASC', 'albumartistsort ASC', 'year ASC'));
+            } else if ($this->params()->fromRoute('order_by') == 'jahr') {
+                $select->order(array('originalyear ASC', 'year ASC', 'album ASC', 'albumartistsort ASC'));
+            }
+        }
+        else {
+            $select->order(array('albumartistsort ASC', 'originalyear ASC', 'year ASC', 'album ASC'));
+        }
 
         $paginator = $this->getAlbumTable()
             ->fetchAll($select);

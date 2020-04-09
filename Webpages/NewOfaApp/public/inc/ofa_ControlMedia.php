@@ -7,7 +7,21 @@ include('./httpful.phar');
 
 $type = $_GET["type"];
 
-if ($type == 'track') {
+if ($type == 'audio') {
+    // Audio
+    if (isset($_GET["music"])) {
+        $url = 'localhost:8085/audio?caller=browser'
+            . '&music=' . $_GET["music"]
+            . '&artistid=' . $_GET["artistid"]
+            . '&year_from=' . $_GET["year_from"]
+            . '&year_to=' . $_GET["year_to"]
+            . '&runtype=2'
+            . '&roomid=' . $_GET["roomid"]
+            . '&personid=' . $_GET["personid"];
+
+        $response = \Httpful\Request::get($url)->send();
+    }
+} else if ($type == 'track') {
     // Track
     if (isset($_GET["trackid"])) {
         $response = \Httpful\Request::get('localhost:8085/audio?trackid=' . $_GET["trackid"] . '&runmode=' . $_GET["runmode"])->send();
@@ -74,6 +88,9 @@ if ($type == 'track') {
 
     // echo $request;
     $response = \Httpful\Request::get($request)->send();
+} else if ($type == 'running') {
+    $response = \Httpful\Request::get('localhost:8085/running?caller=browser&source=' . $_GET["source"]
+        . '&id=' . $_GET["id"] . '&roomid=' . $_GET["roomid"])->send();
 } else {
     echo 'Unknown type';
 }

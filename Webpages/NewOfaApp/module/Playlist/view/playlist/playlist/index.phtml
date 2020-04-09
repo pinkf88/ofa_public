@@ -1,0 +1,75 @@
+<?php
+$title = 'Playlists';
+$this->headTitle($title);
+?>
+<div class="rightside">
+    <div class="rightside_information">
+        <span id="albuminformation"></span>
+    </div>
+    <div class="rightside_bottom">
+        <hr class="selectform">
+        <p><span id="album_info"></span></p>
+        <p>
+            <a href="javascript:album_controlTrack('info');"><span class="ui-icon ui-icon-info"></span></a> |
+            <a href="javascript:album_controlTrack('previous');"><span class="ui-icon ui-icon-seek-prev"></span></a> |
+            <a href="javascript:album_controlTrack('stop');"><span class="ui-icon ui-icon-stop"></span></a> |
+            <a href="javascript:album_controlTrack('pause');"><span class="ui-icon ui-icon-pause"></span></a> |
+            <a href="javascript:album_controlTrack('next');"><span class="ui-icon ui-icon-seek-next"></span></a>
+        </p>
+    </div>
+</div>
+<div id="leftside_album_liste" class="leftside_album_liste">
+    <div class="leftside_album_liste_artists">
+        <ul id="artistliste"></ul>
+    </div>
+    <div class="leftside_album_liste_albums">
+        <div id="sp_albumliste" class="albumliste scroll-pane">
+            <ul id="albumliste"></ul>
+        </div>
+    </div>
+    <div class="leftside_album_liste_tracks">
+        <div id="sp_trackliste" class="trackliste scroll-pane">
+            <ul id="trackliste"></ul>
+        </div>
+    </div>
+    <div id="playlist_save_popup" class="playlist_save_popup">
+        <table id="playlist_save_popup_table">
+            <tr><td>Name:&nbsp;&nbsp;</td><td><input id="playlist_save_input" type="text"></td></tr>
+        </table>
+        <input type="button" value="Save" id="playlist_save_button" class="popup_button" />
+        <input type="button" value="Cancel" id="playlist_cancel_button" class="popup_button" />
+    </div>
+    <div class="leftside_album_liste_play">
+        <div id="sp_playliste" class="playliste scroll-pane">
+            <ul id="playliste"></ul>
+        </div>
+        <div id="playliste_links">
+            <p>
+                <a href="javascript:playlist_playPlaylist(1);">Play all</a> |
+                <a href="javascript:playlist_playPlaylist(2);">Play random</a> |
+                <a href="javascript:playlist_cleanPlaylist();">Clean</a> |
+                <a href="javascript:playlist_sortPlaylist();">Sort</a>
+            </p><p>
+                <a href="javascript:playlist_loadPlaylist();">Load</a> |
+                <a href="javascript:playlist_savePlaylist();">Save</a> |
+                <a href="javascript:playlist_deletePlaylist();">Delete</a> |
+                <a href="javascript:playlist_copyPlaylist();">Copy</a>
+            </p><p>
+                <select id="playlist_list"></select>&nbsp;&nbsp;
+            </p>
+        </div>
+    </div>
+</div>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery-ui.theme.min.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/js/fancybox/jquery.fancybox.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/css/jquery.jscrollpane.css');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery-ui.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.mousewheel.js');
+$this->headScript()->appendFile($this->basePath() . '/js/jquery.jscrollpane.min.js');
+$this->headScript()->appendFile($this->basePath() . '/js/fancybox/jquery.fancybox.js');
+$this->headScript()->appendFile($this->basePath() . '/js/js.cookie.js');
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_playlist.js');
+$this->inlineScript()->prependFile($this->basePath() . '/js/ofa_album.js');
+?>

@@ -50,6 +50,21 @@ class TrackSelectForm extends Form
         ));
 
         $this->add(array(
+            'name' => 'genre',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'value_options' => array(
+                    '0' => 'Alle',
+                    '1' => 'Studio',
+                    '2' => 'Live',
+                ),
+            ),
+            'attributes' => array(
+                'class' => 'lang',
+            ),
+        ));
+
+        $this->add(array(
             'name' => 'suchtext',
             'type' => 'Text',
             'attributes' => array(

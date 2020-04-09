@@ -44,7 +44,8 @@ echo $this->form()->closeTag();
 <hr class="selectform">
 <p>
 <a href="<?php echo $this->url('bild', array('action'=>'add'));?>">Bild hinzufügen</a>
-&nbsp;&nbsp;&nbsp;<a class="newinfo" href="javascript:bild_editInfo()">Neue Info</a>
+&nbsp;&nbsp;&nbsp;<a href="javascript:bild_showBildImportGrid()">Bilder importieren</a></p>
+<p><a class="newinfo" href="javascript:bild_editInfo()">Neue Info</a>
 <?php
 if ($this->bildinfo != '')
 {
@@ -181,6 +182,9 @@ if ($this->paginator->count() > 1) {
 </div>
 <div id="bild_show" class="bild_show">
 <iframe id="frame_bild_show" src="/frames/bild_show.php" class="frame_bild_show"></iframe>
+</div>
+<div id="bild_import" class="bild_import">
+<iframe id="frame_bild_import" src="/frames/bild_import.php" class="frame_bild_import"></iframe>
 </div>
 
 <div id="bildmotivedialog" title="Bildmotive">

@@ -260,7 +260,7 @@ function serie_runVision()
 {
     $.ajax({
         type : "GET",
-        url : "inc/ofa_GetVision.php?serieid=" + g_serieid + "&log=" + g_vision_log
+        url : "/inc/ofa_GetVision.php?serieid=" + g_serieid + "&log=" + g_vision_log
     }).done(function(data)
     {
         addToTextarea($('#serie_log'), data);
@@ -297,7 +297,7 @@ function serie_runVisionStop()
 function serie_playSerie(serieid, runtype)
 {
     $.ajax({
-        url : "inc/ofa_ControlMedia.php?type=series&serieid=" + serieid + "&runtype=" + runtype
+        url : "/inc/ofa_ControlMedia.php?type=series&serieid=" + serieid + "&runtype=" + runtype
     }).done(function(data)
     {
         startSeriesTimer();

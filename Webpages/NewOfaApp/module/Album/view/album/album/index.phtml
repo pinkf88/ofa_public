@@ -38,9 +38,7 @@ echo $this->form()->closeTag();
 <hr class="selectform">
 <p>
 <a href="javascript:album_controlTrack('new');">Neue Alben</a> |
-<a href="javascript:album_controlTrack('update');">DB aktualisieren</a> |
-<a href="<?php echo $this->url('album', array('action'=>'add'));?>">Album hinzufügen</a> |
-<span id="album_view_change"><a href="javascript:album_changeView('tabelle');">Tabelle</a></span>
+<a href="javascript:album_controlTrack('update');">DB aktualisieren</a>
 </p>
 <p>
 Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
@@ -51,9 +49,9 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <div id="leftside_album_tabelle" class="leftside_album_tabelle">
 <table class="table">
 <tr>
-<th>Artist</th>
-<th>Album</th>
-<th>Jahr</th>
+<th><a href="<?php echo $this->url('album'); ?>">Artist</a></th>
+<th><a href="<?php echo $this->url('album', array('order_by' => 'album')); ?>">Album</a></th>
+<th><a href="<?php echo $this->url('album', array('order_by' => 'jahr')); ?>">Jahr</a></th>
 <th>Anzahl</th>
 <th>Owner</th>
 <th>&nbsp;</th>
@@ -65,11 +63,11 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <td>
 <?php
 $jahr = '';
-if ($album->year > 0) {
-	$jahr = '' . $album->year . ' ';
+if ($album->originalyear > 0) {
+	$jahr = '' . $album->originalyear . ' ';
 }
-if ($album->originalyear > 0 && $album->originalyear != $album->year) {
-	$jahr .= '(' . $album->originalyear . ')';
+if ($album->year > 0 && $album->originalyear != $album->year) {
+	$jahr .= '(' . $album->year . ')';
 }
 echo $this->escapeHtml($jahr);
 ?>
@@ -91,10 +89,8 @@ for ($i = 0; $i < count($owners); $i++) {
 ?>
 </span></td>
 <td>
-<a href="<?php echo $this->url('album',
-	array('action'=>'edit', 'musicbrainz_albumid' => $album->musicbrainz_albumid));?>">Edit</a>
-<a href="<?php echo $this->url('album',
-	array('action'=>'delete', 'id' => $album->musicbrainz_albumid));?>">Del</a>
+<a href="javascript:album_picAdded('<?php echo $album->musicbrainz_albumid;?>');">Pic</a>
+<a href="<?php echo $this->url('album',	array('action'=>'delete', 'id' => $album->musicbrainz_albumid));?>">Del</a>
 <a href="javascript:album_playAlbum('<?php echo $album->musicbrainz_albumid;?>');">Play</a>
 </td>
 </tr>
@@ -115,48 +111,7 @@ if ($this->paginator->count() > 1)
 }
 ?>
 </div>
-<div id="leftside_album_liste" class="leftside_album_liste">
-<div class="leftside_album_liste_artists">
-<ul id="artistliste"></ul>
-</div>
-<div class="leftside_album_liste_albums">
-<div id="sp_albumliste" class="albumliste scroll-pane">
-<ul id="albumliste"></ul>
-</div>
-</div>
-<div class="leftside_album_liste_tracks">
-<div id="sp_trackliste" class="trackliste scroll-pane">
-<ul id="trackliste"></ul>
-</div>
-</div>
-<div id="playlist_save_popup" class="playlist_save_popup">
-    <table id="playlist_save_popup_table">
-        <tr><td>Name:&nbsp;&nbsp;</td><td><input id="playlist_save_input" type="text"></td></tr>
-    </table>
-    <input type="button" value="Save" id="playlist_save_button" class="popup_button" />
-    <input type="button" value="Cancel" id="playlist_cancel_button" class="popup_button" />
-</div>
-<div class="leftside_album_liste_play">
-<div id="sp_playliste" class="playliste scroll-pane">
-<ul id="playliste"></ul>
-</div>
-<div id="playliste_links">
-<p>
-<a href="javascript:album_playPlaylist(1);">Play all</a> |
-<a href="javascript:album_playPlaylist(2);">Play random</a> |
-<a href="javascript:album_cleanPlaylist();">Clean</a> |
-<a href="javascript:album_sortPlaylist();">Sort</a>
-</p><p>
-<a href="javascript:album_loadPlaylist();">Load</a> |
-<a href="javascript:album_savePlaylist();">Save</a> |
-<a href="javascript:album_deletePlaylist();">Delete</a> |
-<a href="javascript:album_copyPlaylist();">Copy</a>
-</p><p>
-<select id="playlist_list"></select>&nbsp;&nbsp;
-</p>
-</div>
-</div>
-</div>
+
 </div>
 <div style="clear:both"></div>
 </div>

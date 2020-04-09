@@ -55,7 +55,7 @@ function track_showInformation(trackid)
 function track_playTrack(trackid)
 {
     $.ajax({
-        url : "inc/ofa_ControlMedia.php?type=track&trackid=" + trackid
+        url : "/inc/ofa_ControlMedia.php?type=track&trackid=" + trackid
     }).done(function(data)
     {
     }).fail(function(jqXHR, textStatus)
