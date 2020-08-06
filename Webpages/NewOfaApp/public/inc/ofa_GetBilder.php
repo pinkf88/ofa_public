@@ -37,7 +37,7 @@ if ($jahr > 0) {
 $where_ortid = "";
 
 if ($ortid > 0) {
-    $ortid = " AND b.ortid=" . $ortid;
+    $where_ortid = " AND b.ortid=" . $ortid;
 }
 
 $where_landid = "";
@@ -57,7 +57,14 @@ if ($nummer_von > 0 && $nummer_bis == 0) {
 $where_suchtext = "";
 
 if ($suchtext != "") {
-    $where_suchtext = " AND (b.beschreibung LIKE '%" . $suchtext . "%' OR b.bemerkung LIKE '%" . $suchtext . "%')";
+    $pos = strpos($suchtext, 'DATUM');
+
+    if ($pos === false) {
+        $where_suchtext = " AND (b.beschreibung LIKE '%" . $suchtext . "%' OR b.bemerkung LIKE '%" . $suchtext . "%' OR b.info LIKE '%" . $suchtext . "%')";
+    } else {
+        $datum = explode('-', substr($suchtext, 5));
+        $where_suchtext = " AND DAY(b.datum)='" . $datum[0] . "' AND MONTH(b.datum)='" . $datum[1] . "'";
+    }
 }
 
 $where_wertung_min = "";

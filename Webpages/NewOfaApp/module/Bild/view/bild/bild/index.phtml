@@ -149,6 +149,7 @@ if ($bild->polygon != "") {
     echo '</b>';
 }
 ?>
+<a href="javascript:bild_playBild('<?php echo $this->escapeHtml($bild->nummer);?>');">Play</a>
 <a href="javascript:bild_addToSerie('<?php echo $bild->id;?>');">Serie</a>
 <a href="javascript:bild_editMotive('<?php echo $bild->id;?>');">Motive</a>
 </td>

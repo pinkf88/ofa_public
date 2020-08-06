@@ -13,10 +13,11 @@
     "colors": "^1.4.0",
     "exif-parser": "^0.1.12",
     "fs-extra": "^8.1.0",
-    "jimp": "^0.6.8",
+    "jimp": "^0.14.0",
     "jsonfile": "^5.0.0",
     "mysql": "^2.17.1",
     "node-dir": "^0.1.17",
+    "node-id3": "^0.1.16",
     "piexifjs": "^1.0.6",
     "recursive-readdir": "^2.2.2",
     "ssh2-sftp-client": "^5.1.0"

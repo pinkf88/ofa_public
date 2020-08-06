@@ -27,7 +27,7 @@ class AlbumController extends AbstractActionController
         $roomid = 1;
         $albumartist = '';
         $suchtext = '';
-        $countperpage = 200;
+        $countperpage = 250;
 
         if ($this->session->offsetExists('albumartist'))
         {
@@ -82,7 +82,7 @@ class AlbumController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 200;
+                    $countperpage = 250;
                 }
 
                 if ($this->getRequest()->getPost('ownerid'))
@@ -115,7 +115,7 @@ class AlbumController extends AbstractActionController
 
         if (strlen($albumartist) > 0)
         {
-            $select->where('albumartist="' . preg_replace('/"/', '\"', $albumartist) . '"');
+            $select->where('albumartist LIKE "' . preg_replace('/"/', '\"', $albumartist) . '%"');
         }
 
         if (strlen($suchtext) > 0)
@@ -135,7 +135,7 @@ class AlbumController extends AbstractActionController
             }
         }
         else {
-            $select->order(array('albumartistsort ASC', 'originalyear ASC', 'year ASC', 'album ASC'));
+            $select->order(array('albumartistsort ASC', 'originalyear ASC', 'album ASC', 'year ASC'));
         }
 
         $paginator = $this->getAlbumTable()

@@ -408,23 +408,52 @@ function bild_hideBildImportGrid()
 
 function bild_playBilder(runtype)
 {
+    var url = "/inc/ofa_ControlMedia.php?type=pictures"
+        + "&bildtyp=" + $("[name='bildtyp']")[0].value
+        + "&jahr=" + $("[name='jahr']")[0].value
+        + "&ortid=" + $("[name='ortid']")[0].value
+        + "&landid=" + $("[name='landid']")[0].value
+        + "&nummer_von=" + $("[name='nummer_von']")[0].value
+        + "&nummer_bis=" + $("[name='nummer_bis']")[0].value
+        + "&suchtext=" + $("[name='suchtext']")[0].value
+        + "&wertung_min=" + $("[name='wertung_min']")[0].value
+        + "&countperpage=" + $("[name='countperpage']")[0].value
+        + "&runtype=" + runtype;
+
     $.ajax({
-        url : "/inc/ofa_ControlMedia.php?type=pictures"
-            + "&bildtyp=" + $("[name='bildtyp']")[0].value
-            + "&jahr=" + $("[name='jahr']")[0].value
-            + "&ortid=" + $("[name='ortid']")[0].value
-            + "&landid=" + $("[name='landid']")[0].value
-            + "&nummer_von=" + $("[name='nummer_von']")[0].value
-            + "&nummer_bis=" + $("[name='nummer_bis']")[0].value
-            + "&suchtext=" + $("[name='suchtext']")[0].value
-            + "&wertung_min=" + $("[name='wertung_min']")[0].value
-            + "&countperpage=" + $("[name='countperpage']")[0].value
-            + "&runtype=" + runtype
+        url: url
     }).done(function(data)
     {
         ;
     }).fail(function(jqXHR, textStatus)
     {
         console.log("bild_playBilder(): " + textStatus);
+        console.log(url);
+    });
+}
+
+function bild_playBild(nummer)
+{
+    var url = "/inc/ofa_ControlMedia.php?type=pictures"
+        + "&bildtyp=0"
+        + "&jahr=0"
+        + "&ortid=0"
+        + "&landid=0"
+        + "&nummer_von=" + nummer
+        + "&nummer_bis=" + nummer
+        + "&suchtext="
+        + "&wertung_min=0"
+        + "&countperpage=0"
+        + "&runtype=" + 3;
+
+    $.ajax({
+        url: url
+    }).done(function(data)
+    {
+        ;
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log("bild_playBilder(): " + textStatus);
+        console.log(url);
     });
 }

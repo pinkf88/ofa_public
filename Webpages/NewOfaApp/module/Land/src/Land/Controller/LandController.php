@@ -31,7 +31,7 @@ class LandController extends AbstractActionController
         $firephp = \FirePHP::getInstance(true);
         
         $kontinentid = 0;
-        $countperpage = 50;
+        $countperpage = 250;
         
         if ($this->session->offsetExists('kontinentid'))
         {
@@ -74,7 +74,7 @@ class LandController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 50;
+                    $countperpage = 250;
                 }
             }
         }

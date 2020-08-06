@@ -9,13 +9,15 @@ function bild_hideBilderGrid()
 
 function bild_fillGrid(bildtyp, jahr, ortid, landid, nummer_von, nummer_bis, suchtext, wertung_min, countperpage)
 {
-    // console.log('bildtyp=' + bildtyp);
+    var url = "/inc/ofa_GetBilder.php?bildtyp=" + bildtyp + "&jahr=" + jahr + "&ortid=" + ortid + "&landid=" + landid
+        + "&nummer_von=" + nummer_von + "&nummer_bis=" + nummer_bis
+        + "&suchtext=" + suchtext + "&wertung_min=" + wertung_min + "&countperpage=" + countperpage;
+
+    // console.log('url=' + url);
 
     $.ajax({
-        dataType : "json",
-        url : "/inc/ofa_GetBilder.php?bildtyp=" + bildtyp + "&jahr=" + jahr + "&ortid=" + ortid + "&landid=" + landid
-                + "&nummer_von=" + nummer_von + "&nummer_bis=" + nummer_bis
-                + "&suchtext=" + suchtext + "&wertung_min=" + wertung_min + "&countperpage=" + countperpage
+        dataType: "json",
+        url: url
     }).done(function(data)
     {
         $('#bildergrid').empty();

@@ -74,13 +74,20 @@ div.control_room {
     margin-bottom: 15px;
 }
 
-div.control_music, div.control_artist, div.control_person, div.control_year_from {
+div.control_music, div.control_artist, div.control_person, div.control_year_from,
+div.control_country, div.control_location, div.control_year {
     float: left;
     margin-bottom: 10px;
     margin-right: 20px;
 }
 
-div.control_year_to {
+div.control_year_to, div.control_search {
+    margin-bottom: 10px;
+}
+
+.artist_search {
+    width: 250px;
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
@@ -107,12 +114,6 @@ p.media_album_artist {
 
 .media_album_tracks {
     margin-left: 15px;
-}
-
-.artist_search {
-    width: 250px;
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 
 a.red {
@@ -163,6 +164,11 @@ h3, .h3 {
 h5 {
     font-weight: bold;
     margin-top: 15px;
+}
+
+h6 {
+    font-weight: bold;
+    margin-top: 12px;
 }
 
 .navbar
@@ -278,6 +284,10 @@ textarea.bemerkung {
 
 .mittel {
     width: 150px;
+}
+
+.laenger {
+    width: 250px;
 }
 
 .lang {

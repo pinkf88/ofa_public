@@ -30,7 +30,7 @@ class MotivController extends AbstractActionController
         $firephp = \FirePHP::getInstance(true);
         
         $ortid = 0;
-        $countperpage = 50;
+        $countperpage = 250;
         
         if ($this->session->offsetExists('ortid'))
         {
@@ -73,7 +73,7 @@ class MotivController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 50;
+                    $countperpage = 250;
                 }
             }
         }

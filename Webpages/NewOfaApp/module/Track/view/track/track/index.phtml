@@ -69,7 +69,7 @@ echo $this->escapeHtml($album);
 <td><?php echo $this->escapeHtml($track->genre);?></td>
 <td>
 <a href="javascript:track_playTrack('<?php echo $track->musicbrainz_trackid;?>');">Play</a>
-<a href="javascript:track_addToRunningTrack('<?php echo $track->musicbrainz_trackid;?>');">Add</a>
+<a href="javascript:track_addToRunningTracks('<?php echo $track->musicbrainz_trackid;?>');">Add</a>
 </td>
 </tr>
 <?php endforeach; ?>

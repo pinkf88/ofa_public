@@ -154,7 +154,7 @@ function control_playPlaylist(playlist_name, runtype)
     });
 }
 
-function control_playRandom()
+function control_playMusic(runtype)
 {
     // console.log($("#control_person").val());
     var year_from = parseInt($("#control_year_from").val());
@@ -170,6 +170,7 @@ function control_playRandom()
         + "&personid=" + $("#control_person").val()
         + "&artistid=" + $("#control_artist").val()
         + "&music=" + $("#control_music").val()
+        + "&runtype=" + runtype
         + "&year_from=" + year_from
         + "&year_to=" + year_to;
 
@@ -185,6 +186,38 @@ function control_playRandom()
     }).fail(function(jqXHR, textStatus)
     {
         console.log("control_playRandom(): Database access failed: " + textStatus);
+        console.log(url);
+    });
+}
+
+function control_playPictures(runtype)
+{
+    var url = "/inc/ofa_ControlMedia.php?type=pictures"
+        + "&bildtyp=1"
+        + "&jahr=" + $("#control_year").val()
+        + "&landid=" + $("#control_country").val()
+        + "&ortid=" + $("#control_location").val()
+        + "&nummer_von="
+        + "&nummer_bis="
+        + "&wertung_min=0"
+        + "&countperpage=1000000"
+        + "&suchtext=" + $("#control_search").val()
+        + "&runtype=" + runtype;
+
+    // console.log(url);
+
+    $.ajax({
+        url: url
+    }).done(function(data)
+    {
+        if (data != 'ERROR') {
+            startSeriesTimer();
+        }
+
+        $("#lastinfo").html(data);
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log("control_playPictures(): Database access failed: " + textStatus);
         console.log(url);
     });
 }

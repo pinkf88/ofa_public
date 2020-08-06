@@ -44,7 +44,7 @@ class BildController extends AbstractActionController
         $nummer_bis = '';
         $suchtext = '';
         $wertung_min = 0;
-        $countperpage = 200;
+        $countperpage = 250;
         $serieid = 0;
 
         if ($this->session->offsetExists('bildtyp'))
@@ -188,7 +188,7 @@ class BildController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 200;
+                    $countperpage = 250;
                 }
 
                 if ($this->getRequest()->getPost('serieid'))
@@ -266,7 +266,14 @@ class BildController extends AbstractActionController
 
         if (strlen($suchtext) > 0)
         {
-            $select->where('(beschreibung LIKE "%' . $suchtext . '%" OR bemerkung LIKE "%' . $suchtext . '%" OR info LIKE "%' . $suchtext . '%")');
+            $pos = strpos($suchtext, 'DATUM');
+
+            if ($pos === false) {
+                $select->where('(beschreibung LIKE "%' . $suchtext . '%" OR bemerkung LIKE "%' . $suchtext . '%" OR info LIKE "%' . $suchtext . '%")');
+            } else {
+                $datum = explode('-', substr($suchtext, 5));
+                $select->where('DAY(ofa_bild.datum)="' . $datum[0] . '" AND MONTH(ofa_bild.datum)="' . $datum[1] . '"');
+            }
         }
 
         if (strlen($nummer_von) > 0 && strlen($nummer_bis) == 0)

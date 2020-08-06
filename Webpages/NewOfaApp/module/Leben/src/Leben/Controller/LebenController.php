@@ -33,7 +33,7 @@ class LebenController extends AbstractActionController
         $ortid = 0;
         $landid = 0;
         $suchtext = '';
-        $countperpage = 100;
+        $countperpage = 250;
         
         if ($this->session->offsetExists('jahr'))
         {
@@ -130,7 +130,7 @@ class LebenController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 100;
+                    $countperpage = 250;
                 }
             }
         }

@@ -63,3 +63,17 @@ function track_playTrack(trackid)
         console.log("Database access failed: " + textStatus);
     });
 }
+
+function track_addToRunningTracks(id)
+{
+    $.ajax({
+        type : "GET",
+        url : "/inc/ofa_ControlMedia.php?type=running&source=2&id=" + id + "&roomid=1"
+    }).done(function(data)
+    {
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log("Database access failed: " + textStatus);
+    });
+
+}

@@ -30,7 +30,7 @@ class SerieController extends AbstractActionController
         $firephp = \FirePHP::getInstance(true);
         
         $suchtext = '';
-        $countperpage = 50;
+        $countperpage = 250;
         $webid = 0;
         
         if ($this->session->offsetExists('suchtext'))
@@ -79,7 +79,7 @@ class SerieController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 50;
+                    $countperpage = 250;
                 }
                 
                 if ($this->getRequest()

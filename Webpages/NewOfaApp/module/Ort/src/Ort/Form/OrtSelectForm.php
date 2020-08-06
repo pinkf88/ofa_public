@@ -37,8 +37,7 @@ class OrtSelectForm extends Form
 			'type' => 'Zend\Form\Element\Select',
 			'options' => array(
 				'value_options' => array(
-		            '50' => '50',
-		            '200' => '200',
+		            '250' => '250',
 		            '1000' => '1000',
 		            '1000000' => 'Alle',
 			     ),

@@ -27,7 +27,7 @@ class TrackController extends AbstractActionController
         $albumartist = '';
         $genre = '';
         $suchtext = '';
-        $countperpage = 200;
+        $countperpage = 250;
 
         if ($this->session->offsetExists('albumartist'))
         {
@@ -100,7 +100,7 @@ class TrackController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 200;
+                    $countperpage = 250;
                 }
             }
         }

@@ -30,7 +30,7 @@ class OrtController extends AbstractActionController
         $firephp = \FirePHP::getInstance(true);
         
         $landid = 0;
-        $countperpage = 50;
+        $countperpage = 250;
         
         if ($this->session->offsetExists('landid'))
         {
@@ -73,7 +73,7 @@ class OrtController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 50;
+                    $countperpage = 250;
                 }
             }
         }

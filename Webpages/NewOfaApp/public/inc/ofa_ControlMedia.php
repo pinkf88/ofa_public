@@ -15,7 +15,7 @@ if ($type == 'audio') {
             . '&artistid=' . $_GET["artistid"]
             . '&year_from=' . $_GET["year_from"]
             . '&year_to=' . $_GET["year_to"]
-            . '&runtype=2'
+            . '&runtype=' . $_GET["runtype"]
             . '&roomid=' . $_GET["roomid"]
             . '&personid=' . $_GET["personid"];
 

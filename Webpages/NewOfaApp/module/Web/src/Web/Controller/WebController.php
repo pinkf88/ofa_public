@@ -30,7 +30,7 @@ class WebController extends AbstractActionController
     {
         $firephp = \FirePHP::getInstance(true);
 
-        $countperpage = 200;
+        $countperpage = 250;
         
         if ($this->session->offsetExists('countperpage'))
         {
@@ -50,7 +50,7 @@ class WebController extends AbstractActionController
                 }
                 else
                 {
-                    $countperpage = 200;
+                    $countperpage = 250;
                 }
             }
         }

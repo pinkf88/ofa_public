@@ -88,7 +88,7 @@ class LebenSelectForm extends Form
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
                 'value_options' => array(
-                    '100' => '100',
+                    '250' => '250',
                     '2000' => '1000',
                     '1000000' => 'Alle'
                 )
