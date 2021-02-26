@@ -39,7 +39,10 @@ class AlbumTable extends AbstractTableGateway
                 'year',
                 'originalyear',
                 'anzahl' => new Expression('COUNT(musicbrainz_recordingid)'),
-                'ownerid'
+                'ownerid',
+                'rating',
+                'genre',
+                'studio'
             ))
             ->group(array('musicbrainz_albumid', 'albumartist', 'albumartistsort', 'album', 'year', 'originalyear'));
 
@@ -80,40 +83,6 @@ class AlbumTable extends AbstractTableGateway
         }
 
         return $row;
-    }
-
-    public function saveAlbum(Album $album)
-    {
-        $data = array(
-                'musicbrainz_albumid' => $album->musicbrainz_albumid,
-                'albumartist' => $album->albumartist,
-                'album' => $album->album,
-                'year' => $album->year,
-                'originalyear' => $album->originalyear,
-                'ownerid' => $album->ownerid
-        );
-
-        if ($musicbrainz_albumid == 0)
-        {
-            $this->insert($data);
-            $musicbrainz_albumid = $this->lastInsertValue;
-        }
-        else
-        {
-            if ($this->getAlbum($musicbrainz_albumid))
-            {
-                $this->update($data, array(
-                    'musicbrainz_albumid' => $musicbrainz_albumid
-                ));
-            }
-            else
-            {
-                // $firephp->error('AlbumTable->saveAlbum(). Album musicbrainz_albumid does not exist');
-                throw new \Exception('Album musicbrainz_albumid does not exist');
-            }
-        }
-
-        return $musicbrainz_albumid;
     }
 
     public function deleteAlbum($musicbrainz_albumid)

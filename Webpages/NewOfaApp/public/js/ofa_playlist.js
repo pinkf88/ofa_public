@@ -1,8 +1,12 @@
 var album_data_all = null;
 
 $(function() {
+    setTimeout( function() {
+        $('#control_fancybox-overlay').hide();
+    }, 15000);
+
     $.ajax({
-        url : 'inc/ofa_GetAllMusic.php'
+        url : '/inc/ofa_GetAllMusic.php'
     }).done(function(data)
     {
         album_data_all = JSON.parse(data);
@@ -32,9 +36,12 @@ $(function() {
             $('#sp_playliste').height($(window).height() - 120);
             $('.scroll-pane').jScrollPane();
         });
+
+        $('#control_fancybox-overlay').hide();
     }).fail(function(jqXHR, textStatus)
     {
-        console.log("Database access failed: " + textStatus);
+        console.log('ERROR ofa_playlist function()' + textStatus);
+        $('#control_fancybox-overlay').hide();
     });
 });
 
@@ -195,7 +202,7 @@ function playlist_buildMenuTracks(artist_id, album_id)
         for (var k = 0; k < tracks.length; k++) {
             var title = tracks[k].title;
 
-            if (tracks[k].genre == 'Live') {
+            if (tracks[k].studio == 0) {
                 title = '<i>' + title + '</i>';
             }
 
@@ -262,7 +269,7 @@ function playlist_addTrackToPlaylist(trackid)
         var html = $('#playliste').html();
         var title = track.title;
 
-        if (track.genre == 'Live') {
+        if (track.studio == 0) {
             title = '<i>' + title + '</i>';
         }
 
@@ -298,7 +305,7 @@ function playlist_addAlbumToPlaylist(albumid)
         for (var i = 0; i < tracks.length; i++) {
             var title = tracks[i].title;
 
-            if (tracks[i].genre == 'Live') {
+            if (tracks[i].studio == 0) {
                 title = '<i>' + title + '</i>';
             }
 
@@ -477,7 +484,7 @@ function playlist_loadPlaylist()
         for (var i = 0; i < tracks.length; i++) {
             var title = tracks[i].title;
 
-            if (tracks[i].genre == 'Live') {
+            if (tracks[i].studio == 0) {
                 title = '<i>' + title + '</i>';
             }
 

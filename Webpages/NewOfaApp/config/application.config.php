@@ -1,11 +1,4 @@
 <?php
-// require_once(realpath('./vendor/firephp/FirePHPCore/FirePHP.php'));
-
-// use Zend\Log\Writer\FirePhp;
-
-// $firephp = \FirePHP::getInstance(true);
-// $firephp->log('config/application.config.php');
-
 return array(
     // This should be an array of module namespaces used in the application.
     'modules' => array(
@@ -18,9 +11,10 @@ return array(
         'Land',
     	'Ort',
         'Motiv',
-        // 'Label',
-        // 'Album',
-        // 'Track',
+        'Label',
+        'Album',
+        'Track',
+        'Playlist',
     ),
 
     // These are various options for the listeners attached to the ModuleManager

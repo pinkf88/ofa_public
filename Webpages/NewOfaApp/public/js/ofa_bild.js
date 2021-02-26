@@ -169,6 +169,7 @@ function bild_showInformation(bildid)
         output += data.nummer + '\n';
         output += data.bilddaten + '\n';
         output += data.aufnahmedatum + '\n';
+        output += data.techdaten + '\n';
         output += data.geodaten + '\n';
         output += '<i>' + data.polygon + '</i>\n';
         output += data.motivliste + '\n';

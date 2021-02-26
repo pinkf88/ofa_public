@@ -1,11 +1,8 @@
 <?php
-$firephp = \FirePHP::getInstance(true);
-$firephp->log('Serie/view/serie/serie/edit.phtml');
-
 echo $this->partial('partial/inputform.phtml', array(
-        'form' => $this->form,
-        'title' => 'Serie bearbeiten',
-        'url' => 'serie',
-        'action' => 'edit',
-        'id' => $this->id,
+    'form' => $this->form,
+    'title' => 'Serie bearbeiten',
+    'url' => 'serie',
+    'action' => 'edit',
+    'id' => $this->id,
 ));

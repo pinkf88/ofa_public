@@ -269,11 +269,47 @@ class BildController extends AbstractActionController
             $pos = strpos($suchtext, 'DATUM');
 
             if ($pos === false) {
-                $select->where('(beschreibung LIKE "%' . $suchtext . '%" OR bemerkung LIKE "%' . $suchtext . '%" OR info LIKE "%' . $suchtext . '%")');
+                $pos = strpos($suchtext, ' AND ');
+
+                if ($pos === false) {
+                    $pos = strpos($suchtext, ' OR ');
+
+                    if ($pos === false) {
+                        $where = '(beschreibung LIKE "%' . $suchtext . '%" OR bemerkung LIKE "%' . $suchtext . '%" OR info LIKE "%' . $suchtext . '%")';
+                    } else {
+                        $splits = explode(' OR ', $suchtext);
+                        $where = '(';
+    
+                        for ($i = 0; $i < count($splits); $i++) {
+                            if ($i > 0) {
+                                $where .= ' OR ';
+                            }
+    
+                            $where .= 'beschreibung LIKE "%' . $splits[$i] . '%" OR bemerkung LIKE "%' . $splits[$i] . '%" OR info LIKE "%' . $splits[$i] . '%"';
+                        }
+    
+                        $where .= ')';
+                    }
+                } else {
+                    $splits = explode(' AND ', $suchtext);
+                    $where = '(';
+
+                    for ($i = 0; $i < count($splits); $i++) {
+                        if ($i > 0) {
+                            $where .= ' AND ';
+                        }
+
+                        $where .= '(beschreibung LIKE "%' . $splits[$i] . '%" OR bemerkung LIKE "%' . $splits[$i] . '%" OR info LIKE "%' . $splits[$i] . '%")';
+                    }
+
+                    $where .= ')';
+                }
             } else {
                 $datum = explode('-', substr($suchtext, 5));
-                $select->where('DAY(ofa_bild.datum)="' . $datum[0] . '" AND MONTH(ofa_bild.datum)="' . $datum[1] . '"');
+                $where = 'DAY(ofa_bild.datum)="' . $datum[0] . '" AND MONTH(ofa_bild.datum)="' . $datum[1] . '"';
             }
+
+            $select->where($where);
         }
 
         if (strlen($nummer_von) > 0 && strlen($nummer_bis) == 0)

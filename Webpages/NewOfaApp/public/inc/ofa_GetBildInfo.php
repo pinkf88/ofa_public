@@ -19,6 +19,7 @@ $ticket = 0;
 $jahr = 0;
 $info = "";
 $aufnahmedatum = "";
+$techdaten = "";
 $polygon = "";
 $geodaten = "";
 
@@ -73,7 +74,7 @@ if ($version == 1) {
 
     $serieliste = '<p class=\"serieliste\" id=\"serieliste\">';
 
-    $sql = "SELECT ws.titel FROM $dbt_ofa_serie_bild sb, $dbt_ofa_web_serie ws WHERE sb.bildid=$bildid AND sb.serieid=ws.serieid ORDER BY ws.titel";
+    $sql = "SELECT DISTINCT ws.titel FROM $dbt_ofa_serie_bild sb, $dbt_ofa_web_serie ws WHERE sb.bildid=$bildid AND sb.serieid=ws.serieid ORDER BY ws.titel";
 
     if ($resultat = mysqli_query($db_link, $sql))
     {
@@ -109,7 +110,8 @@ if ($version == 1) {
 
     $nummer = '<p><b>' . $nummer . '</b>';
 
-    $sql = "SELECT bd.BildNr, bd.Aufnahmedatum, bd.Kameradatum, bd.Laenge, bd.Breite, bd.polygon, bd.locations FROM $dbt_ofa_bilddaten bd WHERE bd.BildNr=$datei";
+    $sql = "SELECT bd.BildNr, bd.Aufnahmedatum, bd.Kameradatum, bd.Zeit, bd.Blende, bd.ISO, bd.Brennweite, "
+        . "bd.Laenge, bd.Breite, bd.Hoehe, bd.polygon, bd.locations FROM $dbt_ofa_bilddaten bd WHERE bd.BildNr=$datei";
 
     if ($resultat = mysqli_query($db_link, $sql))
     {
@@ -127,6 +129,22 @@ if ($version == 1) {
                 {
                     $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Aufnahmedatum"] . '</p>';
                 }
+
+                $techdaten = '<p class=\"techdaten\">' . $datensatz["Zeit"] . ' / ';
+                
+                if ($datensatz["Blende"] == "") {
+                    $techdaten .= '-';
+                } else {
+                    $techdaten .= $datensatz["Blende"];
+                }
+
+                $techdaten .= ' / ISO ' . $datensatz["ISO"] . ' / ' . $datensatz["Brennweite"];
+                
+                if ($datensatz["Hoehe"] != 0 && $datensatz["Hoehe"] != '' && $datensatz["Hoehe"] != '0') {
+                    $techdaten .= ' / ' . $datensatz["Hoehe"] . ' m';
+                }
+                
+                $techdaten .= '</p>';
             }
 
             if ($datensatz["Laenge"] <> 0 && $datensatz["Breite"] <> 0) {
@@ -162,6 +180,7 @@ if ($version == 1) {
     echo '  "serieliste": "' . $serieliste . '",';
     echo '  "zusatzinfo": "' . $zusatzinfo . '",';
     echo '  "aufnahmedatum": "' . $aufnahmedatum . '",';
+    echo '  "techdaten": "' . $techdaten . '",';
     echo '  "geodaten": "' . $geodaten . '",';
     echo '  "bilddaten": "' . $bilddaten . '",';
     echo '  "polygon": "' . $polygon .  '"';

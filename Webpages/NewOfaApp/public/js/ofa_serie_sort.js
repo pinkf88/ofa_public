@@ -92,3 +92,44 @@ function serie_setDauer(serieid, bildid, dauer)
         console.log("Database access failed: " + textStatus);
     });
 }
+
+$(document).keypress(function(event) {
+    if ($(".fancybox-image").length) {
+        var span = ($("span.child")[0].innerHTML).split('|');
+        var nummer = span[0];
+        var bildid = span[1];
+        var serieid = span[2];
+
+        if (event.charCode == 112) {
+            serie_playBild(nummer);
+        } else if (event.charCode == 100) {
+            serie_deleteBild(serieid, bildid);
+        }
+    }
+});
+
+function serie_playBild(nummer)
+{
+    var url = "/inc/ofa_ControlMedia.php?type=pictures"
+        + "&bildtyp=0"
+        + "&jahr=0"
+        + "&ortid=0"
+        + "&landid=0"
+        + "&nummer_von=" + nummer
+        + "&nummer_bis=" + nummer
+        + "&suchtext="
+        + "&wertung_min=0"
+        + "&countperpage=0"
+        + "&runtype=" + 3;
+
+    $.ajax({
+        url: url
+    }).done(function(data)
+    {
+        ;
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log("serie_playBild(): " + textStatus);
+        console.log(url);
+    });
+}

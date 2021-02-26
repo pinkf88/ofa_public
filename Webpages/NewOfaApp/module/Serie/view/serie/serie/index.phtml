@@ -1,7 +1,4 @@
 <?php
-$firephp = \FirePHP::getInstance(true);
-$firephp->log('Serie/view/serie/serie/index.phtml');
-
 function date_mysql2german($datum)
 {
     if ($datum == '')
@@ -50,7 +47,6 @@ echo $this->form()->closeTag();
 </p>
 <hr class="selectform">
 <p>
-<a href="javascript:serie_controlBild('update');">Datenbank aktualisieren</a> |
 <a href="<?php echo $this->url('serie', array('action'=>'add'));?>">Serie hinzufügen</a>
 </p>
 <p>
@@ -64,8 +60,9 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <table class="table">
 <tr>
 <th>Serie</th>
-<th></th>
-<th></th>
+<th>ID</th>
+<th>Label</th>
+<th>Links</th>
 <th></th>
 </tr>
 <?php foreach ($this->paginator as $serie) : ?>
@@ -81,6 +78,39 @@ if ($serie->zusatz == 'SUBCAPTION') {
 <td class="datum">
 <?php
 echo $this->escapeHtml(date_mysql2german($serie->labelcheck));
+?>
+</td>
+<td>
+<?php
+$links = '';
+
+if ($serie->link_serie == 1 || $serie->link_land == 1 || $serie->link_ort == 1 || $serie->link_motiv == 1) {
+    if ($serie->link_serie == 0) {
+        $links .= '- / ';
+    } else {
+        $links .= 'S / ';
+    }
+
+    if ($serie->link_land == 0) {
+        $links .= '- / ';
+    } else {
+        $links .= 'L / ';
+    }
+
+    if ($serie->link_ort == 0) {
+        $links .= '- / ';
+    } else {
+        $links .= 'O / ';
+    }
+
+    if ($serie->link_motiv == 0) {
+        $links .= '-';
+    } else {
+        $links .= 'M';
+    }
+}
+
+echo $links;
 ?>
 </td>
 <td class="editing">

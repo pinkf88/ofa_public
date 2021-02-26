@@ -42,9 +42,15 @@ class TrackTable extends AbstractTableGateway
                 'albumartist',
                 'duration',
                 'genre',
+                'originalyear',
                 'year',
                 'musicbrainz_albumid',
-                'musicbrainz_trackid'
+                'musicbrainz_trackid',
+                'rating',
+                'count_play',
+                'studio',
+                'mean_volume',
+                'max_volume'
             ));
 
         // echo($select->getSqlString());
@@ -78,9 +84,11 @@ class TrackTable extends AbstractTableGateway
         $select->from($this->table)
             ->quantifier('DISTINCT')
             ->columns(array(
-                'album', 'musicbrainz_albumid', 'year'
+                'album', 'musicbrainz_albumid', 'originalyear', 'year'
             ))
-            ->order('album');
+            ->order(array(
+                'album', 'originalyear', 'year'
+            ));
 
         $resultSet = $this->selectWith($select);
         $resultSet->buffer();
@@ -99,53 +107,9 @@ class TrackTable extends AbstractTableGateway
 
         if (! $row)
         {
-            // $firephp->error('TrackTable->getTrack(). Could not find row ' . $id);
             throw new \Exception("Could not find row $id");
         }
 
         return $row;
-    }
-
-    public function saveTrack(Track $track)
-    {
-        $data = array(
-                'artist' => $track->artist,
-                'album' => $track->album,
-        );
-
-        $musicbrainz_albumid = (int) $track->musicbrainz_albumid;
-
-        // $firephp->log('TrackTable->saveTrack(). ' . $musicbrainz_albumid . "/" . $track->nummer . "/" . $track->datei . "/" . $track->datum);
-
-        if ($musicbrainz_albumid == 0)
-        {
-            /*
-            $this->insert($data);
-            $musicbrainz_albumid = $this->lastInsertValue;
-            */
-        }
-        else
-        {
-            if ($this->getTrack($id))
-            {
-                $this->update($data, array(
-                        'musicbrainz_albumid' => $musicbrainz_albumid
-                ));
-            }
-            else
-            {
-                // $firephp->error('TrackTable->saveTrack(). Track musicbrainz_albumid does not exist');
-                throw new \Exception('Track musicbrainz_albumid does not exist');
-            }
-        }
-
-        return $musicbrainz_albumid;
-    }
-
-    public function deleteTrack($id)
-    {
-        $this->delete(array(
-                'id' => (int) $id
-        ));
     }
 }

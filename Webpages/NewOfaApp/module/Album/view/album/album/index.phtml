@@ -16,7 +16,7 @@ echo '<p class="selectform">' . $this->formRow($this->selectform->get('roomid'))
 echo '<hr class="selectform">';
 echo '<p class="selectform">' . $this->formRow($this->selectform->get('albumartist')) . '</p>';
 echo '<p class="selectform">' . $this->formRow($this->selectform->get('suchtext')) . '</p>';
-echo '<p class="selectform">' . $this->formRow($this->selectform->get('countperpage')) . '</p>';
+echo '<p class="selectform">' . $this->formRow($this->selectform->get('rating')) . $this->formRow($this->selectform->get('countperpage')) . '</p>';
 echo '<p class="selectform">' . $this->formSubmit($this->selectform->get('submit')) . '</p>';
 echo '<hr class="selectform">';
 echo $this->form()->closeTag();
@@ -37,10 +37,6 @@ echo $this->form()->closeTag();
 </p>
 <hr class="selectform">
 <p>
-<a href="javascript:album_controlTrack('new');">Neue Alben</a> |
-<a href="javascript:album_controlTrack('update');">DB aktualisieren</a>
-</p>
-<p>
 Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 </p>
 <h3><?php echo $this->escapeHtml($title); ?></h3></div>
@@ -52,8 +48,11 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <th><a href="<?php echo $this->url('album'); ?>">Artist</a></th>
 <th><a href="<?php echo $this->url('album', array('order_by' => 'album')); ?>">Album</a></th>
 <th><a href="<?php echo $this->url('album', array('order_by' => 'jahr')); ?>">Jahr</a></th>
+<th>Genre</th>
 <th>Anzahl</th>
 <th>Owner</th>
+<th>Rating</th>
+<th>S/L</th>
 <th>&nbsp;</th>
 </tr>
 <?php foreach ($this->paginator as $album) : ?>
@@ -72,6 +71,7 @@ if ($album->year > 0 && $album->originalyear != $album->year) {
 echo $this->escapeHtml($jahr);
 ?>
 </td>
+<td><?php echo $this->escapeHtml($album->genre);?></td>
 <td class="shortnumber"><?php echo $this->escapeHtml($album->anzahl);?></td>
 <td><span id="owner_<?php echo $album->musicbrainz_albumid;?>">
 <?php
@@ -85,6 +85,30 @@ for ($i = 0; $i < count($owners); $i++) {
 	if ($i < count($owners) - 1) {
 		echo ' | ';
 	}
+}
+?>
+</span></td>
+<td><span id="rating_<?php echo $album->musicbrainz_albumid;?>">
+<?php
+for ($i = 0; $i <= 5; $i++) {
+	if ($album->rating == $i) {
+		echo '<b>' . $i . '</b>';
+	} else {
+		echo '<a href="javascript:album_setRating(\'' .  $album->musicbrainz_albumid . '\', '  . $i . ');">' . $i . '</a>';
+	}
+
+	if ($i < 5) {
+		echo ' | ';
+	}
+}
+?>
+</span></td>
+<td><span id="studio_<?php echo $album->musicbrainz_albumid;?>">
+<?php
+if ($album->studio == 1) {
+	echo '<a href="javascript:album_setStudioLive(\'' .  $album->musicbrainz_albumid . '\', 0);">Studio</a>';
+} else {
+	echo '<a href="javascript:album_setStudioLive(\'' .  $album->musicbrainz_albumid . '\', 1);">Live</a>';
 }
 ?>
 </span></td>

@@ -12,6 +12,25 @@ Systeminfo: <?php echo php_uname(); ?>
 <p style="margin-top: 15px">
 <span id='history'></span>
 </p>
+
+<!--
+... 
+<div style="display:none; *margin-left:-9999px; *height:0px; *position:relative; *top:-500px; *display:block ">
+<div id="mapBox" >
+<iframe id="map" width="550" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=fenway+park&amp;sll=42.291762,-71.425894&amp;sspn=0.20368,0.315514&amp;ie=UTF8&amp;hq=Fenway+Park&amp;hnear=Fenway+Park,+4+Yawkey+Way,+Boston,+Massachusetts+02215-3409&amp;z=14&amp;iwloc=A&amp;cid=10154405128186028253&amp;ll=42.346751,-71.096946&amp;output=embed"></iframe></small>
+</div>
+</div>
+ 
+<a id="inline" href="#mapBox" >Directions to Fenway Park</a>
+-->
 <?php
 $this->inlineScript()->prependFile($this->basePath() . '/js/ofa_start.js');
+
+// $this->inlineScript()->captureStart();
+// echo <<<JS
+// $(function()
+// {
+// });
+// JS;
+// $this->inlineScript()->captureEnd();
 ?>

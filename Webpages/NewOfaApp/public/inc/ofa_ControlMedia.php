@@ -20,6 +20,8 @@ if ($type == 'audio') {
             . '&personid=' . $_GET["personid"];
 
         $response = \Httpful\Request::get($url)->send();
+    } else if (isset($_GET["direction"])) {
+        $response = \Httpful\Request::get('localhost:8085/audio?direction=' . $_GET["direction"] . '&roomid=' . $_GET["roomid"])->send();
     }
 } else if ($type == 'track') {
     // Track
@@ -60,6 +62,36 @@ if ($type == 'audio') {
     } else if (isset($_GET["copy"])) {
         $response = \Httpful\Request::get('localhost:8085/playlist?copy&playlist_name=' . $_GET["playlist_name"])->send();
     }
+} else if ($type == 'flaglist') {
+    if (isset($_GET["add"])) {
+        $response = \Httpful\Request::get('localhost:8085/flaglist?add&albumid=' . $_GET["albumid"])->send();
+    } else if (isset($_GET["remove"])) {
+        $response = \Httpful\Request::get('localhost:8085/flaglist?remove&albumid=' . $_GET["albumid"])->send();
+    } else if (isset($_GET["list"])) {
+        $response = \Httpful\Request::get('localhost:8085/flaglist?list')->send();
+    }
+} else if ($type == 'starlist') {
+    if (isset($_GET["add"])) {
+        $response = \Httpful\Request::get('localhost:8085/starlist?add&albumid=' . $_GET["albumid"] . '&year=' . $_GET["year"])->send();
+    } else if (isset($_GET["remove"])) {
+        $response = \Httpful\Request::get('localhost:8085/starlist?remove&albumid=' . $_GET["albumid"] . '&year=' . $_GET["year"])->send();
+    } else if (isset($_GET["list"])) {
+        $response = \Httpful\Request::get('localhost:8085/starlist?list')->send();
+    }
+} else if ($type == 'videolist') {
+    if (isset($_GET["list"])) {
+        $response = \Httpful\Request::get('localhost:8085/videolist?list')->send();
+    } else if (isset($_GET["play"])) {
+        $response = \Httpful\Request::get('localhost:8085/videolist?play&url=' . $_GET["url"])->send();
+    } else if (isset($_GET["seek"])) {
+        $response = \Httpful\Request::get('localhost:8085/videolist?seek&url=' . $_GET["url"])->send();
+    } else if (isset($_GET["stop"])) {
+        $response = \Httpful\Request::get('localhost:8085/videolist?stop')->send();
+    } else if (isset($_GET["pause"])) {
+        $response = \Httpful\Request::get('localhost:8085/videolist?pause')->send();
+    } else if (isset($_GET["info"])) {
+        $response = \Httpful\Request::get('localhost:8085/videolist?info')->send();
+    }
 } else if ($type == 'series') {
     if (isset($_GET["serieid"]) && isset($_GET["runtype"])) {
         $response = \Httpful\Request::get('localhost:8085/series?serieid=' . $_GET["serieid"] . '&runtype=' . $_GET["runtype"])->send();
@@ -72,14 +104,6 @@ if ($type == 'audio') {
     } else if (isset($_GET["pause"])) {
         $response = \Httpful\Request::get('localhost:8085/series?pause')->send();
     }
-} else if ($type == 'manage') {
-    if (isset($_GET["audio_new"])) {
-        $response = \Httpful\Request::get('localhost:8085/manage?audio=db_new')->send();
-    } else if (isset($_GET["audio_update"])) {
-        $response = \Httpful\Request::get('localhost:8085/manage?audio=db_update')->send();
-    } else if (isset($_GET["picture"])) {
-        $response = \Httpful\Request::get('localhost:8085/manage?picture=db')->send();
-    }
 } else if ($type == 'pictures') {
     $request = 'localhost:8085/pictures?caller=browser&bildtyp=' . $_GET["bildtyp"]
         . '&jahr=' . $_GET["jahr"] . '&ortid=' . $_GET["ortid"] . '&landid=' . $_GET["landid"] . '&nummer_von=' . $_GET["nummer_von"]
@@ -88,6 +112,24 @@ if ($type == 'audio') {
 
     // echo $request;
     $response = \Httpful\Request::get($request)->send();
+} else if ($type == 'admin') {
+    if (isset($_GET["restart_webmedia"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_webmedia')->send();
+    } else if (isset($_GET["reconnect_kodi"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?reconnect_kodi')->send();
+    } else if (isset($_GET["restart_kodi"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_kodi')->send();
+    } else if (isset($_GET["restart_webhome"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_webhome')->send();
+    } else if (isset($_GET["restart_iobroker"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_iobroker')->send();
+    } else if (isset($_GET["audio_volumecheck"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?audio_volumecheck')->send();
+    } else if (isset($_GET["update_videolist"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?update_videolist')->send();
+    } else if (isset($_GET["info_iobroker"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?info_iobroker')->send();
+    }
 } else if ($type == 'running') {
     $response = \Httpful\Request::get('localhost:8085/running?caller=browser&source=' . $_GET["source"]
         . '&id=' . $_GET["id"] . '&roomid=' . $_GET["roomid"])->send();

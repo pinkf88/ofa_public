@@ -11,9 +11,6 @@ class SerieForm extends Form
 	
     public function __construct($name = null, AdapterInterface $dbAdapter = null)
     {
-    	$firephp = \FirePHP::getInstance(true);
-    	$firephp->log('SerieForm->__construct(). $name=' . $name);
-    	
     	$this->setDbAdapter($dbAdapter);
     	
         // we want to ignore the name passed
@@ -46,7 +43,51 @@ class SerieForm extends Form
                         'class' => 'textarea',
                 ),
         ));
-        
+
+        $this->add(array(
+		    'type' => 'Zend\Form\Element\Checkbox',
+		    'name' => 'link_serie',
+		    'options' => array(
+		        'label' => 'Link Serie',
+		        'use_hidden_element' => true,
+		        'checked_value' => '1',
+		        'unchecked_value' => '0'
+		    )
+		));
+
+        $this->add(array(
+		    'type' => 'Zend\Form\Element\Checkbox',
+		    'name' => 'link_land',
+		    'options' => array(
+		        'label' => 'Link Land',
+		        'use_hidden_element' => true,
+		        'checked_value' => '1',
+		        'unchecked_value' => '0'
+		    )
+		));
+
+        $this->add(array(
+		    'type' => 'Zend\Form\Element\Checkbox',
+		    'name' => 'link_ort',
+		    'options' => array(
+		        'label' => 'Link Ort',
+		        'use_hidden_element' => true,
+		        'checked_value' => '1',
+		        'unchecked_value' => '0'
+		    )
+		));
+
+        $this->add(array(
+		    'type' => 'Zend\Form\Element\Checkbox',
+		    'name' => 'link_motiv',
+		    'options' => array(
+		        'label' => 'Link Motiv',
+		        'use_hidden_element' => true,
+		        'checked_value' => '1',
+		        'unchecked_value' => '0'
+		    )
+		));
+
         $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',
@@ -55,8 +96,6 @@ class SerieForm extends Form
             'id' => 'submitbutton',
             ),
         ));
-        
-        $firephp->log('SerieForm->__construct(). ENDE');
     }
     
     protected function setDbAdapter($dbA)

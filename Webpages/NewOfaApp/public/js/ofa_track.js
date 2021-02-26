@@ -77,3 +77,26 @@ function track_addToRunningTracks(id)
     });
 
 }
+
+function track_setStudioLive(trackid, studio)
+{
+    var html = '';
+
+    if (studio == 11) {
+        html = '<a href="javascript:track_setStudioLive(\'' +  trackid + '\', 10);">Studio</a>';
+    } else {
+        html = '<a href="javascript:track_setStudioLive(\'' +  trackid + '\', 11);">Live</a>';
+    }
+    
+    $("#studio_" + trackid).html(html);
+
+    $.ajax({
+        type: 'GET',
+        url : "/inc/ofa_UpdateStudioLive.php?id=" + trackid + "&studio=" + studio
+    }).done(function(data)
+    {
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log("ERROR track_setStudioLive(): " + textStatus);
+    });
+}

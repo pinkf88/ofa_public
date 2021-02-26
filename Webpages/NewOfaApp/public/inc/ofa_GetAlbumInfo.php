@@ -6,7 +6,7 @@ $albumid = $_GET["albumid"];
 
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
-$sql = "SELECT DISTINCT t.albumartist, t.album, t.discnumber, t.totaldiscs, t.discsubtitle, t.year, t.originalyear, t.pic "
+$sql = "SELECT DISTINCT t.albumartist, t.album, t.discnumber, t.totaldiscs, t.discsubtitle, t.year, t.originalyear, t.pic, t.path "
     . "FROM $dbt_ofa_tracks t WHERE t.musicbrainz_albumid=\"" . $albumid . "\" ORDER BY t.discnumber";
 // SELECT musicbrainz_albumid, albumartist, album, year, originalyear, COUNT(musicbrainz_recordingid) FROM `ofa_tracks` GROUP BY musicbrainz_albumid, albumartist, album, year, originalyear ORDER BY albumartist, album
 // echo $sql;
@@ -18,24 +18,25 @@ $totaldiscs = 0;
 $year = 0;
 $originalyear = 0;
 $pic = 0;
+$path = '';
 
 if ($resultat = mysqli_query($db_link, $sql))
 {
     if (mysqli_num_rows ($resultat) > 0)
     {
-        while ($datensatz = mysqli_fetch_assoc ($resultat)) {
-            $albumartist = preg_replace('/"/', '\"', $datensatz["albumartist"]);
-            $album = preg_replace('/"/', '\"', $datensatz["album"]);
+        $datensatz = mysqli_fetch_assoc ($resultat);
+        $albumartist = preg_replace('/"/', '\"', $datensatz["albumartist"]);
+        $album = preg_replace('/"/', '\"', $datensatz["album"]);
 
-            if ($datensatz["discsubtitle"] != '') {
-                $discsubtitle .= $datensatz["discnumber"] . ': ' . $datensatz["discsubtitle"] . ' | ';
-            }
-
-            $totaldiscs = $datensatz["totaldiscs"];
-            $year = $datensatz["year"];
-            $originalyear = $datensatz["originalyear"];
-            $pic = $datensatz["pic"];
+        if ($datensatz["discsubtitle"] != '') {
+            $discsubtitle .= $datensatz["discnumber"] . ': ' . $datensatz["discsubtitle"] . ' | ';
         }
+
+        $totaldiscs = $datensatz["totaldiscs"];
+        $year = $datensatz["year"];
+        $originalyear = $datensatz["originalyear"];
+        $pic = $datensatz["pic"];
+        // $path = $datensatz["path"]; // preg_replace('/\/', '\\', $datensatz["path"]);
     }
 
     mysqli_free_result($resultat);
@@ -62,7 +63,13 @@ if ($originalyear > 0 && $originalyear != $year) {
 }
 
 $albumdaten .= '<p class=\"year\">' . $jahr . '</p>';
-$albumdaten .= '<p class=\"mblink\"><a href=\"https://musicbrainz.org/release/' . $albumid . '\">MusicBrainz</a></p>';
+$albumdaten .= '<p class=\"path\">' . $path . '</p>';
+
+if (strlen($albumid) == 36) {
+    $albumdaten .= '<p class=\"mblink\"><a href=\"https://musicbrainz.org/release/' . $albumid . '\">MusicBrainz</a></p>';
+}
+
+$albumdaten .= '<p class=\"albumid\">' . $albumid . '</p>';
 
 $bilddaten = '';
 

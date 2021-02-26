@@ -10,7 +10,6 @@ class TrackSelectForm extends Form
         parent::__construct();
 
         $selectDataArtist = array();
-
         $selectDataArtist['0'] = 'Alle Künstler';
 
         foreach ($resultSetArtists as $res)
@@ -19,12 +18,17 @@ class TrackSelectForm extends Form
         }
 
         $selectDataAlbum = array();
-
         $selectDataAlbum['0'] = 'Alle Alben';
 
         foreach ($resultSetAlbums as $res)
         {
-            $selectDataAlbum[$res->musicbrainz_albumid] = $res->album . ' (' . $res->year . ')';
+            $year = $res->originalyear;
+
+            if ($res->year != $res->originalyear) {
+                $year .= '/' . $res->year;
+            }
+
+            $selectDataAlbum[$res->musicbrainz_albumid] = $res->album . ' (' . $year . ')';
         }
 
         $this->add(array(

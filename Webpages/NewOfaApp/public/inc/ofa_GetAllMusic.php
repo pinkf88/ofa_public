@@ -4,7 +4,8 @@ include_once "ofa_Database.php";
 
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
-$sql = 'SELECT DISTINCT t.id, t.musicbrainz_trackid, t.albumartist, t.albumartistsort, t.album, t.discnumber, t.totaldiscs, t.musicbrainz_albumid, t.year, t.originalyear, t.track, t.title, t.duration, t.genre '
+$sql = 'SELECT DISTINCT t.id, t.musicbrainz_trackid, t.albumartist, t.albumartistsort, t.album, t.discnumber, t.totaldiscs, t.musicbrainz_albumid, '
+    . 't.year, t.originalyear, t.track, t.title, t.duration, t.genre, t.studio '
     . 'FROM ' . $dbt_ofa_tracks . ' t ORDER BY t.albumartistsort, t.albumartist, t.album, t.year, t.musicbrainz_albumid, t.discnumber, t.track';
 // echo $sql;
 
@@ -74,7 +75,9 @@ if ($resultat = mysqli_query($db_link, $sql))
                 echo ",\n";
             }
 
-            echo '            { "id": "' . $datensatz["id"] . '", "trackid": "' . $datensatz["musicbrainz_trackid"] . '", "track": "' . $datensatz["track"] . '", "title": "' . preg_replace( '/"/', '\"', $datensatz["title"]) . '", "duration": "' . $datensatz["duration"] . '", "genre": "' . $datensatz["genre"] . '" }';
+            echo '            { "id": "' . $datensatz["id"] . '", "trackid": "' . $datensatz["musicbrainz_trackid"] . '", "track": "' . $datensatz["track"] . '", '
+                . '"title": "' . preg_replace( '/"/', '\"', $datensatz["title"]) . '", "duration": "' . $datensatz["duration"] . '", '
+                . '"genre": "' . $datensatz["genre"] . '", "studio": ' . $datensatz["studio"] . ' }';
         }
     }
 

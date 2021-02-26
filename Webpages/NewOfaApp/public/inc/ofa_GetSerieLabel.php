@@ -37,7 +37,10 @@ if ($resultat = mysqli_query($db_link, $sql))
         {
             $serie_labels .= '<span id=\"label' . $datensatz["labelid"] . '\">'
                 . '<a href=\"javascript:serie_invalidLabelForSerie(' . $serieid . ',' . $datensatz["labelid"] . ')\">'
-                . $datensatz["label_de"] . ' / ' . $datensatz["label_en"] . '</a></span><br>';
+                . '<b>' . $datensatz["label_de"] . ' / ' . $datensatz["label_en"] . '</b></a>'
+                . ' | <a href=\"javascript:serie_showBilderWithLabel(' . $datensatz["labelid"] . ')\">Show</a>'
+                . ' | <a href=\"javascript:serie_showBilderWithLabel(0)\">All</a>'
+                . '</span><br>';
         }
     }
 
@@ -73,9 +76,10 @@ if ($resultat = mysqli_query($db_link, $sql))
 
                 $bildinfo = ofa_GetBildPfad($datensatz["nummer"], $datensatz["ticket"], $datensatz["jahr"]);
                 $labels = '| ';
+                $label_ids = 'id_';
 
                 if ($datensatz["version"] > 0) {
-                    $sql = "SELECT DISTINCT bl.id AS bildlabelid, lb.label_en, lb.label_de, bl.score, bl.valid "
+                    $sql = "SELECT DISTINCT bl.id AS bildlabelid, lb.id AS labelid, lb.label_en, lb.label_de, bl.score, bl.valid "
                     . "FROM $dbt_ofa_bild_label bl, $dbt_ofa_label lb "
                     . "WHERE bl.labelid=lb.id AND bl.bildid=" . $datensatz['bildid'] . " AND bl.version=" . $datensatz["version"] . " AND lb.used=1 "
                     . "ORDER BY bl.score DESC";
@@ -100,6 +104,8 @@ if ($resultat = mysqli_query($db_link, $sql))
 
                                 $labels .= '<span id=\"bl' . $datensatz_label["bildlabelid"] . '\"><a' . $aclass . ' href=\"javascript:' . $jscall . '(' . $datensatz_label["bildlabelid"] . ')\">' . $label . '</a></span>';
                                 $labels .= ' | ';
+
+                                $label_ids .= $datensatz_label["labelid"] . '_';
                             }
                         }
                     }
@@ -111,6 +117,10 @@ if ($resultat = mysqli_query($db_link, $sql))
                     $labels = '';
                 }
 
+                if ($label_ids == 'id_') {
+                    $label_ids = '';
+                }
+
                 $bilddaten = "";
 
                 if (strlen($bildinfo["pfad"]) > 0)
@@ -119,7 +129,7 @@ if ($resultat = mysqli_query($db_link, $sql))
                          . '<img class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a></div>';
                 }
 
-                $serie_bilder .= '<li class=\"bildertable\">' . $bilddaten
+                $serie_bilder .= '<li id=\"' .  $label_ids . '\" class=\"bildertable_element\">' . $bilddaten
                     . '<div class=\"bildertable_label\"><span class=\"bildertable_nummer\">' . $datensatz["nr"] . ' - ' . $datensatz["nummer"] . '</span>'
                     . '<span class=\"bildertable_beschreibung\"> - ' . $datensatz["ort"];
 

@@ -35,32 +35,33 @@ if ($resultat = mysqli_query($db_link, $sql))
 {
     if (mysqli_num_rows($resultat) > 0)
     {
-        while ($datensatz = mysqli_fetch_assoc($resultat))
-        {
+        while ($datensatz = mysqli_fetch_assoc($resultat)) {
             $serie_anzahl ++;
 
             $bildinfo = ofa_GetBildPfad($datensatz["nummer"], $datensatz["ticket"], $datensatz["jahr"]);
 
             $bilddaten = "";
 
-            if (strlen($bildinfo["pfad"]) > 0)
-            {
-                $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"' . $bildinfo["pfad"] . '.jpg\"><img class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a><br>';
+            if (strlen($bildinfo["pfad"]) > 0) {
+                $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"' . $bildinfo["pfad"] . '.jpg\" title=\"' . $datensatz["nummer"] . '|'  . $datensatz["bildid"] . '|' . $serieid . '\">'
+                    . '<img class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a><br>';
             } else if (strpos ($datensatz["beschreibung"], 'YOUTUBE') !== false) {
                 $bilddaten = $datensatz["ort"] . '<br>';
             }
 
             $serie_bilder .= '<li id=\"id' . $datensatz["bildid"] . '\" class=\"ui-state-default\">'
-                . $datensatz["nr"] . ' | ' . $datensatz["nummer"] . ' | '
-                . '<span id=\"dur' . $datensatz["bildid"] . '\">' . $datensatz["dauer"] . ' Sekunden</span>'
-                . '<br>' . $bilddaten
-                . '<a href=\"javascript:serie_editBild(' . $serieid . ',' . $datensatz["bildid"] . ')\">Edit</a>&nbsp;&nbsp;'
-                . '<a href=\"javascript:serie_deleteBild(' . $serieid . ',' . $datensatz["bildid"] . ')\">Del</a>&nbsp;&nbsp;|&nbsp;&nbsp;'
-                . '<a href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',2)\">2</a> '
-                . '<a href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',5)\">5</a> '
-                . '<a href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',8)\">8</a> '
-                . '<a href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',15)\">15</a> '
-                . '<a href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',30)\">30</a>'
+                . '<div class=\"bildergrid\"><div>' . $datensatz["nr"] . ' | ' . $datensatz["nummer"] . ' | '
+                . '<span id=\"dur' . $datensatz["bildid"] . '\">' . $datensatz["dauer"] . ' Sekunden</span></div>'
+                . '<div>' . $bilddaten . '</div>'
+                . '<div class=\"bildergrid_wertung\">'
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_editBild(' . $serieid . ',' . $datensatz["bildid"] . ')\">Edit</a>&nbsp;&nbsp;'
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_deleteBild(' . $serieid . ',' . $datensatz["bildid"] . ')\">Del</a>&nbsp;&nbsp;|&nbsp;&nbsp;'
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',2)\">2</a> '
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',5)\">5</a> '
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',8)\">8</a> '
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',15)\">15</a> '
+                . '<a style=\"color: #2a8af2;\" href=\"javascript:serie_setDauer(' . $serieid . ',' . $datensatz["bildid"] . ',30)\">30</a>'
+                . '</div></div>'
                 . '</li>';
         }
     }

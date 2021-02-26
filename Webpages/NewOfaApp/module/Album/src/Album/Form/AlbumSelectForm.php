@@ -71,6 +71,24 @@ class AlbumSelectForm extends Form
         ));
 
         $this->add(array(
+            'name' => 'rating',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'value_options' => array(
+                        '0' => '0',
+                        '1' => '1',
+                        '2' => '2',
+                        '3' => '3',
+                        '4' => '4',
+                        '5' => '5',
+                ),
+            ),
+            'attributes' => array(
+                'class' => 'mittel',
+            ),
+        ));
+
+        $this->add(array(
             'name' => 'countperpage',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(

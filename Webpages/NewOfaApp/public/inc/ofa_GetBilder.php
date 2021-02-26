@@ -15,7 +15,6 @@ $countperpage = 0 + $_GET["countperpage"];
 
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
-$bilder = "";
 $anzahl = 0;
 
 $where_bildtyp = "";
@@ -56,14 +55,50 @@ if ($nummer_von > 0 && $nummer_bis == 0) {
 
 $where_suchtext = "";
 
-if ($suchtext != "") {
-    $pos = strpos($suchtext, 'DATUM');
+if (strlen($suchtext) > 0) {
+    $where_suchtext = " AND ";
+
+    $pos = strpos($suchtext, "DATUM");
 
     if ($pos === false) {
-        $where_suchtext = " AND (b.beschreibung LIKE '%" . $suchtext . "%' OR b.bemerkung LIKE '%" . $suchtext . "%' OR b.info LIKE '%" . $suchtext . "%')";
+        $pos = strpos($suchtext, " AND ");
+
+        if ($pos === false) {
+            $pos = strpos($suchtext, " OR ");
+
+            if ($pos === false) {
+                $where_suchtext .= "(beschreibung LIKE '%" . $suchtext . "%' OR bemerkung LIKE '%" . $suchtext . "%' OR info LIKE '%" . $suchtext . "%')";
+            } else {
+                $splits = explode(" OR ", $suchtext);
+                $where_suchtext .= "(";
+
+                for ($i = 0; $i < count($splits); $i++) {
+                    if ($i > 0) {
+                        $where_suchtext .= " OR ";
+                    }
+
+                    $where_suchtext .= "beschreibung LIKE '%" . $splits[$i] . "%' OR bemerkung LIKE '%" . $splits[$i] . "%' OR info LIKE '%" . $splits[$i] . "%'";
+                }
+
+                $where_suchtext .= ")";
+            }
+        } else {
+            $splits = explode(" AND ", $suchtext);
+            $where_suchtext .= "(";
+
+            for ($i = 0; $i < count($splits); $i++) {
+                if ($i > 0) {
+                    $where_suchtext .= " AND ";
+                }
+
+                $where_suchtext .= "(beschreibung LIKE '%" . $splits[$i] . "%' OR bemerkung LIKE '%" . $splits[$i] . "%' OR info LIKE '%" . $splits[$i] . "%')";
+            }
+
+            $where_suchtext .= ")";
+        }
     } else {
-        $datum = explode('-', substr($suchtext, 5));
-        $where_suchtext = " AND DAY(b.datum)='" . $datum[0] . "' AND MONTH(b.datum)='" . $datum[1] . "'";
+        $datum = explode("-", substr($suchtext, 5));
+        $where_suchtext .= "DAY(ofa_bild.datum)='" . $datum[0] . "' AND MONTH(ofa_bild.datum)='" . $datum[1] . "'";
     }
 }
 
@@ -79,55 +114,70 @@ if ($countperpage > 0) {
     $limit = " LIMIT " . $countperpage;
 }
 
+$bilder = array();
 
-$sql = "SELECT b.id AS bildid, b.nummer, YEAR(b.datum) AS jahr, b.ticket, b.beschreibung, b.wertung, o.ort "
-    . "FROM $dbt_ofa_bild b, $dbt_ofa_ort o WHERE b.ortid=o.id "
+$sql = "SELECT b.id AS bildid, bd.Kamera, bd.objektiv, b.nummer, YEAR(b.datum) AS jahr, b.ticket, b.beschreibung, b.wertung, o.ort "
+    . "FROM ofa_bild b LEFT JOIN ofa_bilddaten bd ON (b.datei = bd.BildNr), ofa_ort o WHERE b.ortid=o.id AND b.beschreibung NOT LIKE \"YOUTUBE%\" "
     . $where_bildtyp . $where_jahr . $where_ortid . $where_landid . $where_nummern . $where_suchtext . $where_wertung_min
     . " ORDER BY jahr DESC, b.nummer" . $limit;
 
 // echo $sql;
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows($resultat) > 0)
-    {
-        while ($datensatz = mysqli_fetch_assoc($resultat))
-        {
-            $anzahl ++;
-
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows($resultat) > 0) {
+        while ($datensatz = mysqli_fetch_assoc($resultat)) {
             $bildinfo = ofa_GetBildPfad($datensatz["nummer"], $datensatz["ticket"], $datensatz["jahr"]);
 
-            $bilddaten = "";
-
-            if (strlen($bildinfo["pfad"]) > 0)
-            {
-                $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"' . $bildinfo["pfad"] . '.jpg\" title=\"' . $datensatz["bildid"] . ' | ' . $datensatz["wertung"] . '\">'
-                    . '<img id=\"img' . $datensatz["bildid"] . '\" class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a><br>';
-            } else if (strpos ($datensatz["beschreibung"], 'YOUTUBE') !== false) {
-                $bilddaten = $datensatz["ort"] . '<br>';
-            }
-
-            $bilder .= '<li id=\"id' . $datensatz["bildid"] . '\" class=\"ui-state-default\">'
-                . $datensatz["nummer"] . ' | '
-                . '<span id=\"wertung' . $datensatz["bildid"] . '\">Wertung: ' . $datensatz["wertung"] . '</span>'
-                . '<br>' . $bilddaten
-                . '<a href=\"javascript:bild_setWertung(' . $datensatz["bildid"] . ',0)\">0</a> '
-                . '<a href=\"javascript:bild_setWertung(' . $datensatz["bildid"] . ',1)\">1</a> '
-                . '<a href=\"javascript:bild_setWertung(' . $datensatz["bildid"] . ',2)\">2</a> '
-                . '<a href=\"javascript:bild_setWertung(' . $datensatz["bildid"] . ',3)\">3</a> '
-                . '<a href=\"javascript:bild_setWertung(' . $datensatz["bildid"] . ',4)\">4</a> '
-                . '<a href=\"javascript:bild_setWertung(' . $datensatz["bildid"] . ',5)\">5</a>'
-                . '</li>';
+            $bilder[] = '|' . $datensatz["bildid"] . '|' . $datensatz["nummer"] . '|' . $datensatz["Kamera"] . '|' . $datensatz["objektiv"] . '|'
+                . $datensatz["wertung"] . '|' . $bildinfo["pfad"] . '|' . $bildinfo["extension"];
+            
+            $anzahl ++;
         }
     }
 
     mysqli_free_result($resultat);
 }
 
+$sql = 'SELECT DISTINCT bd.Kamera FROM ofa_bild b LEFT JOIN ofa_bilddaten bd ON (b.datei = bd.BildNr), ofa_ort o WHERE bd.Kamera IS NOT NULL AND bd.Kamera!="" AND b.ortid=o.id '
+    . $where_bildtyp . $where_jahr . $where_ortid . $where_landid . $where_nummern . $where_suchtext . $where_wertung_min
+    . ' ORDER BY bd.Kamera';
+
+$kameras = array();
+
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows($resultat) > 0) {
+        while ($datensatz = mysqli_fetch_assoc($resultat)) {
+            $kameras[] = $datensatz["Kamera"];
+        }
+    }
+}
+
+// echo json_encode($kameras);
+    
+$sql = 'SELECT DISTINCT bd.objektiv FROM ofa_bild b LEFT JOIN ofa_bilddaten bd ON (b.datei = bd.BildNr), ofa_ort o WHERE bd.objektiv IS NOT NULL AND bd.objektiv!="" AND b.ortid=o.id '
+    . $where_bildtyp . $where_jahr . $where_ortid . $where_landid . $where_nummern . $where_suchtext . $where_wertung_min
+    . ' ORDER BY bd.objektiv';
+
+$objektive = array();
+
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows($resultat) > 0) {
+        while ($datensatz = mysqli_fetch_assoc($resultat)) {
+            $objektive[] = $datensatz["objektiv"];;
+        }
+    }
+}
+
+// echo json_encode($objektive);
+
+
 echo '{';
 echo '  "anzahl": "' . $anzahl . '",';
-echo '  "bilder": "' . $bilder . '"';
+echo '  "bilder": ' . json_encode($bilder) . ',';
+echo '  "kameras": ' . json_encode($kameras) . ',';
+echo '  "objektive":' . json_encode($objektive);
 echo '}';
+
 
 mysqli_close($db_link);
 ?>

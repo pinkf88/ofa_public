@@ -126,9 +126,9 @@ class TrackController extends AbstractActionController
         if (strlen($genre) > 0)
         {
             if ($genre == 2) {  // Live
-                $select->where('genre="Live"');
+                $select->where('studio=0');
             } else {
-                $select->where('genre<>"Live"');
+                $select->where('studio=1');
             }
         }
 
@@ -178,153 +178,6 @@ class TrackController extends AbstractActionController
                 'selectform' => $selectform
         ));
     }
-
-    /*
-    public function addAction()
-    {
-        $dbAdapter = $this->getServiceLocator()
-            ->get('Zend\Db\Adapter\Adapter');
-
-        $form = new TrackForm(null, $dbAdapter);
-        $form->get('submit')
-            ->setValue('Ok');
-
-        $request = $this->getRequest();
-
-        if ($request->isPost())
-        {
-            $Track = new Track($dbAdapter);
-            $form->setInputFilter($Track->getInputFilter());
-            $form->setData($request->getPost());
-
-            if ($form->isValid())
-            {
-                $Track->exchangeArray($form->getData());
-
-                $validator = new NoRecordExists(array(
-                        'adapter' => $dbAdapter,
-                        'table' => 'ofa_tracks',
-                        'field' => 'musicbrainz_albumid'
-                ));
-
-                if ($validator->isValid($Track->Track))
-                {
-                    $this->getTrackTable()
-                        ->saveTrack($Track);
-
-                    // Redirect to list of Tracks
-                    return $this->redirect()
-                        ->toRoute('Track');
-                }
-            }
-        }
-
-        return array(
-                'form' => $form
-        );
-    }
-
-    public function editAction()
-    {
-        $musicbrainz_albumid = $this->params()
-            ->fromRoute('musicbrainz_albumid', 0);
-
-        if (! $musicbrainz_albumid)
-        {
-            return $this->redirect()
-                ->toRoute('Track', array(
-                    'action' => 'add'
-            ));
-        }
-
-        $Track = '';
-
-        // Get the Track with the specified id. An exception is thrown
-        // if it cannot be found, in which case go to the index page.
-        try
-        {
-            $Track = $this->getTrackTable()
-                ->getTrack($musicbrainz_albumid);
-        }
-        catch (\Exception $ex)
-        {
-            return $this->redirect()
-                ->toRoute('Track', array(
-                    'action' => 'index'
-            ));
-        }
-
-        $dbAdapter = $this->getServiceLocator()
-            ->get('Zend\Db\Adapter\Adapter');
-
-        $form = new TrackForm(null, $dbAdapter);
-        $form->bind($Track);
-
-        $form->get('submit')
-            ->setValue('Ändern');
-
-        $request = $this->getRequest();
-
-        if ($request->isPost())
-        {
-            $form->setInputFilter($Track->getInputFilter());
-            $form->setData($request->getPost());
-
-            // print_r($request->getPost());
-
-            if ($form->isValid())
-            {
-                $this->getTrackTable()
-                    ->saveTrack($Track);
-
-                // Redirect to list of Tracks
-                return $this->redirect()
-                    ->toRoute('Track');
-            }
-        }
-
-        return array(
-                'musicbrainz_albumid' => $musicbrainz_albumid,
-                'form' => $form
-        );
-    }
-
-    public function deleteAction()
-    {
-        $musicbrainz_albumid = $this->params()
-            ->fromRoute('musicbrainz_albumid', 0);
-
-        if (! $musicbrainz_albumid)
-        {
-            return $this->redirect()
-                ->toRoute('Track');
-        }
-
-        $request = $this->getRequest();
-
-        if ($request->isPost())
-        {
-            $del = $request->getPost('del', 'Nein');
-
-            if ($del == 'Ja')
-            {
-                $musicbrainz_albumid = $request->getPost('musicbrainz_albumid');
-                $this->getTrackTable()
-                    ->deleteTrack($musicbrainz_albumid);
-            }
-
-            // Redirect to list of Tracks
-            return $this->redirect()
-                ->toRoute('Track');
-        }
-
-        return array(
-                'musicbrainz_albumid' => $musicbrainz_albumid,
-                'Track' => $this->getTrackTable()
-                    ->getTrack($musicbrainz_albumid)
-        );
-    }
-    */
 
     public function getTrackTable()
     {

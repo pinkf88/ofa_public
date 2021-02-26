@@ -38,6 +38,9 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <th>Nr</th>
 <th>Dauer</th>
 <th>Genre</th>
+<th>S/L</th>
+<th>Vols</th>
+<th>Plays</th>
 <th>&nbsp;</th>
 </tr>
 <?php foreach ($this->paginator as $track) : ?>
@@ -46,9 +49,11 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <td>
 <?php
 $artist = $track->artist;
+
 if ($artist == '') {
 	$artist = $track->albumartist;
 }
+
 if ($artist == 'AC') {
 	$artist = $track->albumartist;
 }
@@ -67,6 +72,21 @@ echo $this->escapeHtml($album);
 <td class="shortnumber"><?php echo $this->escapeHtml($track->track);?></td>
 <td><?php echo $this->escapeHtml($track->duration);?></td>
 <td><?php echo $this->escapeHtml($track->genre);?></td>
+<td><span id="studio_<?php echo $track->musicbrainz_trackid;?>">
+<?php
+if ($track->studio == 1) {
+	echo '<a href="javascript:track_setStudioLive(\'' .  $track->musicbrainz_trackid . '\', 10);">Studio</a>';
+} else {
+	echo '<a href="javascript:track_setStudioLive(\'' .  $track->musicbrainz_trackid . '\', 11);">Live</a>';
+}
+?>
+</span></td>
+<td class="volumes">
+<?php
+echo number_format($track->mean_volume, 1) . ' / ' . number_format($track->max_volume, 1);
+?>
+</td>
+<td class="shortnumber"><?php echo $this->escapeHtml($track->count_play);?></td>
 <td>
 <a href="javascript:track_playTrack('<?php echo $track->musicbrainz_trackid;?>');">Play</a>
 <a href="javascript:track_addToRunningTracks('<?php echo $track->musicbrainz_trackid;?>');">Add</a>

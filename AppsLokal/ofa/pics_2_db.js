@@ -1,184 +1,168 @@
-var dir = require('node-dir');
-var fs = require('fs');
-var mysql = require('mysql');
-var Jimp = require('jimp');
-var database    = require('../../libs/lib_database.js');
-var config = require('../../configs/ofa_config.json');
+var ArgumentParser  = require('argparse').ArgumentParser;
+var recursive       = require('recursive-readdir');
+var path            = require('path');
+var sizeOf          = require('image-size');
+var colors          = require('colors');
+var database        = require('../libs/lib_database.js');
+var config          = require('../../configs/ofa_config.json');
 
 
-const PFAD_SOURCE_MAIN = config.apps.pics_2_db.path_source_main;
-const SUFFIX_Z0 = config.apps.pics_2_db.suffix_z0;
-
-const USE = 'node pics_2_db.js pics_path pic_number pic_date pic_location pic_description pic_remark. E.g. node pics_2_db.js bilder 1801001 2019-10-21 München Olympiapark "Im Hintergrund das BMW-Hochhaus."' 
-
-const args = process.argv;
-// console.log(args);
-
-var PFAD_SOURCE = PFAD_SOURCE_MAIN;
-
-if (args[2] == null) {
-    console.log('Path missing (can be "". Correct use: ' + USE);
-    return;
-} else {
-    // pics_path
-    PFAD_SOURCE += args[2] + '/';
-}
-
-console.log(PFAD_SOURCE);
-
-var files_all = null;
-
-try {
-    files_all = dir.files(PFAD_SOURCE, { sync: true });
-}
-catch(err) {
-    console.log(PFAD_SOURCE + ' nicht vorhanden.')
-    // console.log(err.message);
-    return;
-}
-
-if (files_all == null || files_all.length < 1) {
-    console.log('Keine Dateien vorhanden.');
-    return;
-}
-
-// console.log(files_all);
-files_all.sort();
-
-var files_jpg = files_all.filter(function(a)
-{
-    return a.toUpperCase().includes(SUFFIX_Z0.toUpperCase() + '.JPG');
+var parser = new ArgumentParser({
+    add_help:        false,
+    description:    'mavic_panos'
 });
 
-// console.log(files_jpg);
-console.log(files_jpg.length + ' jpg-Dateien im Verzeichnis "' + PFAD_SOURCE + '".');
-
-if (files_jpg.length < 1) {
-    console.log('Keine Dateien vorhanden.');
-    return;
-}
-
-var pic_number = 0;
-
-if (args[3] == null) {
-    console.log('Picture start number missing. Correct use: ' + USE);
-    return;
-} else {
-    // pic_number
-    pic_number = parseInt(args[3], 10);
-
-    if (pic_number <= 0) {
-        console.log('Invalid picture start number (' + pic_number + '). Correct use: ' + USE);
-        return;
+parser.add_argument(
+    '--root',   // e.g. "E:/OfaPics/SerienHD"
+    {
+        required: false
     }
+);
+
+parser.add_argument(
+    '--dir',   // Directory
+    {
+        required: false
+    }
+);
+
+parser.add_argument(
+    '-u',
+    {
+        help: 'Update.',
+        action: 'store_true'
+    }
+);
+
+var args = parser.parse_args();
+
+var root_dir = 'E:/OfaPics/SerienHD';
+
+if (args.root != undefined && args.root != '') {
+    root_dir = args.root;
+
 }
 
-var pic_date = '';
+var sub_dir = '';
 
-if (args[4] == null) {
-    console.log('Picture date (e.g. 2019-10-21) missing. Correct use: ' + USE);
-    return;
-} else {
-    // pic_date
-    pic_date = args[4];
+if (args.dir != undefined && args.dir != '') {
+    sub_dir = '' + args.dir;
+    
 }
 
-var pic_description = '';
+var update = false;
 
-if (args[6] != null) {
-    pic_description = args[6];
+if (args.u != undefined && args.u != '') {
+    update = args.u;
+    
 }
 
-var pic_remark = '';
+var db_connection = database.connect();
 
-if (args[7] != null) {
-    pic_remark = args[7];
-}
+var file_no = 0;
+var file_hds = [];
 
-db_connection = database.connect();
+recursive(root_dir, function (err, files) {
+    if (err) {
+        console.log('pics_2_db | readDirectory(): ' + err.message);
+        finish();
+    }
 
-var pic_location_id = 0;
-var pic_location = '';
+    for (var i = 0; i < files.length; i++) {
+        if (sub_dir != '' && files[i].replace(/\\/g, '/').includes(sub_dir)) {
+            var file_hd = {
+                pfad:       files[i].replace(/\\/g, '/'),
+                nummer:     parseInt(path.basename(files[i].replace(/\\/g, '/').substr(root_dir.length)))
+            };
 
-if (args[5] == null) {
-    console.log('Picture location missing. Correct use: ' + USE);
-    finish;
-} else {
-    // pic_location
-    pic_location = args[5];
-
-    var ort_sql = 'SELECT id FROM ofa_ort WHERE ort="' + pic_location + '" ';
-
-    db_connection.query(ort_sql, function (err, result) {
-        if (err) {
-            console.log('check_and_add_db(): Wrong SQL: ' + ort_sql);
-            throw err;
-            finish();
+            file_hds.push(file_hd);
         }
+    }
 
-        if (result == null || result.length == 0) {
-            console.log('Invalid location (' + pic_location + '). Correct use: ' + USE);
-            finish();
-        } else {
-            pic_location_id = result[0].id;
+    // console.log(file_hds);
 
-            check_and_add_db(0);
-        }
-    });
-}
+    if (file_hds.length > 0) {
+        checkAndWriteDb(0);
+    } else {
+        finish();
+    }
+});
 
-function check_and_add_db(file_no) {
-    if (file_no >= files_jpg.length) {
+function checkAndWriteDb(file_no)
+{
+    if (file_no >= file_hds.length) {
         finish();
         return;
     }
 
-    var file = files_jpg[file_no].replace(/^.*[\\\/]/, '');
-    var p20 = false;
-
-    if (file.startsWith('go')) {
-        // go3_2017_30018945
-        file = file.replace('_300', '_3');
-    } else if (file.startsWith('p20')) {
-        p20 = true;
+    var sql = 'SELECT b.id, b.nummer, b.hd_path FROM ofa_bild b WHERE b.nummer="' + file_hds[file_no].nummer + '"';
+    
+    if (update == false) {
+        sql += ' AND (b.hd_path IS NULL OR b.hd_path=\"\");';
     }
 
-    var datei = file.replace(SUFFIX_Z0 + '.jpg', '').replace('5dii', '').replace('6dii', '')
-        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '').replace('p20','').replace(/_/g, '');
-    // console.log(datei);
+    // console.log(sql);
 
-    if (p20) {
-        datei = datei.substr(2);
-    }
-
-    var bild_select_sql = 'SELECT nummer FROM ofa_bild WHERE datei="' + datei + '" ';
-
-    db_connection.query(bild_select_sql, function (err, result) {
+    db_connection.query(sql, function (err, result) {
         if (err) {
-            console.log('check_and_add_db(): Wrong SQL: ' + bild_select_sql);
-            throw err;
-            finish();
+            console.log(err.message);
+
+            setTimeout(function() {
+                connectDatabase();
+                checkAndWriteDb(jahr, gruppe); 
+            }, 60000);
+
+            return;
         }
 
+        // console.log(result);
+
         if (result == null || result.length == 0) {
-            var sql_insert_bild = 'INSERT INTO ofa_bild '
-                + '(nummer, datei, datum, ortid, beschreibung, bemerkung) '
-                + 'VALUES ("' + pic_number + '", "' + datei + '", "' + pic_date + '", "' + pic_location_id + '", "' + pic_description + '", "' + pic_remark + '");';
+            // console.log('Bild ' + file_hds[file_no].nummer + ' existiert nicht in Datenbank oder hat schon einen Pfad.');
 
-            db_connection.query(sql_insert_bild, function (err, result) {
-                if (err) {
-                    console.log('check_and_add_db(): Wrong SQL: ' + sql_insert_bild);
-                    throw err;
-                    finish();
-                }
+            file_no++;
 
-                // console.log(bildnr + " | Result: insertId=" + result.insertId + ' / changedRows=' + result.changedRows);
-                pic_number++;
-                check_and_add_db(file_no + 1);
-            });
+            setTimeout(function() {
+                checkAndWriteDb(file_no); 
+            }, 1);
         } else {
-            console.log('Datei ' + files_jpg[file_no] + ' schon in Datenbank vorhanden.');
-            finish();
+            var dimensions = sizeOf(file_hds[file_no].pfad);
+            var hd_path = file_hds[file_no].pfad.substr(root_dir.length);
+            var hd_path_old = result[0]['hd_path'];
+
+            if (hd_path != hd_path_old) {
+                var sql = 'UPDATE ofa_bild b SET b.hd_path="' + hd_path + '", b.hd_width="' + dimensions.width + '", b.hd_height="' + dimensions.height + '" WHERE b.id="' + result[0]['id'] + '";';
+                // console.log(sql);
+
+                db_connection.query(sql, function (err, result) {
+                    if (err) {
+                        console.log(err.message);
+                        console.log(sql);
+                        setTimeout(function() {
+                            connectDatabase();
+                            checkAndWriteDb(jahr, gruppe); 
+                        }, 60000);
+
+                        return;
+                    }
+
+                    console.log('UPDATED | ' + file_hds[file_no].nummer + ': alt=' + hd_path_old + ' / neu=' + hd_path + ' | ' + dimensions.width + '/' + dimensions.height);
+
+                    file_no++;
+
+                    setTimeout(function() {
+                        checkAndWriteDb(file_no); 
+                    }, 1);
+                });
+            } else {
+                console.log('NOT UPDATED | ' + file_hds[file_no].nummer + ': alt=' + hd_path_old + ' / neu=' + hd_path + ' | ' + dimensions.width + '/' + dimensions.height);
+
+                file_no++;
+
+                setTimeout(function() {
+                    checkAndWriteDb(file_no); 
+                }, 1);
+            }
         }
     });
 }
@@ -186,6 +170,5 @@ function check_and_add_db(file_no) {
 function finish()
 {
     console.log('finish(): DB connection closed');
-    database.disconnect(db_connection);
-    process.exit();
+    db_connection.destroy();
 }

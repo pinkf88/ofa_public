@@ -1,13 +1,10 @@
 <?php
-$firephp = \FirePHP::getInstance(true);
-$firephp->log('Serie/view/serie/serie/delete.phtml');
- 
 echo $this->partial('partial/deleteform.phtml', array(
-        'title' => 'Serien',
-        'text' => $serie->serie,
-        'url' => $this->url('serie', array(
-                'action' => 'delete',
-                'id' => $this->id
-        )),
+    'title' => 'Serien',
+    'text' => $serie->serie,
+    'url' => $this->url('serie', array(
+        'action' => 'delete',
         'id' => $this->id
+    )),
+    'id' => $this->id
 ));

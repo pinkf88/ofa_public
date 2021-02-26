@@ -113,8 +113,8 @@ function serie_showBilder(serieid)
     var output = "";
 
     $.ajax({
-        dataType: "json",
-        url : "/inc/ofa_GetSerie.php?serieid=" + serieid
+        dataType:   "json",
+        url:        "/inc/ofa_GetSerie.php?serieid=" + serieid
     }).done(function(data)
     {
         // console.log(data);
@@ -125,10 +125,11 @@ function serie_showBilder(serieid)
         output += '<b>' + data.serie + '</b><br>\n';
         output += data.serie_anzahl + ' Bilder\n';
 
-        $("#serieinformation").html(output);
+        $('#serieinformation').html(output);
+        $('.bildergrid_wertung').hide();
     }).fail(function(jqXHR, textStatus)
     {
-        console.log("Database access failed: " + textStatus);
+        console.log('serie_showBilder: ' + textStatus);
     });
 
     $(".fancybox").fancybox();
@@ -197,11 +198,19 @@ function serie_addToWeb(serieid)
         $('input[name=webid]').val($('select[name=webid]').val());
         $('input[name=serieid]').val(serieid);
         $('input[name=webserie_titel]').val(data.serie);
-        $('input[name=webserie_pfad]').val(data.serie.split(' ').join('_').toLowerCase().replace(/:/g, ''));
+
+        var splits = data.serie.split(' | ');
+
+        if (splits[0] == 'Highlights') {
+            $('input[name=webserie_pfad]').val(splits[2].toLowerCase().replace(/ /g, '_'));
+        } else {
+            $('input[name=webserie_pfad]').val(data.serie.split(' ').join('_').toLowerCase().replace(/:/g, ''));
+        }
+        
         $("#webseriedialog").dialog("open");
     }).fail(function(jqXHR, textStatus)
     {
-        console.log("Database access failed: " + textStatus);
+        console.log("serie_addToWeb ERROR: " + textStatus);
     });
 }
 
@@ -324,11 +333,11 @@ var no_picture_showing_counter = 0;
 
 function serie_controlBild(todo)
 {
-    var url = 'inc/ofa_ControlMedia.php?type=series&';
+    var url = '/inc/ofa_ControlMedia.php?type=series&';
 
     switch (todo) {
         case 'update':
-            url = 'inc/ofa_ControlMedia.php?type=manage&picture';
+            url = '/inc/ofa_ControlMedia.php?type=manage&picture';
             break;
 
         case 'info':

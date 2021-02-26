@@ -4,7 +4,7 @@ function ofa_getRootPfadBilder()
 //    if (strpos(php_uname(), 'DiskStation') === false)
 //        return '/home/jr/ofa/Bilder/';
 
-    return '/media/backup4/BackupPC4/OfaPics/Bilder/';
+    return '/media/vol2/BilderBearbeitet/Bilder/';
 }
 
 function ofa_getBildPfad($nummer, $ticket, $jahr)

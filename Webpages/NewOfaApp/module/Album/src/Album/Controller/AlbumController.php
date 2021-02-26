@@ -24,6 +24,7 @@ class AlbumController extends AbstractActionController
     public function indexAction()
     {
         $ownerid = 0;
+        $rating = 0;
         $roomid = 1;
         $albumartist = '';
         $suchtext = '';
@@ -47,6 +48,11 @@ class AlbumController extends AbstractActionController
         if ($this->session->offsetExists('ownerid'))
         {
             $ownerid = intval($this->session->offsetGet('ownerid'));
+        }
+
+        if ($this->session->offsetExists('rating'))
+        {
+            $rating = intval($this->session->offsetGet('rating'));
         }
 
         if ($this->session->offsetExists('roomid'))
@@ -94,6 +100,15 @@ class AlbumController extends AbstractActionController
                     $ownerid = 0;
                 }
 
+                if ($this->getRequest()->getPost('rating'))
+                {
+                    $rating = intval($this->getRequest()->getPost('rating'));
+                }
+                else
+                {
+                    $rating = 0;
+                }
+
                 if ($this->getRequest()->getPost('roomid'))
                 {
                     $roomid = intval($this->getRequest()->getPost('roomid'));
@@ -127,6 +142,10 @@ class AlbumController extends AbstractActionController
             $select->where('ownerid="' . $ownerid . '"');
         }
 
+        if ($rating > 0) {
+            $select->where('rating>="' . $rating . '"');
+        }
+
         if ($this->params()->fromRoute('order_by')) {
             if ($this->params()->fromRoute('order_by') == 'album') {
                 $select->order(array('album ASC', 'albumartistsort ASC', 'year ASC'));
@@ -156,6 +175,7 @@ class AlbumController extends AbstractActionController
         }
         
         $selectform->get('ownerid')->setValue($ownerid);
+        $selectform->get('rating')->setValue($rating);
         $selectform->get('roomid')->setValue($roomid);
         $selectform->get('countperpage')->setValue($countperpage);
 
@@ -163,115 +183,6 @@ class AlbumController extends AbstractActionController
                 'paginator' => $paginator,
                 'selectform' => $selectform
         ));
-    }
-
-    public function addAction()
-    {
-        $dbAdapter = $this->getServiceLocator()
-            ->get('Zend\Db\Adapter\Adapter');
-
-        $form = new AlbumForm(null, $dbAdapter);
-        $form->get('submit')
-            ->setValue('Ok');
-
-        $request = $this->getRequest();
-
-        if ($request->isPost())
-        {
-            $Album = new Album($dbAdapter);
-            $form->setInputFilter($Album->getInputFilter());
-            $form->setData($request->getPost());
-
-            if ($form->isValid())
-            {
-                $Album->exchangeArray($form->getData());
-
-                $validator = new NoRecordExists(array(
-                        'adapter' => $dbAdapter,
-                        'table' => 'ofa_tracks',
-                        'field' => 'musicbrainz_albumid'
-                ));
-
-                if ($validator->isValid($Album->Album))
-                {
-                    $this->getAlbumTable()
-                        ->saveAlbum($Album);
-
-                    // Redirect to list of Albums
-                    return $this->redirect()
-                        ->toRoute('Album');
-                }
-            }
-        }
-
-        return array(
-                'form' => $form
-        );
-    }
-
-    public function editAction()
-    {
-        $musicbrainz_albumid = $this->params()
-            ->fromRoute('musicbrainz_albumid', 0);
-
-        if (! $musicbrainz_albumid)
-        {
-            return $this->redirect()
-                ->toRoute('Album', array(
-                    'action' => 'add'
-            ));
-        }
-
-        $Album = '';
-
-        // Get the Album with the specified id. An exception is thrown
-        // if it cannot be found, in which case go to the index page.
-        try
-        {
-            $Album = $this->getAlbumTable()
-                ->getAlbum($musicbrainz_albumid);
-        }
-        catch (\Exception $ex)
-        {
-            return $this->redirect()
-                ->toRoute('Album', array(
-                    'action' => 'index'
-            ));
-        }
-
-        $dbAdapter = $this->getServiceLocator()
-            ->get('Zend\Db\Adapter\Adapter');
-
-        $form = new AlbumForm(null, $dbAdapter);
-        $form->bind($Album);
-
-        $form->get('submit')
-            ->setValue('Ändern');
-
-        $request = $this->getRequest();
-
-        if ($request->isPost())
-        {
-            $form->setInputFilter($Album->getInputFilter());
-            $form->setData($request->getPost());
-
-            // print_r($request->getPost());
-
-            if ($form->isValid())
-            {
-                $this->getAlbumTable()
-                    ->saveAlbum($Album);
-
-                // Redirect to list of Albums
-                return $this->redirect()
-                    ->toRoute('Album');
-            }
-        }
-
-        return array(
-                'musicbrainz_albumid' => $musicbrainz_albumid,
-                'form' => $form
-        );
     }
 
     public function deleteAction()

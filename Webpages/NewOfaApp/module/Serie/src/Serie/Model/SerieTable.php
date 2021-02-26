@@ -16,9 +16,6 @@ class SerieTable extends AbstractTableGateway
 
     public function __construct(Adapter $adapter)
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieTable->__construct()');
-        
         $this->adapter = $adapter;
         $this->resultSetPrototype = new ResultSet();
         $this->resultSetPrototype->setArrayObjectPrototype(new Serie($adapter));
@@ -28,8 +25,6 @@ class SerieTable extends AbstractTableGateway
 
     public function fetchAll(Select $select = null)
     {
-        $firephp = \FirePHP::getInstance(true);
-        
         if (null === $select)
             $select = new Select();
         
@@ -38,10 +33,13 @@ class SerieTable extends AbstractTableGateway
                 'id',
                 'serie',
                 'zusatz',
-                'labelcheck'
+                'labelcheck',
+                'extras',
+                'link_serie',
+                'link_land',
+                'link_ort',
+                'link_motiv'
         ));
-        
-        $firephp->log('SerieTable->fetchAll(). SQL: ' . $select->getSqlString());
         
         $paginatorAdapter = new DbSelect($select, $this->adapter, $this->resultSetPrototype);
         
@@ -51,20 +49,14 @@ class SerieTable extends AbstractTableGateway
 
     public function getSerie($id)
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieTable->getSerie()');
-        
         $id = (int) $id;
         $rowset = $this->select(array(
-                'id' => $id
+            'id' => $id
         ));
+
         $row = $rowset->current();
         
-        $firephp->log('SerieTable->getSerie(). $id=' . $id . '. $serie=' . $row->serie);
-        
-        if (! $row)
-        {
-            $firephp->error('SerieTable->getSerie(). Could not find row ' . $id);
+        if (! $row) {
             throw new \Exception("Could not find row $id");
         }
         
@@ -73,32 +65,29 @@ class SerieTable extends AbstractTableGateway
 
     public function saveSerie(Serie $serie)
     {
-        $firephp = \FirePHP::getInstance(true);
-        
         $id = (int) $serie->id;
         
-        $firephp->log('SerieTable->saveSerie(). ' . $id . "/" . $serie->serie);
-        
         $data = array(
-                'serie' => $serie->serie,
-                'zusatz' => $serie->zusatz
+            'serie' => $serie->serie,
+            'zusatz' => $serie->zusatz,
+            'extras' => $serie->extras,
+            'link_serie' => $serie->link_serie,
+            'link_land' => $serie->link_land,
+            'link_ort' => $serie->link_ort,
+            'link_motiv' => $serie->link_motiv
         );
         
-        if ($id == 0)
-        {
+        if ($id == 0) {
             $this->insert($data);
         }
         else
         {
-            if ($this->getSerie($id))
-            {
+            if ($this->getSerie($id)) {
                 $this->update($data, array(
-                        'id' => $id
+                    'id' => $id
                 ));
             }
-            else
-            {
-                $firephp->error('SerieTable->saveSerie(). Serie id does not exist');
+            else {
                 throw new \Exception('Serie id does not exist');
             }
         }
@@ -106,11 +95,8 @@ class SerieTable extends AbstractTableGateway
 
     public function deleteSerie($id)
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieTable->deleteSerie()');
-        
         $this->delete(array(
-                'id' => (int) $id
+            'id' => (int) $id
         ));
     }
 }

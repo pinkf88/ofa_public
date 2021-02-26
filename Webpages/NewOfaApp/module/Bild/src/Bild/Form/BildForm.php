@@ -7,10 +7,6 @@ class BildForm extends Form
 {
     public function __construct($resultSet)
     {
-    	// $firephp = \FirePHP::getInstance(true);
-    	// $firephp->log('BildForm->__construct().');
-
-        // we want to ignore the name passed
         parent::__construct('bild');
 
         $selectData = array();

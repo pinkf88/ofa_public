@@ -19,16 +19,11 @@ class SerieController extends AbstractActionController
 
     public function __construct()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieController->__construct().');
-        
         $this->session = new Container('ofa_serie');
     }
 
     public function indexAction()
     {
-        $firephp = \FirePHP::getInstance(true);
-        
         $suchtext = '';
         $countperpage = 250;
         $webid = 0;
@@ -50,17 +45,12 @@ class SerieController extends AbstractActionController
         
         if ($this->getRequest())
         {
-            $firephp->log('SerieController->indexAction(). getRequest(): isPost=' . $this->getRequest()
-                ->isPost());
-            
             if ($this->getRequest()
                 ->isPost())
             {
                 if ($this->getRequest()
                     ->getPost('suchtext'))
                 {
-                    $firephp->log('SerieController->indexAction(). suchtext=' . $this->getRequest()
-                        ->getPost('suchtext'));
                     $suchtext = $this->getRequest()
                         ->getPost('suchtext');
                 }
@@ -72,8 +62,6 @@ class SerieController extends AbstractActionController
                 if ($this->getRequest()
                     ->getPost('countperpage'))
                 {
-                    $firephp->log('SerieController->indexAction(). countperpage=' . $this->getRequest()
-                        ->getPost('countperpage'));
                     $countperpage = intval($this->getRequest()
                         ->getPost('countperpage'));
                 }
@@ -108,8 +96,6 @@ class SerieController extends AbstractActionController
         
         $select->order('serie ' . Select::ORDER_ASCENDING);
         
-        // $firephp->log('SerieController->indexAction(). ' . $order_by . '/' . $order . '/' . $jahr . '/' . $ortid . '/' . $landid);
-        
         $paginator = $this->getSerieTable()
             ->fetchAll($select);
         $paginator->setCurrentPageNumber((int) $this->params()
@@ -137,8 +123,6 @@ class SerieController extends AbstractActionController
                 ->setValue($webid);
         }
         
-        $firephp->log('SerieController->indexAction() XXXXX');
-        
         return new ViewModel(array(
                 'paginator' => $paginator,
                 'selectform' => $selectform
@@ -147,10 +131,6 @@ class SerieController extends AbstractActionController
 
     public function addAction()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieController->addAction()');
-        // $firephp->trace('Trace Label');
-        
         $session = $this->session;
         
         $form = new SerieForm();
@@ -187,9 +167,6 @@ class SerieController extends AbstractActionController
 
     public function editAction()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieController->editAction()');
-        
         $session = $this->session;
         
         $id = (int) $this->params()
@@ -214,8 +191,6 @@ class SerieController extends AbstractActionController
         }
         catch (\Exception $ex)
         {
-            $firephp->error('SerieController->editAction()');
-            
             return $this->redirect()
                 ->toRoute('serie', array(
                     'action' => 'index'
@@ -231,15 +206,11 @@ class SerieController extends AbstractActionController
         
         if ($request->isPost())
         {
-            $firephp->log('isPost -> SerieController->editAction()');
-            
             $form->setInputFilter($serie->getInputFilter());
             $form->setData($request->getPost());
             
             if ($form->isValid())
             {
-                $firephp->log('isValid -> SerieController->editAction()');
-                
                 $this->getSerieTable()
                     ->saveSerie($serie);
                 
@@ -254,8 +225,6 @@ class SerieController extends AbstractActionController
                 return $this->redirect()
                     ->toUrl('/serie?page=' . $page);
             }
-            
-            $firephp->warn('isValid=false -> SerieController->editAction()');
         }
         
         return array(
@@ -266,9 +235,6 @@ class SerieController extends AbstractActionController
 
     public function deleteAction()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieController->deleteAction()');
-        
         $id = (int) $this->params()
             ->fromRoute('id', 0);
         
@@ -309,9 +275,6 @@ class SerieController extends AbstractActionController
 
     public function getSerieTable()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieController->getSerieTable()');
-        
         if (! $this->serieTable)
         {
             $sm = $this->getServiceLocator();
@@ -323,9 +286,6 @@ class SerieController extends AbstractActionController
 
     public function getSerieBildTable()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('SerieController->getSerieBildTable()');
-        
         if (! $this->serieBildTable)
         {
             $sm = $this->getServiceLocator();
@@ -337,9 +297,6 @@ class SerieController extends AbstractActionController
 
     public function getWebTable()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log("SerieController->getWebTable()");
-        
         if (! $this->webTable)
         {
             $sm = $this->getServiceLocator();

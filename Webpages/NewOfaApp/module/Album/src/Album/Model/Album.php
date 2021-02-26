@@ -20,6 +20,9 @@ class Album implements InputFilterAwareInterface
     public $originalyear;
     public $anzahl;
     public $ownerid;
+    public $rating;
+    public $genre;
+    public $studio;
     protected $inputFilter;
     protected $dbAdapter;
 
@@ -37,6 +40,9 @@ class Album implements InputFilterAwareInterface
         $this->originalyear = (isset($data['originalyear'])) ? $data['originalyear'] : null;
         $this->anzahl = (isset($data['anzahl'])) ? $data['anzahl'] : null;
         $this->ownerid = (isset($data['ownerid'])) ? $data['ownerid'] : null;
+        $this->rating = (isset($data['rating'])) ? $data['rating'] : null;
+        $this->genre = (isset($data['genre'])) ? $data['genre'] : null;
+        $this->studio = (isset($data['studio'])) ? $data['studio'] : null;
     }
 
     public function getArrayCopy()
@@ -51,156 +57,5 @@ class Album implements InputFilterAwareInterface
 
     public function getInputFilter()
     {
-        if (! $this->inputFilter)
-        {
-            $inputFilter = new InputFilter();
-
-            $inputFilter->add(array(
-                'name' => 'id',
-                'required' => true,
-                'filters' => array(
-                    array(
-                        'name' => 'Int'
-                    )
-                )
-            ));
-
-            $validatormusicbrainz_albumid = null;
-
-            if ($this->id > 0)
-            {
-                $validatormusicbrainz_albumid = new NoRecordExists(array(
-                        'adapter' => $this->dbAdapter,
-                        'table' => 'ofa_tracks',
-                        'field' => 'musicbrainz_albumid',
-                        'exclude' => array(
-                                'field' => 'id',
-                                'value' => $this->id
-                        )
-                ));
-            }
-            else
-            {
-                $validatormusicbrainz_albumid = new NoRecordExists(array(
-                        'adapter' => $this->dbAdapter,
-                        'table' => 'ofa_tracks',
-                        'field' => 'musicbrainz_albumid'
-                ));
-            }
-
-            $inputFilter->add(array(
-                    'name' => 'musicbrainz_albumid',
-                    'required' => true,
-                    'filters' => array(
-                            array(
-                                    'name' => 'Int'
-                            )
-                    ),
-                    'validators' => array(
-                            $validatormusicbrainz_albumid
-                    )
-            ));
-
-            $validatoralbumartist = null;
-
-            if ($this->id > 0)
-            {
-                $validatoralbumartist = new NoRecordExists(array(
-                        'adapter' => $this->dbAdapter,
-                        'table' => 'ofa_tracks',
-                        'field' => 'albumartist',
-                        'exclude' => array(
-                                'field' => 'id',
-                                'value' => $this->id
-                        )
-                ));
-            }
-            else
-            {
-                $validatoralbumartist = new NoRecordExists(array(
-                        'adapter' => $this->dbAdapter,
-                        'table' => 'ofa_tracks',
-                        'field' => 'albumartist'
-                ));
-            }
-
-            $inputFilter->add(array(
-                    'name' => 'albumartist',
-                    'required' => false,
-                    'filters' => array(
-                            array(
-                                    'name' => 'Int'
-                            )
-                    ),
-                    'validators' => array(
-                            $validatoralbumartist
-                    )
-            ));
-
-            $inputFilter->add(array(
-                    'name' => 'album',
-                    'required' => true,
-                    'filters' => array(
-                            array(
-                                    'name' => 'StripTags'
-                            ),
-                            array(
-                                    'name' => 'StringTrim'
-                            )
-                    ),
-                    'validators' => array(
-                            array(
-                                    'name' => 'StringLength',
-                                    'options' => array(
-                                            'encoding' => 'UTF-8',
-                                            'min' => 1,
-                                            'max' => 10
-                                    )
-                            )
-                    )
-            ));
-
-            $inputFilter->add(array(
-                    'name' => 'originalyear',
-                    'required' => false,
-                    'filters' => array(
-                            array(
-                                    'name' => 'Int'
-                            )
-                    )
-            ));
-
-            $inputFilter->add(array(
-                    'name' => 'anzahl',
-                    'required' => true,
-                    'filters' => array(
-                            array(
-                                    'name' => 'Int'
-                            )
-                    ),
-                    'validators' => array(
-                            array(
-                                    'name' => 'GreaterThan',
-                                    'options' => array(
-                                            'min' => 0
-                                    )
-                            )
-                    )
-            ));
-
-            $inputFilter->add(array(
-                'name' => 'ownerid',
-                'required' => false,
-                'filters' => array(
-                    array(
-                        'name' => 'Int'
-                    )
-                )
-            ));
-
-            $this->inputFilter = $inputFilter;
-        }
-
-        return $this->inputFilter;
     }
 }

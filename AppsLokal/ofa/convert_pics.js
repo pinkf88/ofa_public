@@ -1,7 +1,8 @@
 var dir         = require('node-dir');
 var fs          = require('fs');
-var database    = require('../../libs/lib_database.js');
+var database    = require('../libs/lib_database.js');
 var Jimp        = require('jimp');
+var piexif      = require("piexifjs");
 var config      = require('../../configs/ofa_config.json');
 
 
@@ -158,7 +159,9 @@ function check_db(file) {
             console.log("In Datenbank gefundene Bilder: " + bild_array.length);
 
             if (bild_array.length > 0) {
-                convert_bild(0);
+                setTimeout( function () {
+                    convert_bild(0);
+                }, 10);
             } else {
                 finish();
             }
@@ -194,7 +197,7 @@ function scale_bild(bild_no, file, nummer, scale_type)
                 .write(PFAD_HD + nummer + '_hd.jpg', function (err) {
                     if (err) throw err;
 
-                    scale_bild(bild_no, file, nummer, SCALE_TYPE_200);
+                    readDatabase(PFAD_HD + nummer + '_hd.jpg', bild_no, file, nummer);
                 });
         }
 
@@ -210,7 +213,9 @@ function scale_bild(bild_no, file, nummer, scale_type)
                     fs.unlinkSync(PFAD_SOURCE + file);
 
                     if (bild_no < bild_array.length - 1) {
-                        convert_bild(bild_no + 1);
+                        setTimeout( function() {
+                            convert_bild(bild_no + 1);
+                        }, 10);
                     } else {
                         finish();
                     }
@@ -244,7 +249,7 @@ function convert_bild(bild_no)
     var scale_type = SCALE_TYPE_1000;
 
     if (fs.existsSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''))) {
-        console.log('>>>>> ' + PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg');
+        // console.log('>>>>> ' + PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg');
         fs.copyFileSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''), PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg');
         fs.copyFileSync(PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg', PFAD_OFA_BU + get_subpfad(nummer) + nummer + '.jpg');
         fs.unlinkSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''));
@@ -252,13 +257,103 @@ function convert_bild(bild_no)
         scale_type = SCALE_TYPE_HD;
     }
 
-    scale_bild(bild_no, file, nummer, scale_type);
+    setTimeout(function () {
+        scale_bild(bild_no, file, nummer, scale_type);
+    }, 1);
+}
+
+function readDatabase(path, bild_no, file, nummer)
+{
+    var bild_sql = 'SELECT b.datum, bd.Aufnahmedatum FROM ofa_bild b LEFT JOIN ofa_bilddaten bd ON (bd.BildNr=b.datei) WHERE b.nummer="' + nummer + '" ';
+
+    db_connection.query(bild_sql, function (err, result) {
+        if (err) {
+            // throw err;
+            console.log(colors.yellow('update_pics | readDatabase(): ERROR: ' + err.message));
+            console.log(bild_sql);
+            finish();
+        }
+
+        if (result == null || result.length == 0) {
+            console.log(colors.yellow('update_pics | readDatabase(): Datei ' + file_list[file_no] + ' NICHT in Datenbank vorhanden.'));
+            finish();
+        } else {
+            var date_original = result[0].datum + ' 12:00:00';
+
+            if (result[0].Aufnahmedatum != null && result[0].Aufnahmedatum != '') {
+                date_original = result[0].Aufnahmedatum;
+            }
+
+            updateExif(path, bild_no, file, nummer, date_original);
+        }
+    });
+}
+
+function updateExif(path, bild_no, file, nummer, date_original)
+{
+    // console.log(colors.green('update_pics | updateExif(): path=' + file_list[file_no] + ', date_original=' + date_original));
+
+    try {
+        var jpeg = fs.readFileSync(path);
+        var data = jpeg.toString("binary");
+        var exif = piexif.load(data);
+
+        // console.log(exif.Exif);
+
+        var update1 = false;
+
+        try {
+        
+            if (exif.Exif[piexif.ExifIFD.DateTimeOriginal] != date_original.replace(/-/g, ":")) {
+                update1 = true;            
+            }
+        } catch (e) {
+            update1 = true;
+        }
+        
+        // console.log (exif.Exif[piexif.ExifIFD.DateTimeOriginal], date_original.replace(/-/g, ":"), update1);
+        
+        if (update1 == true) {
+            exif.Exif[piexif.ExifIFD.DateTimeOriginal] = date_original.replace(/-/g, ":");  // "2010:10:10";
+        }
+        
+        var update2 = false;
+        
+        try {
+            if (exif['0th'][piexif.ImageIFD.DateTime] != date_original.replace(/-/g, ":")) {
+                update2 = true;            
+            }
+        } catch (e) {
+            update2 = true;
+        }
+        
+        // console.log(exif['0th'][piexif.ImageIFD.DateTime], date_original.replace(/-/g, ":"), update2);
+        
+        if (update2 == true) {
+            exif['0th'][piexif.ImageIFD.DateTime] = date_original.replace(/-/g, ":");         // "2010:10:10";
+        }
+        
+        // console.log(exif);
+
+        if (update1 == true || update2 == true) {
+            fs.writeFileSync(path, Buffer.from(piexif.insert(piexif.dump(exif), data), 'binary'));
+        }
+    } catch(e) {
+        console.log(e);
+        console.log(colors.yellow('update_pics | updateExif(): ' + e.message));
+        console.log(colors.yellow('update_pics | updateExif(): ' + path));
+    }
+
+    setTimeout(function() {
+        scale_bild(bild_no, file, nummer, SCALE_TYPE_200);
+    }, 1);
 }
 
 function finish()
 {
     console.log('finish(): DB connection closed');
     database.disconnect(db_connection);
+    process.exit();
 }
 
 for (var i = 0; i < files_jpg.length; i++) {

@@ -22,10 +22,14 @@ a {
     color: #2a8af2;
 }
 
+.bgcolor_lightyellow {
+    background-color: lightyellow;
+}
+
 div.control_left {
     position: fixed;
     left: 0;
-    width: 200px;
+    width: 230px;
     top: 0;
     height: 100%;
     padding: 10px;
@@ -33,8 +37,8 @@ div.control_left {
     background: #cccccc;
 }
 
-div.control_left_picture {
-    padding-top: 20px;
+div.control_left_audio, div.control_left_picture {
+    margin-top: 10px;
 }
 
 div.control_album {
@@ -47,6 +51,33 @@ div.control_cover {
     min-height: 160px;
     border: 0;
     margin-bottom: 10px;
+}
+
+div.control_series {
+    max-width: 160px;
+    border: 0;
+    margin-bottom: 10px;
+}
+
+div.control_left_info, div.control_left_music {
+    margin-top: 15px;
+    font-size: 11px;
+}
+
+div.control_left_pictures {
+    margin-top: 15px;
+    font-size: 11px;
+    display: none;
+}
+
+div.control_left_video {
+    margin-top: 25px;
+    font-size: 13px;
+    display: none;
+}
+
+p.control_left_video_info {
+    margin-top: 15px;
 }
 
 div.control_picture {
@@ -67,7 +98,32 @@ img.control_picture {
 }
 
 div.control_lists {
-    padding-left: 220px;
+    padding-left: 250px;
+    padding-top: 30px;
+}
+
+#control_tab_tracks {
+    display: none;
+}
+
+#control_tab_playlists {
+    display: none;
+}
+
+#control_tab_pictures {
+    display: none;
+}
+
+#control_tab_videos {
+    display: none;
+}
+
+#control_tab_home {
+    display: none;
+}
+
+#control_tab_admin {
+    display: none;
 }
 
 div.control_room {
@@ -85,35 +141,123 @@ div.control_year_to, div.control_search {
     margin-bottom: 10px;
 }
 
-.artist_search {
-    width: 250px;
+div.control_admin_info_iobroker {
+    margin-left: 30px;
     margin-top: 10px;
+    font-size: 14px;
+    font-weight: bolder;
+}
+
+.control_led {
+    border-radius: 50%;
+    box-shadow: #555d0d 0 0 1px 1px, #446f44 0 0 0, inset #e44949 0 0 0;
+    height: .9em;
+    width: .9em;
+    float: left;
+    margin-right: 20px;
+}
+
+.control_led_green {
+    background-color: #86d686;
+}
+
+.control_led_red {
+    background-color: #f53117;
+}
+
+.artist_search, .serie_search, .video_search, .track_search {
+    width: 100%;
+    max-width: 500px;
     margin-bottom: 10px;
 }
 
 div.media_playlist, div.media_show {
     margin-bottom: 8px;
-}
-
-p.media_album_firstletter {
-    margin-top: 12px;
-    margin-bottom: 4px;
-    font-weight: bold;
     font-size: 14px;
-}
-
-p.media_album_artist {
-    margin-top: 12px;
-    margin-bottom: 4px;
-    font-size: 13px;
-}
-
-.media_albums_intro_firstletters {
     font-weight: bold;
 }
 
-.media_album_tracks {
-    margin-left: 15px;
+.media_playlist_caption {
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+p.media_album_firstletter, p.media_album_originalyear, p.media_track_firstletter {
+    margin-top: 30px;
+    margin-bottom: 0px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+p.media_album_artist, p.media_video_artist {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.media_album, .media_track, .media_serien_serie, .media_video, .media_serien_highlight {
+    margin-top: 4px;
+    margin-bottom: 1px;
+    font-size: 14px;
+    padding: 1px;
+}
+
+.media_video_caption {
+    margin-top: 15px;
+    margin-bottom: 2px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.media_video_subcaption {
+    margin-top: 12px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.title_sort {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 4px;
+    margin-bottom: 20px;
+}
+
+#alben_sort_artist {
+    display: block;
+}
+
+#alben_sort_year {
+    display: none;
+}
+
+.alben_sort_artist_intro_firstletters, .alben_sort_year_intro_originalyears, .tracks_sort_track_intro_firstletters {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 14px;
+}
+
+.media_album_tracks, .media_video_infos {
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.media_album_track, .media_video_info {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+p.control_admin {
+    margin-top: 15px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.media_serien {
+    display: none;
 }
 
 a.red {
@@ -141,6 +285,18 @@ a.red:hover {
     text-decoration: underline;
 }
 
+.ui-icon-red {
+	background-image: url("images/ui-icons_cc0000_256x240.png");
+}
+
+.ui-icon-blue {
+	background-image: url("images/ui-icons_228ef1_256x240.png");
+}
+
+.ui-icon-gray {
+	background-image: url("images/ui-icons_555555_256x240.png");
+}
+
 .ui-autocomplete
 {
      max-height: 150px;
@@ -161,19 +317,54 @@ h3, .h3 {
     margin-top: 10px;
 }
 
-h5 {
+h4 {
+    font-size: 40px;
     font-weight: bold;
-    margin-top: 15px;
+    letter-spacing: 6px;
+    margin-top: 5px;
+    margin-left: -30px;
+    padding: 30px;
+    background-color: #dddddd;
+}
+
+h5 {
+    font-size: 35px;
+    font-weight: bold;
+    margin-top: 30px;
+}
+
+h5.control {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+
+hr.control {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 2px solid #333333;
 }
 
 h6 {
+    font-size: 16px;
     font-weight: bold;
     margin-top: 12px;
 }
 
-.navbar
-{
+h6.control {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 24px;
+}
+
+.navbar {
     min-height: 0;
+}
+
+.navbar-control {
+    margin-left: 180px;
 }
 
 .navbar-brand
@@ -223,6 +414,7 @@ img.mini
     margin-top: 5px;
     margin-bottom: 5px;
     max-width: 200px;
+    max-height: 200px;
     height: auto;
 }
 
@@ -230,6 +422,11 @@ img.mini
 {
     line-height: 1.1;
     padding: 4px;
+}
+
+td.volumes {
+    text-align: right;
+    width: 90px;
 }
 
 td.coords,th.coords {
@@ -502,22 +699,63 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     font-weight: normal;
 }
 
-#bildergrid, #bildimportgrid {
+#bildergrid, #bildimportgrid, #albumgrid {
     list-style-type: none;
     margin: 0;
     padding: 0;
     width: 100%;
 }
 
-#bildergrid li {
+#bildergrid li, #albumgrid li {
     margin: 0 3px 3px 3px;
     padding: 0.4em;
     padding-left: 10px;
     float: left;
-    width: 230px;
-    height: 240px;
+    width: 220px;
+    height: 265px;
     font-weight: normal;
 }
+
+.bildergrid, .albumgrid {
+    position:   relative;
+    height:     100%;
+    width:      100%;
+}
+
+.bildergrid_wertung, .albumgrid_select {
+    position:   absolute;
+    bottom:     0;
+    left:       0;
+ }
+
+#bildergrid_select {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#bildergrid_select_kamera {
+    margin-left: 5px;
+    margin-top: 10px;
+ }
+ 
+#bildergrid_select_objektiv {
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+ .albumgrid_top {
+    height:     27px;
+    max-height: 27px;
+ }
+
+ .albumgrid_bottom {
+    clear:      both;
+    margin-bottom: 10px;
+ }
+
+ a.bildergrid {
+    color: #2a8af2;
+ }
 
 #bildimportgrid li {
     margin: 0 3px 3px 3px;
@@ -540,15 +778,6 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     width: 100%;
 }
 
-#bildertable li {
-    margin: 0 3px 3px 3px;
-    padding: 0.4em;
-    padding-left: 10px;
-    float: left;
-    width: 99%;
-    font-weight: normal;
-}
-
 div.labeltable {
     float: left;
     width: 20%;
@@ -560,10 +789,15 @@ div.bildertable {
     padding-left: 20px;
 }
 
-li.bildertable {
+li.bildertable_element {
+    margin: 0 3px 3px 3px;
+    padding: 0.4em;
+    padding-left: 10px;
+    float: left;
+    width: 99%;
+    font-weight: normal;
     border: 1px solid #cccccc;
     background: #f6f6f6;
-    font-weight: bold;
 }
 
 .bildertable_bild {
