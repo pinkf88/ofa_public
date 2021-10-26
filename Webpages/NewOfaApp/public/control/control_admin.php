@@ -5,6 +5,14 @@
     <a href="javascript:control_admin('restart_kodi');">Restart Kodi</a>
 </p>
 <p class="control_admin">
+    <a href="javascript:control_admin('restart_echostudio');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;
+    <a href="javascript:control_admin('restart_echostudio');">Restart Echo Studio</a>
+</p>
+<p class="control_admin">
+    <a href="javascript:control_admin('restart_echoshow');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;
+    <a href="javascript:control_admin('restart_echoshow');">Restart Echo Show</a>
+</p>
+<p class="control_admin">
     <a href="javascript:control_admin('restart_webmedia');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;
     <a href="javascript:control_admin('restart_webmedia');">Restart Webmedia</a>
 </p>
@@ -23,6 +31,16 @@
 <p class="control_admin">
     <a href="javascript:control_admin('update_videolist');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;
     <a href="javascript:control_admin('update_videolist');">Update Videolist</a>
+</p>
+<p class="control_admin">
+    <a href="javascript:control_admin('update_playlists');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;
+    <a href="javascript:control_admin('update_playlists');">Update Playlists</a>
+</p>
+<p class="control_admin">
+    <a href="javascript:control_admin('update_databases_all');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;
+    <a href="javascript:control_admin('update_databases_all');">Update all databases</a>&nbsp;&nbsp;
+    <a href="javascript:control_admin('update_databases_jr');">Update j-r.de database</a>&nbsp;&nbsp;
+    <a href="javascript:control_admin('update_databases_eib');">Update eib.de database</a>
 </p>
 <p class="control_admin">
     <a href="javascript:control_admin('restart_iobroker');"><span class="ui-icon ui-icon-arrowrefresh-1-e"></span></a>&nbsp;&nbsp;&nbsp;

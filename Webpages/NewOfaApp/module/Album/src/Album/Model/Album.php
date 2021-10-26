@@ -23,6 +23,7 @@ class Album implements InputFilterAwareInterface
     public $rating;
     public $genre;
     public $studio;
+    public $compilation;
     protected $inputFilter;
     protected $dbAdapter;
 
@@ -43,6 +44,7 @@ class Album implements InputFilterAwareInterface
         $this->rating = (isset($data['rating'])) ? $data['rating'] : null;
         $this->genre = (isset($data['genre'])) ? $data['genre'] : null;
         $this->studio = (isset($data['studio'])) ? $data['studio'] : null;
+        $this->compilation = (isset($data['compilation'])) ? $data['compilation'] : null;
     }
 
     public function getArrayCopy()

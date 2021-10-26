@@ -26,6 +26,9 @@ echo $this->form()->closeTag();
 <span id="albuminformation"></span>
 </div>
 <div class="rightside_bottom">
+<div class="rightside_feedback">
+<span id="feedbackinformation"></span>
+</div>
 <hr class="selectform">
 <p><span id="album_info"></span></p>
 <p>
@@ -53,6 +56,7 @@ Anzahl: <?php echo $this->paginator->getTotalItemCount(); ?>
 <th>Owner</th>
 <th>Rating</th>
 <th>S/L</th>
+<th>C</th>
 <th>&nbsp;</th>
 </tr>
 <?php foreach ($this->paginator as $album) : ?>
@@ -112,8 +116,17 @@ if ($album->studio == 1) {
 }
 ?>
 </span></td>
+<td><span id="compilation_<?php echo $album->musicbrainz_albumid;?>">
+<?php
+if ($album->compilation == 1) {
+	echo '<a href="javascript:album_setCompilation(\'' .  $album->musicbrainz_albumid . '\', 0);">Comp.</a>';
+} else {
+	echo '<a href="javascript:album_setCompilation(\'' .  $album->musicbrainz_albumid . '\', 1);">Reg.</a>';
+}
+?>
+</span></td>
 <td>
-<a href="javascript:album_picAdded('<?php echo $album->musicbrainz_albumid;?>');">Pic</a>
+<a href="javascript:album_updateData('<?php echo $album->musicbrainz_albumid;?>');">Upd</a>
 <a href="<?php echo $this->url('album',	array('action'=>'delete', 'id' => $album->musicbrainz_albumid));?>">Del</a>
 <a href="javascript:album_playAlbum('<?php echo $album->musicbrainz_albumid;?>');">Play</a>
 </td>

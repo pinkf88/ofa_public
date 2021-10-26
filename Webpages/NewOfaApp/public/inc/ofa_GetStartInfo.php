@@ -12,13 +12,6 @@ $jahr_min = 1967;
 
 // echo $sql;
 
-function date_mysql2german($datum)
-{
-    $d = explode("-", $datum);
-    
-    return sprintf("%02d.%02d.%04d", $d[2], $d[1], $d[0]);
-}
-
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
 $sql = "SELECT l.id, l.datumvon, l.datumbis, o.ort, la.land, l.beschreibung, l.bemerkung FROM $dbt_ofa_leben l, $dbt_ofa_ort o, $dbt_ofa_land la ";

@@ -4,6 +4,7 @@
   "description": "",
   "main": "lib_email.js",
   "dependencies": {
+    "colors": "^1.4.0",
     "dataformat": "^1.0.0",
     "dateformat": "^4.5.1",
     "emailjs": "^3.4.0",

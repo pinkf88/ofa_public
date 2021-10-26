@@ -5,7 +5,7 @@ var piexif          = require("piexifjs");
 var ArgumentParser  = require('argparse').ArgumentParser;
 var recursive       = require('recursive-readdir');
 var database        = require('../libs/lib_database.js');
-var config          = require('../../configs/ofa_config.json');
+var config          = require('../configs/ofa_config.json');
 
 
 var parser = new ArgumentParser({

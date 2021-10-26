@@ -75,7 +75,7 @@ if ($year > 0) {
     $trackdaten .= '</p>';
 }
 
-$trackdaten .= '<p class=\"mblink\"><a href=\"https://musicbrainz.org/track/' . $trackid . '\">MusicBrainz</a></p>';
+$trackdaten .= '<p class=\"mblink\"><a href=\"https://musicbrainz.org/track/' . $trackid . '\" target=\"_blank\">MusicBrainz</a></p>';
 $trackdata = '{ "trackid": "' . $trackid . '", "title": "' . preg_replace('/"/', '\"', $title) . '", "bildurl": "' . $bildurl . '" }';
 
 echo '{';

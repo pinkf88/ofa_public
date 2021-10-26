@@ -1,10 +1,10 @@
 <?php
-$playlist_categories = [
-    [ "STUDIO_", "Studio" ],
-    [ "LIVE_", "Live"],
-    [ "JR_IN_CONCERT_", "JR In Concert"],
-    [ "SONSTIGE_", "Sonstige"]
-];
+$playlist_categories = array(
+    array("STUDIO_", "Studio"),
+    array("LIVE_", "Live"),
+    array("JR_IN_CONCERT_", "JR In Concert"),
+    array("SONSTIGE_", "Sonstige")
+);
 ?>
 <div id="control_tab_playlists">
 <h4 class="control">PLAYLISTEN</h4>
@@ -76,7 +76,10 @@ if ($resultat = mysqli_query($db_link, $sql))
 <?php echo $years; ?>
     </select>
 </div>
-<p><a href="javascript:control_playMusic(1);">Play</a> | <a href="javascript:control_playMusic(2);">Play random</a></p>
+<div class="control_no_compilations">
+    <input type="checkbox" id="no_compilations" name="no_compilations"><label class="no_compilations" for="no_compilations">Keine Compilations</label>
+</div>
+<p class="control_playbuttons"><a href="javascript:control_playMusic(1);">Play</a> | <a href="javascript:control_playMusic(2);">Play random</a></p>
 <p><span id="lastinfo"></span></p>
 <h5 class="control" id="playlists">Playlists</h5>
 <hr class="control">

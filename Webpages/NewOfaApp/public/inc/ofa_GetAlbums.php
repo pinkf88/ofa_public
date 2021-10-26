@@ -6,8 +6,11 @@ $artistid = $_GET["artistid"];
 
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
-$sql = 'SELECT DISTINCT t.album, t.musicbrainz_albumid, t.year, t.originalyear, COUNT(t.id) AS anzahl, t.albumartist, t.pic '
-    . 'FROM ' . $dbt_ofa_tracks . ' t WHERE t.musicbrainz_albumartistid="' . $artistid . '" GROUP BY t.musicbrainz_albumid ORDER BY t.originalyear, t.album, t.year, t.musicbrainz_albumid';
+$sql = 'SELECT DISTINCT t.album, t.musicbrainz_albumid, t.year, t.originalyear, COUNT(t.id) AS anzahl, t.albumartist, t.pic, '
+    . "a.discogs_albumid, a.genres, a.styles "
+    . 'FROM ofa_tracks t LEFT JOIN ofa_albums a ON (t.musicbrainz_albumid = a.musicbrainz_albumid) '
+    . 'WHERE t.musicbrainz_albumartistid="' . $artistid . '" '
+    . 'GROUP BY t.musicbrainz_albumid ORDER BY t.originalyear, t.album, t.year, t.musicbrainz_albumid';
 
 $resultat = mysqli_query($db_link, $sql);
 // print_r($resultat);
@@ -39,7 +42,19 @@ while ($datensatz = mysqli_fetch_assoc ($resultat)) {
         . '<a style="color: #2a8af2;" href="javascript:album_playAlbum(\'' . $albumid . '\', 1);">Play</a> | '
         . '<a style="color: #2a8af2;" href="javascript:album_playAlbum(\'' . $albumid . '\', 2);">Play random</a> | '
         . '<a style="color: #2a8af2;" href="javascript:control_addToRunningTracks(1, \'' . $albumid . '\');">Add</a>'
-        . '</div></div>'
+        . '</div>';
+
+    if (is_null($datensatz["genres"]) == FALSE && $datensatz["genres"] != '') {
+        $genres = preg_replace("/\|/", " | ", trim($datensatz["genres"], "|"));
+        $albumdaten .= '<div class="albumgrid_genres">' . $genres . '</div>';
+    }
+
+    if (is_null($datensatz["styles"]) == FALSE && $datensatz["styles"] != '') {
+        $styles = preg_replace("/\|/", " | ", trim($datensatz["styles"], "|"));
+        $albumdaten .= '<div class="albumgrid_styles">' . $styles . '</div>';
+    }
+
+    $albumdaten .= '</div>'
         . '</li>' . "\n";
 }
 

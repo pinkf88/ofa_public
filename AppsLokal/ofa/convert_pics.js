@@ -1,9 +1,10 @@
 var dir         = require('node-dir');
 var fs          = require('fs');
-var database    = require('../libs/lib_database.js');
 var Jimp        = require('jimp');
-var piexif      = require("piexifjs");
-var config      = require('../../configs/ofa_config.json');
+var piexif      = require('piexifjs');
+var tools       = require('../libs/lib_tools.js');
+var database    = require('../libs/lib_database.js');
+var config      = require('../configs/ofa_config.json');
 
 
 const PFAD_SOURCE_MAIN = config.apps.convert.path_source_main;
@@ -64,34 +65,8 @@ var bild_array = [];
 
 db_connection = database.connect();
 
-function get_subpfad(nummer, jahr=0)
+function check_db(file)
 {
-    if (nummer > 10000000)
-    {
-        // Ticket
-        return 'tickets/' + jahr + '/';
-    }
-
-    var s1 = "" + (Math.floor(nummer / 1000) * 1000);
-    var s2 = "" + (Math.floor(nummer / 100) * 100);
-    
-    return s1.padStart(6, '0') + '/' + s2.padStart(6, '0') + '/';
-}
-
-function get_subpfad1000(nummer, jahr=0)
-{
-    if (nummer > 10000000)
-    {
-        // Ticket
-        return 'tickets/' + jahr + '/';
-    }
-
-    var s1 = "" + (Math.floor(nummer / 1000) * 1000);
-    
-    return s1.padStart(6, '0') + '/';
-}
-
-function check_db(file) {
     var file_temp = file;
     var p20 = false;
 
@@ -183,10 +158,10 @@ function scale_bild(bild_no, file, nummer, scale_type)
         if (scale_type == SCALE_TYPE_1000) {
             bild.scaleToFit(1000, 1000, Jimp.RESIZE_BICUBIC)
                 .quality(95)
-                .write(PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg', function (err) {
+                .write(PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.jpg', function (err) {
                     if (err) throw err;
 
-                    fs.copyFileSync(PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg', PFAD_OFA_BU + get_subpfad(nummer) + nummer + '.jpg');
+                    fs.copyFileSync(PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.jpg', PFAD_OFA_BU + tools.get_subpfad(nummer) + nummer + '.jpg');
                     scale_bild(bild_no, file, nummer, SCALE_TYPE_HD);
                 });
         }
@@ -203,13 +178,13 @@ function scale_bild(bild_no, file, nummer, scale_type)
 
         if (scale_type == SCALE_TYPE_200) {
             bild.scaleToFit(200, 200, Jimp.RESIZE_BICUBIC)
-                .write(PFAD_OFA + get_subpfad(nummer) + nummer + '.png', function (err) {
+                .write(PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.png', function (err) {
                     if (err) throw err;
 
-                    fs.copyFileSync(PFAD_OFA + get_subpfad(nummer) + nummer + '.png', PFAD_OFA_BU + get_subpfad(nummer) + nummer + '.png');
-                    console.log(PFAD_OFA + get_subpfad(nummer) + nummer + SUFFIX_Z0 + '.jpg');
-                    fs.copyFileSync(PFAD_SOURCE + file, PFAD_OFA + get_subpfad(nummer) + nummer + SUFFIX_Z0 + '.jpg');
-                    fs.copyFileSync(PFAD_SOURCE + file, PFAD_OFA_BU + get_subpfad(nummer) + nummer + SUFFIX_Z0 + '.jpg');
+                    fs.copyFileSync(PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.png', PFAD_OFA_BU + tools.get_subpfad(nummer) + nummer + '.png');
+                    console.log(PFAD_OFA + tools.get_subpfad(nummer) + nummer + SUFFIX_Z0 + '.jpg');
+                    fs.copyFileSync(PFAD_SOURCE + file, PFAD_OFA + tools.get_subpfad(nummer) + nummer + SUFFIX_Z0 + '.jpg');
+                    fs.copyFileSync(PFAD_SOURCE + file, PFAD_OFA_BU + tools.get_subpfad(nummer) + nummer + SUFFIX_Z0 + '.jpg');
                     fs.unlinkSync(PFAD_SOURCE + file);
 
                     if (bild_no < bild_array.length - 1) {
@@ -230,28 +205,28 @@ function convert_bild(bild_no)
     var nummer = bild_array[bild_no].nummer;
     console.log('convert_bild(): ' + bild_no + ' / ' + file + ' / ' + nummer);
 
-    if (fs.existsSync(PFAD_OFA + get_subpfad1000(nummer)) == false) {
-        fs.mkdirSync(PFAD_OFA + get_subpfad1000(nummer));
+    if (fs.existsSync(PFAD_OFA + tools.get_subpfad1000(nummer)) == false) {
+        fs.mkdirSync(PFAD_OFA + tools.get_subpfad1000(nummer));
     }
 
-    if (fs.existsSync(PFAD_OFA + get_subpfad(nummer)) == false) {
-        fs.mkdirSync(PFAD_OFA + get_subpfad(nummer));
+    if (fs.existsSync(PFAD_OFA + tools.get_subpfad(nummer)) == false) {
+        fs.mkdirSync(PFAD_OFA + tools.get_subpfad(nummer));
     }
 
-    if (fs.existsSync(PFAD_OFA_BU + get_subpfad1000(nummer)) == false) {
-        fs.mkdirSync(PFAD_OFA_BU + get_subpfad1000(nummer));
+    if (fs.existsSync(PFAD_OFA_BU + tools.get_subpfad1000(nummer)) == false) {
+        fs.mkdirSync(PFAD_OFA_BU + tools.get_subpfad1000(nummer));
     }
 
-    if (fs.existsSync(PFAD_OFA_BU + get_subpfad(nummer)) == false) {
-        fs.mkdirSync(PFAD_OFA_BU + get_subpfad(nummer));
+    if (fs.existsSync(PFAD_OFA_BU + tools.get_subpfad(nummer)) == false) {
+        fs.mkdirSync(PFAD_OFA_BU + tools.get_subpfad(nummer));
     }
 
     var scale_type = SCALE_TYPE_1000;
 
     if (fs.existsSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''))) {
-        // console.log('>>>>> ' + PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg');
-        fs.copyFileSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''), PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg');
-        fs.copyFileSync(PFAD_OFA + get_subpfad(nummer) + nummer + '.jpg', PFAD_OFA_BU + get_subpfad(nummer) + nummer + '.jpg');
+        // console.log('>>>>> ' + PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.jpg');
+        fs.copyFileSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''), PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.jpg');
+        fs.copyFileSync(PFAD_OFA + tools.get_subpfad(nummer) + nummer + '.jpg', PFAD_OFA_BU + tools.get_subpfad(nummer) + nummer + '.jpg');
         fs.unlinkSync(PFAD_SOURCE + file.replace(SUFFIX_Z0, ''));
 
         scale_type = SCALE_TYPE_HD;

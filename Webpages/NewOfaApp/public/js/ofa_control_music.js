@@ -5,6 +5,7 @@ function control_sortArtist()
 
     $('#alben_sort_artist').show();
     $('#alben_sort_year').hide();
+    $('#feedbackinformation').html('');
 }
 
 function control_sortYear()
@@ -14,22 +15,36 @@ function control_sortYear()
     
     $('#alben_sort_year').show();
     $('#alben_sort_artist').hide();
+    $('#feedbackinformation').html('');
 }
 
-function control_showTracks(albumid)
+function control_showTracksMore(albumid)
 {
-    if ($('#' + albumid).html() == '') {
+    $('#track_info_' + albumid).show();
+}
+
+function control_showTracks(albumid, doit = false)
+{
+    if (doit == false) {
+        $('#feedbackinformation').html('');
+    }
+    
+    if ($('#' + albumid).html() == '' || doit == true) {
+        var musicbrainz_albumid = albumid.replace('year_tracks_', '').replace('artist_tracks_', '');
+        var url = '/inc/ofa_ControlMedia.php?type=album&albumid=' + musicbrainz_albumid;
+
         $.ajax({
             type:       'GET',
             dataType:   'json',
-            url:        '/inc/ofa_ControlMedia.php?type=album&albumid=' + albumid.replace('year_tracks_', '').replace('artist_tracks_', '')
-        }).done(function(tracks)
+            url:        url
+        }).done(function(tracks_info)
         {
-            if (tracks != 'ERROR') {
+            if (tracks_info != 'ERROR') {
                 album_startTimer();
             }
 
             var html = '';
+            var tracks = tracks_info.tracks;
             // console.log(tracks);
 
             for (var i = 0; i < tracks.length; i++) {
@@ -47,7 +62,45 @@ function control_showTracks(albumid)
                 html += ' | ' + tracks[i].duration + '</a></p>';
             }
 
-            $('#' + albumid).append(html);
+            var info = tracks_info.info;
+
+            if (info != null && info != undefined) {
+                html += '<p id="track_more_' + musicbrainz_albumid + '" class="media_album_track_more">'
+                    + '<a href="javascript:control_showTracksMore(\'' + musicbrainz_albumid + '\')">Mehr Infos</a>&nbsp;&nbsp;&nbsp;'
+                    + '<a href="javascript:control_updateAlbum(\'' + albumid + '\', \'' + musicbrainz_albumid + '\')">Update Album</a>'
+                    + '</p>';
+
+                html += '<div id="track_info_' + musicbrainz_albumid + '" class="media_album_track_info">'
+
+                html += '<p class="media_album_track_more_genres"><b>Genres:</b> ' + info.genres.slice(1, -1).replace(/\|/g, " | ") + '</p>';
+                html += '<p class="media_album_track_more_styles"><b>Style:</b> ' + info.styles.slice(1, -1).replace(/\|/g, " | ") + '</p>';
+
+                html += '<p class="media_album_track_more_extraartists">';
+                
+                for (var i in info.extraartists) {
+                    var extraartist = info.extraartists[i].split('|');
+                    html += extraartist[0] + ' <i>(' + extraartist[1] + ')</i><br>';
+                }
+                
+                html += '</p>';
+
+                html += '<p class="media_album_track_more_videos">';
+                
+                for (var i in info.videos) {
+                    var video = info.videos[i].split('|');
+                    html += '<a href=' + video[0] + ' target="_blank">' + video[1] + '</a><br>';
+                }
+
+                html += '</p>';
+
+                html += '</div>';
+            } else {
+                html += '<p id="track_more_' + musicbrainz_albumid + '" class="media_album_track_more">'
+                    + '<a href="javascript:control_updateAlbum(\'' + albumid + '\', \'' + musicbrainz_albumid + '\')">Update Album</a>'
+                    + '</p>';
+            }
+
+            $('#' + albumid).html(html);
         }).fail(function(jqXHR, textStatus)
         {
             console.log("control_showTracks: ERROR " + textStatus);
@@ -62,6 +115,8 @@ function control_showTracks(albumid)
 // 2: Track
 function control_addToRunningTracks(source, id)
 {
+    $('#feedbackinformation').html('');
+
     $.ajax({
         type : "GET",
         url : "/inc/ofa_ControlMedia.php?type=running&source=" + source + "&id=" + id + "&roomid=1"
@@ -79,6 +134,8 @@ function control_addToRunningTracks(source, id)
 
 function control_scrollToLetter(letter = '')
 {
+    $('#feedbackinformation').html('');
+
     if (letter == '') {
         $('html, body').animate({ scrollTop: $("#alben_sort_artist_intro_firstletters").offset().top - 100 }, 1000);
     } else {
@@ -88,6 +145,8 @@ function control_scrollToLetter(letter = '')
 
 function control_scrollToYear(year = '')
 {
+    $('#feedbackinformation').html('');
+
     if (year == '') {
         $('html, body').animate({ scrollTop: $("#alben_sort_year_intro_originalyears").offset().top - 100 }, 1000);
     } else {
@@ -97,6 +156,8 @@ function control_scrollToYear(year = '')
 
 function control_scrollToTrackLetter(letter = '')
 {
+    $('#feedbackinformation').html('');
+
     if (letter == '') {
         $('html, body').animate({ scrollTop: $("#tracks_sort_track_intro_firstletters").offset().top - 100 }, 1000);
     } else {
@@ -106,6 +167,8 @@ function control_scrollToTrackLetter(letter = '')
 
 function control_playPlaylist(playlist_name, runtype)
 {
+    $('#feedbackinformation').html('');
+
     console.log('control_playPlaylist()');
 
     $.ajax({
@@ -143,6 +206,8 @@ function control_playPlaylist(playlist_name, runtype)
 
 function control_playMusic(runtype)
 {
+    $('#feedbackinformation').html('');
+
     // console.log($("#control_person").val());
     var year_from = parseInt($("#control_year_from").val());
     var year_to = parseInt($("#control_year_to").val());
@@ -152,6 +217,12 @@ function control_playMusic(runtype)
         year_to = parseInt($("#control_year_from").val());
     }
 
+    var no_compilations = 0;
+
+    if ($('#no_compilations').is(':checked')) {
+        no_compilations = 1;
+    }
+
     var url = "/inc/ofa_ControlMedia.php?type=audio"
         + "&roomid=" + $("#control_room").val()
         + "&personid=" + $("#control_person").val()
@@ -159,7 +230,8 @@ function control_playMusic(runtype)
         + "&music=" + $("#control_music").val()
         + "&runtype=" + runtype
         + "&year_from=" + year_from
-        + "&year_to=" + year_to;
+        + "&year_to=" + year_to
+        + "&no_compilations=" + no_compilations;
 
     $.ajax({
         url: url
@@ -179,6 +251,8 @@ function control_playMusic(runtype)
 
 function control_showAlbums(artistid, mode)
 {
+    $('#feedbackinformation').html('');
+
     if ($('#albums_' + artistid).html() == '') {
         var url = '/inc/ofa_GetAlbums.php?artistid=' + artistid;
 
@@ -202,6 +276,8 @@ function control_showAlbums(artistid, mode)
 
 function control_flagAlbum(albumid)
 {
+    $('#feedbackinformation').html('');
+
     var func = 'add';
 
     if ($('#artist_flag_' + albumid).hasClass('ui-icon-red')) {
@@ -233,6 +309,8 @@ function control_flagAlbum(albumid)
 
 function control_starAlbum(albumid, year)
 {
+    $('#feedbackinformation').html('');
+    
     var func = 'add';
 
     if ($('#artist_star_' + albumid).hasClass('ui-icon-red')) {
@@ -260,4 +338,32 @@ function control_starAlbum(albumid, year)
     {
         console.log('ERROR control_starAlbum(): ' + textStatus);
     });    
+}
+
+function control_updateAlbum(albumid, musicbrainz_albumid)
+{
+    var url = '/inc/ofa_ControlMedia.php?type=album&update&albumid=' + musicbrainz_albumid;
+
+    $.ajax({
+        type:   'GET',
+        url:    url
+    }).done(function(data)
+    {
+        console.log('album_updateData(): ', data);
+        $('#feedbackinformation').html(data);
+
+        if (data == 'OK') {
+            control_showTracks(albumid, true);
+        } else {
+            var html = '<a href="javascript:control_updateAlbum(\'' + albumid + '\', \'' + musicbrainz_albumid + '\')">Update Album</a>'
+                + '&nbsp;&nbsp;&nbsp;'
+                + '<a href="https://musicbrainz.org/release/' + musicbrainz_albumid + '" target="_blank">MusicBrainz</a>';
+
+            $('#track_more_' + musicbrainz_albumid).html(html);
+        }
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log("album_updateData(): Database access failed: " + textStatus);
+        $('#feedbackinformation').html('ERROR');
+    });
 }

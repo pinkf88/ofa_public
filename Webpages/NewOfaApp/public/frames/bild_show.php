@@ -19,6 +19,7 @@
 <script type="text/javascript" src="/js/fancybox/jquery.fancybox.js"></script>
 </head>
 <body class="body_bild_show">
+<div id="bildergrid_serie"></div>
 <div id="bildergrid_select"></div>
 <div>
 <ul id="bildergrid">

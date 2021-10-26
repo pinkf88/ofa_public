@@ -8,17 +8,37 @@ $serieid = 0 + $_GET["serieid"];
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
 $serie = "";
+$serie_link = "";
 
-$sql = "SELECT s.serie FROM $dbt_ofa_serie s WHERE s.id=$serieid";
+$sql = "SELECT s.serie, w.nummer AS webnummer, w.web, w.pfad AS webpfad, ws.titel, ws.pfad AS seriepfad "
+    . "FROM ofa_serie s LEFT JOIN ofa_web_serie ws ON (ws.serieid=$serieid) LEFT JOIN ofa_web w ON (ws.webid=w.id) "
+    . "WHERE s.id=$serieid";
 // echo $sql;
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows($resultat) > 0)
-    {
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows($resultat) > 0) {
         $datensatz = mysqli_fetch_assoc($resultat);
 
         $serie = $datensatz["serie"];
+
+        $url = 'https://www.juergen-reichmann.de';
+        $url_end = '';
+        $web = $datensatz["web"] . ' | ';
+
+        if ($datensatz["webnummer"] < 0) {
+            $url = 'https://www.19xx.de';
+        } else if (strpos($datensatz["web"], 'Highlights |') !== false) {
+            $url = 'https://www.erde-in-bildern.de';
+            $web = '';
+        } else {
+            $url_end = $datensatz["bildnummer"] . '/';
+        }
+
+        $url .= str_replace('/highlights', '', $datensatz["webpfad"]) . $datensatz["seriepfad"] . '/' . $url_end;
+
+        $serie_link .= '<p><b>'
+            . '<a href=\"' . $url . '\" target=\"_blank\">' . $web . $datensatz["titel"] . '</a>'
+            . '</b>';
     }
 
     mysqli_free_result($resultat);
@@ -31,10 +51,8 @@ $sql = "SELECT sb.nr, sb.bildid, sb.dauer, b.nummer, YEAR(b.datum) AS jahr, b.ti
     . "FROM $dbt_ofa_serie_bild sb, $dbt_ofa_bild b, $dbt_ofa_ort o WHERE sb.serieid=$serieid AND sb.bildid=b.id AND b.ortid=o.id ORDER BY sb.nr";
 // echo $sql;
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows($resultat) > 0)
-    {
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows($resultat) > 0) {
         while ($datensatz = mysqli_fetch_assoc($resultat)) {
             $serie_anzahl ++;
 
@@ -71,6 +89,7 @@ if ($resultat = mysqli_query($db_link, $sql))
 
 echo '{';
 echo '  "serie": "' . $serie . '",';
+echo '  "serie_link": "' . $serie_link . '",';
 echo '  "serie_anzahl": "' . $serie_anzahl . '",';
 echo '  "serie_bilder": "' . $serie_bilder . '"';
 echo '}';

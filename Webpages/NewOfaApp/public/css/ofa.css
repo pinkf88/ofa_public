@@ -26,6 +26,14 @@ a {
     background-color: lightyellow;
 }
 
+.color_red {
+    color: red;
+}
+
+.color_green {
+    color: green;
+}
+
 div.control_left {
     position: fixed;
     left: 0;
@@ -37,8 +45,36 @@ div.control_left {
     background: #cccccc;
 }
 
-div.control_left_audio, div.control_left_picture {
-    margin-top: 10px;
+dl.control_left_menu {
+    margin-top: 0px;
+}
+
+dt.control_left_menu {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+dd.control_left_menu {
+    display: none;
+    margin-bottom: 15px;
+}
+
+.control_left_menu_admin {
+    margin-top: 8px;
+}
+
+.menu_closed {
+    font-variant: normal;
+}
+
+.menu_open {
+    font-variant: small-caps;
+}
+
+.menu_initial_open {
+    display: block;
+    margin-bottom: 15px;
 }
 
 div.control_album {
@@ -59,7 +95,7 @@ div.control_series {
     margin-bottom: 10px;
 }
 
-div.control_left_info, div.control_left_music {
+div.control_left_info {
     margin-top: 15px;
     font-size: 11px;
 }
@@ -76,8 +112,8 @@ div.control_left_video {
     display: none;
 }
 
-p.control_left_video_info {
-    margin-top: 15px;
+div.control_left_feedback {
+    margin-top: 25px;
 }
 
 div.control_picture {
@@ -102,6 +138,10 @@ div.control_lists {
     padding-top: 30px;
 }
 
+#control_tab_albums {
+    display: none;
+}
+
 #control_tab_tracks {
     display: none;
 }
@@ -118,7 +158,7 @@ div.control_lists {
     display: none;
 }
 
-#control_tab_home {
+#control_tab_analytics {
     display: none;
 }
 
@@ -130,15 +170,27 @@ div.control_room {
     margin-bottom: 15px;
 }
 
-div.control_music, div.control_artist, div.control_person, div.control_year_from,
+div.control_music, div.control_artist, div.control_person, div.control_year_from, div.control_year_to,
 div.control_country, div.control_location, div.control_year {
     float: left;
     margin-bottom: 10px;
     margin-right: 20px;
 }
 
-div.control_year_to, div.control_search {
+div.control_search {
     margin-bottom: 10px;
+}
+
+div.control_no_compilations, div.control_search {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+label.no_compilations {
+    font-weight: normal;
+    margin-left: 10px;
+    margin-bottom: -4px;
 }
 
 div.control_admin_info_iobroker {
@@ -146,6 +198,10 @@ div.control_admin_info_iobroker {
     margin-top: 10px;
     font-size: 14px;
     font-weight: bolder;
+}
+
+p.control_playbuttons {
+    clear: both;
 }
 
 .control_led {
@@ -165,7 +221,36 @@ div.control_admin_info_iobroker {
     background-color: #f53117;
 }
 
-.artist_search, .serie_search, .video_search, .track_search {
+.legend {
+    display: block;
+    -webkit-padding-start: 2px;
+    -webkit-padding-end: 2px;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.legendLayer .background {
+    fill: rgba(255, 255, 255, 0.85);
+    stroke: rgba(0, 0, 0, 0.85);
+    stroke-width: 1;
+}
+
+#tooltip {
+    position: absolute;
+    display: none;
+    border: 1px solid #fdd;
+    padding: 2px;
+    background-color: #fee;
+    opacity: 0.80
+}
+
+.artist_search, .serie_search, .video_search, .track_search, .ofapics {
     width: 100%;
     max-width: 500px;
     margin-bottom: 10px;
@@ -191,10 +276,21 @@ p.media_album_firstletter, p.media_album_originalyear, p.media_track_firstletter
     font-size: 16px;
 }
 
-p.media_album_artist, p.media_video_artist {
+p.media_album_artist {
     margin-top: 16px;
     margin-bottom: 8px;
     font-size: 15px;
+}
+
+p.media_video_artist {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.media_video_captionsub1 {
+    margin-top: 6px;
 }
 
 .media_album, .media_track, .media_serien_serie, .media_video, .media_serien_highlight {
@@ -260,6 +356,72 @@ p.control_admin {
     display: none;
 }
 
+hr.analytics {
+    margin-left: 0px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    border: 0;
+    border-top: 1px solid #a0a0a0;
+    width: 1050px;
+}
+
+.analytics_overview, .analytics_auswahl {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    margin-left: 20px;
+}
+
+.control_admin_overview {
+    float: left;
+    margin-right: 25px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.control_admin_overview_days {
+    font-size: 14px;
+    width: 100px;
+}
+
+.overview_data, .auswahl_data {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.overview_data_web, .web_data_web, .ortemotive_data_ortemotive {
+    display: inline-block;
+    width: 500px;
+    padding-right: 20px;
+}
+
+.overview_data_path, .web_data_path, .ortemotive_data_url {
+    display: inline-block;
+    width: 500px;
+    padding-right: 20px;
+}
+
+.auswahl_data_land {
+    display: inline-block;
+    width: 1000px;
+    padding-right: 20px;
+}
+
+.overview_data_pageview, .web_data_pageview, .auswahl_data_pageview, .ortemotive_data_pageview {
+    display: inline-block;
+    width: 50px;
+    text-align: right;
+}
+
+.overview_web {
+    display: none;
+    margin-bottom: 8px;
+}
+
+.web_data {
+    margin-bottom: 3px;
+}
+
 a.red {
     color: #dc4f36;
     text-decoration: none;
@@ -282,6 +444,31 @@ a.red:active {
 
 a.red:hover {
     color: #dc4f36;
+    text-decoration: underline;
+}
+
+a.dimgray {
+    color: dimgray;
+    text-decoration: none;
+}
+
+a.dimgray:link {
+    color: dimgray;
+    text-decoration: none;
+}
+
+a.dimgray:visited {
+    color: dimgray;
+    text-decoration: none;
+}
+
+a.dimgray:active {
+    color: dimgray;
+    text-decoration: none;
+}
+
+a.dimgray:hover {
+    color: dimgray;
     text-decoration: underline;
 }
 
@@ -639,6 +826,10 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     margin-top: 5px;
 }
 
+.motivliste, .serieliste {
+    margin-top: 5px;
+}
+
 .leftside_bildmotive
 {
     float: left;
@@ -653,6 +844,10 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
 
 .rightside_top {
     width: 100%;
+}
+
+.rightside_mblink, .rightside_genres {
+    margin-top: 8px;
 }
 
 .rightside_bottom {
@@ -716,6 +911,19 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     font-weight: normal;
 }
 
+#albumgrid li {
+    height: 295px;
+}
+
+.albumgrid_genres {
+    font-size: smaller;
+}
+
+.albumgrid_genres, .albumgrid_styles {
+    margin-top: 1px;
+    font-size: smaller;
+}
+
 .bildergrid, .albumgrid {
     position:   relative;
     height:     100%;
@@ -753,7 +961,35 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     margin-bottom: 10px;
  }
 
- a.bildergrid {
+ .media_album_track_more {
+     margin-top: 10px;
+     margin-bottom: 10px;
+ }
+
+ .media_album_track_info {
+    margin-top: 10px;
+    display: none;
+}
+
+.media_album_track_more_genres {
+    margin-top: 5px;
+}
+
+.media_album_track_more_styles {
+    margin-top: 5px;
+}
+
+.media_album_track_more_extraartists {
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+.media_album_track_more_videos {
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+a.bildergrid {
     color: #2a8af2;
  }
 

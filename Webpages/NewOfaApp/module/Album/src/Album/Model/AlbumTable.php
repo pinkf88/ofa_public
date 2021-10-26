@@ -42,7 +42,8 @@ class AlbumTable extends AbstractTableGateway
                 'ownerid',
                 'rating',
                 'genre',
-                'studio'
+                'studio',
+                'compilation'
             ))
             ->group(array('musicbrainz_albumid', 'albumartist', 'albumartistsort', 'album', 'year', 'originalyear'));
 

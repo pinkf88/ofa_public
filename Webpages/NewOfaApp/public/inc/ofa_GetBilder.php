@@ -13,6 +13,13 @@ $suchtext = $_GET["suchtext"];
 $wertung_min = 0 + $_GET["wertung_min"];
 $countperpage = 0 + $_GET["countperpage"];
 
+$serieid = 0;
+
+if (isset($_GET["serieid"])) {
+    $serieid = 0 + $_GET["serieid"];
+}
+
+
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
 $anzahl = 0;
@@ -116,8 +123,9 @@ if ($countperpage > 0) {
 
 $bilder = array();
 
-$sql = "SELECT b.id AS bildid, bd.Kamera, bd.objektiv, b.nummer, YEAR(b.datum) AS jahr, b.ticket, b.beschreibung, b.wertung, o.ort "
-    . "FROM ofa_bild b LEFT JOIN ofa_bilddaten bd ON (b.datei = bd.BildNr), ofa_ort o WHERE b.ortid=o.id AND b.beschreibung NOT LIKE \"YOUTUBE%\" "
+$sql = "SELECT b.id AS bildid, b.nummer, b.datei, bd.Kamera, bd.objektiv, YEAR(b.datum) AS jahr, b.ticket, b.beschreibung, b.wertung, o.ort, sb.id AS seriebildid "
+    . "FROM ofa_bild b LEFT JOIN ofa_bilddaten bd ON (b.datei = bd.BildNr) LEFT JOIN ofa_serie_bild sb ON (b.id = sb.bildid AND sb.serieid=" . $serieid . "), ofa_ort o "
+    . "WHERE b.ortid=o.id AND b.beschreibung NOT LIKE \"YOUTUBE%\" "
     . $where_bildtyp . $where_jahr . $where_ortid . $where_landid . $where_nummern . $where_suchtext . $where_wertung_min
     . " ORDER BY jahr DESC, b.nummer" . $limit;
 
@@ -127,9 +135,14 @@ if ($resultat = mysqli_query($db_link, $sql)) {
     if (mysqli_num_rows($resultat) > 0) {
         while ($datensatz = mysqli_fetch_assoc($resultat)) {
             $bildinfo = ofa_GetBildPfad($datensatz["nummer"], $datensatz["ticket"], $datensatz["jahr"]);
+            $seriebildid = '0';
+                
+            if ($datensatz["seriebildid"] != '') {
+                $seriebildid = $datensatz["seriebildid"];
+            }
 
-            $bilder[] = '|' . $datensatz["bildid"] . '|' . $datensatz["nummer"] . '|' . $datensatz["Kamera"] . '|' . $datensatz["objektiv"] . '|'
-                . $datensatz["wertung"] . '|' . $bildinfo["pfad"] . '|' . $bildinfo["extension"];
+            $bilder[] = '|' . $datensatz["bildid"] . '|' . $datensatz["nummer"] . '|' . $datensatz["datei"] . '|' . $datensatz["Kamera"] . '|' . $datensatz["objektiv"] . '|'
+                . $datensatz["wertung"] . '|' . $bildinfo["pfad"] . '|' . $bildinfo["extension"] . '|' . $seriebildid;
             
             $anzahl ++;
         }

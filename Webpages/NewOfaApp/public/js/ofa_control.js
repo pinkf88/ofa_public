@@ -9,21 +9,23 @@ const PLAYLIST_CATEGORIES = [
     'SONSTIGE_'
 ];
 
-const VIDEOID_KONZERTE = '44$13200';
-const VIDEOID_SPIELFILME = '44$13412';
-const VIDEOID_SERIEN = '44$13434';
-const VIDEOID_DOKUMENTATIONEN = '44$13269';
-const VIDEOID_COMEDY = '44$13433';
-const VIDEOID_SPORT = '44$13461';
-const VIDEOID_JRFILME = '44$13190';
-const VIDEOID_TEMP = '44$13464';
-
 
 $(function() {
     setTimeout( function() {
-        $('#control_fancybox-overlay').hide();
+        control_overlayOff();
     }, 15000);
 
+    control_tab('home');
+
+    $('.navbar-collapse ul li a:not(.dropdown-toggle)').bind('click touchstart', function () {
+        $('.navbar-toggle').click();
+    });
+
+    $('dt').click(function() {
+		$(this).next('dd').slideToggle('fast');
+		$(this).children('a').toggleClass('menu_closed menu_open');
+	});
+    
     control_listPlaylists();
 
     $('#artist_search').on('input', function(e) {
@@ -51,49 +53,6 @@ $(function() {
             } else {
                 $('.media_album_firstletter').hide();
                 $('.media_albums_intro_firstletters').hide();
-            }
-        }
-    });
-
-    $('#track_search').on('input', function(e) {
-        var input = $(this);
-        var val = input.val().toLowerCase();
-
-        if (input.data('lastval_t') != val) {
-            input.data('lastval_t', val);
-            var vals = val.split(' ');
-            // console.log(val);
-
-            var elems = $('.media_track');
-            // console.log(elems);
-
-            for (var i = 0; i < elems.length; i++) {
-                var hidden = true;
-
-                if (val == '') {
-                    hidden = false;
-                } else {
-                    var not_found = false;
-
-                    for (var j = 0; j < vals.length; j++) {
-                        if (elems[i].id.includes(vals[j]) == false) {
-                            not_found = true;
-                            break;
-                        }
-                    }
-
-                    hidden = not_found;
-                }
-
-                elems[i].hidden = hidden;
-            }
-
-            if (val == '') {
-                $('.media_track_firstletter').show();
-                $('.tracks_sort_track_intro_firstletters').show();
-            } else {
-                $('.media_track_firstletter').hide();
-                $('.tracks_sort_track_intro_firstletters').hide();
             }
         }
     });
@@ -144,6 +103,12 @@ $(function() {
                 }
             }
         }
+
+        if (val.length > 0) {
+            $('.media_videocontents').hide();
+        } else {
+            $('.media_videocontents').show();
+        }
     });
 
     $('.alben_sort_artist').show();
@@ -184,14 +149,14 @@ function control_listPlaylists()
             $('#' + playlist_id).append(html);
         }
 
-        control_updateAlbums();
+        control_updateStarFlagList();
     }).fail(function(jqXHR, textStatus)
     {
         console.log("ERROR control_listPlaylists(): " + textStatus);
     });
 }
 
-function control_updateAlbums()
+function control_updateStarFlagList()
 {
     $.ajax({
         url :   '/inc/ofa_ControlMedia.php?type=starlist&list'
@@ -219,255 +184,126 @@ function control_updateAlbums()
                 $('#year_media_album_' + flaglist[i]).addClass('bgcolor_lightyellow');
             }
 
+            control_overlayOff();
             control_listVideolist();
         }).fail(function(jqXHR, textStatus)
         {
-            console.log('ERROR control_updateAlbums(): ' + textStatus);
+            console.log('ERROR control_updateStarFlagList(): ' + textStatus);
         });        
     }).fail(function(jqXHR, textStatus)
     {
-        console.log('ERROR control_updateAlbums(): ' + textStatus);
+        console.log('ERROR control_updateStarFlagList(): ' + textStatus);
     });    
 }
 
-function control_listVideolist()
+function control_overlayOn()
 {
-    $.ajax({
-        url :   '/inc/ofa_ControlMedia.php?type=videolist&list'
-    }).done(function(data)
-    {
-        var videolist = JSON.parse(data);
-        // console.log(videolist);
-        
-        var konzerte = findNode(VIDEOID_KONZERTE, videolist);
-        var title_old = '';
-        var html = '<h5 id="Konzerte" class="control">Konzerte</h5><hr class="control">';
+    $('#control_fancybox-overlay').show();
+}
 
-        for (var i = 0; i < konzerte.children.length; i++) {
-            html += '<div id="' + konzerte.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_artist">'
-                + '<b>' + konzerte.children[i].title + '</b></div>';
-
-            for (var j = 0; j < konzerte.children[i].children.length; j++) {
-                html += '<div id="' + konzerte.children[i].children[j].title.toLowerCase() + '" class="media_video">'
-                    + getVideoLink(konzerte.children[i].children[j].url, konzerte.children[i].children[j].title,
-                        konzerte.children[i].children[j].duration, konzerte.children[i].children[j].resolution, konzerte.children[i].children[j].size);
-            }
-        }
-
-        var spielfilme = findNode(VIDEOID_SPIELFILME, videolist);
-        html += '<h5 id="Spielfilme" class="control">Spielfilme</h5><hr class="control">';
-
-        for (var i = 0; i < spielfilme.children.length; i++) {
-            html += '<div id="' + spielfilme.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_artist">'
-                + '<b>' + spielfilme.children[i].title + '</b></div>';
-
-            for (var j = 0; j < spielfilme.children[i].children.length; j++) {
-                html += '<div id="' + spielfilme.children[i].children[j].title.toLowerCase() + '" class="media_video">'
-                    + getVideoLink(spielfilme.children[i].children[j].url, spielfilme.children[i].children[j].title,
-                        spielfilme.children[i].children[j].duration, spielfilme.children[i].children[j].resolution, spielfilme.children[i].children[j].size);
-            }
-        }
-
-        var serien = findNode(VIDEOID_SERIEN, videolist);
-        html += '<h5 id="Serien" class="control">Serien</h5><hr class="control">';
-
-        for (var i = 0; i < serien.children.length; i++) {
-            html += '<div id="' + serien.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_caption">'
-                + serien.children[i].title + '</p></div>';
-
-            var children = [];
-            getChildren(findNode(serien.children[i].id, videolist), children);
-
-            for (var j = 0; j < children.length; j++) {
-                // console.log('children', children[j]);
-
-                html += '<div id="' + children[j].title.toLowerCase() + '" class="media_video">';
-
-                title = '';
-                getTitle(children[j], serien.children[i]);
-
-                if (title_old != title) {
-                    title_old = title;
-
-                    if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
-                    }
-                }
-
-                html += getVideoLink(children[j].url, children[j].title, children[j].duration, children[j].resolution, children[j].size);
-            }
-        }
-
-        var dokumentationen = findNode(VIDEOID_DOKUMENTATIONEN, videolist);
-        html += '<h5 id="Dokumentationen" class="control">Dokumentationen</h5><hr class="control">';
-
-        for (var i = 0; i < dokumentationen.children.length; i++) {
-            html += '<div id="' + dokumentationen.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_caption">'
-                + dokumentationen.children[i].title + '</p></div>';
-
-            var children = [];
-            getChildren(findNode(dokumentationen.children[i].id, videolist), children);
-
-            for (var j = 0; j < children.length; j++) {
-                // console.log('children', children[j]);
-
-                html += '<div id="' + children[j].title.toLowerCase() + '" class="media_video">';
-
-                title = '';
-                getTitle(children[j], dokumentationen.children[i]);
-
-                if (title_old != title) {
-                    title_old = title;
-
-                    if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
-                    }
-                }
-
-                html += getVideoLink(children[j].url, children[j].title, children[j].duration, children[j].resolution, children[j].size);
-            }
-        }
-
-        var comedy = findNode(VIDEOID_COMEDY, videolist);
-        html += '<h5 id="Comedy" class="control">Comedy</h5><hr class="control">';
-
-        for (var i = 0; i < comedy.children.length; i++) {
-            html += '<div id="' + comedy.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_caption">'
-                + comedy.children[i].title + '</p></div>';
-
-            var children = [];
-            getChildren(findNode(comedy.children[i].id, videolist), children);
-
-            for (var j = 0; j < children.length; j++) {
-                // console.log('children', children[j]);
-
-                html += '<div id="' + children[j].title.toLowerCase() + '" class="media_video">';
-
-                title = '';
-                getTitle(children[j], comedy.children[i]);
-
-                if (title_old != title) {
-                    title_old = title;
-
-                    if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
-                    }
-                }
-
-                html += getVideoLink(children[j].url, children[j].title, children[j].duration, children[j].resolution, children[j].size);
-            }
-        }
-
-        var sport = findNode(VIDEOID_SPORT, videolist);
-        html += '<h5 id="Sport" class="control">Sport</h5><hr class="control">';
-
-        for (var i = 0; i < sport.children.length; i++) {
-            html += '<div id="' + sport.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_caption">'
-                + sport.children[i].title + '</p></div>';
-
-            var children = [];
-            getChildren(findNode(sport.children[i].id, videolist), children);
-
-            for (var j = 0; j < children.length; j++) {
-                // console.log('children', children[j]);
-
-                html += '<div id="' + children[j].title.toLowerCase() + '" class="media_video">';
-
-                title = '';
-                getTitle(children[j], sport.children[i]);
-
-                if (title_old != title) {
-                    title_old = title;
-
-                    if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
-                    }
-                }
-
-                html += getVideoLink(children[j].url, children[j].title, children[j].duration, children[j].resolution, children[j].size);
-            }
-        }
-
-        var jrfilme = findNode(VIDEOID_JRFILME, videolist);
-        html += '<h5 id="JR-Filme" class="control">JR-Filme</h5><hr class="control">';
-
-        for (var i = 0; i < jrfilme.children.length; i++) {
-            html += '<div id="' + jrfilme.children[i].title.toLowerCase() + '" class="media_video_artist_videos"><p class="media_video_caption">'
-                + jrfilme.children[i].title + '</p></div>';
-
-            var children = [];
-            getChildren(findNode(jrfilme.children[i].id, videolist), children);
-
-            for (var j = 0; j < children.length; j++) {
-                // console.log('children', children[j]);
-
-                html += '<div id="' + children[j].title.toLowerCase() + '" class="media_video">';
-
-                title = '';
-                getTitle(children[j], jrfilme.children[i]);
-
-                if (title_old != title) {
-                    title_old = title;
-
-                    if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
-                    }
-                }
-
-                html += getVideoLink(children[j].url, children[j].title, children[j].duration, children[j].resolution, children[j].size);
-            }
-        }
-
-        var temp = findNode(VIDEOID_TEMP, videolist);
-        html += '<h5 id="Temp" class="control">Temp</h5><hr class="control">';
-
-        for (var i = 0; i < temp.children.length; i++) {
-            html += '<div id="' + temp.children[i].title.toLowerCase() + '" class="media_video">'
-                + getVideoLink(temp.children[i].url, temp.children[i].title, temp.children[i].duration, temp.children[i].resolution, temp.children[i].size);
-        }
-
-        $('#media_videolist').append(html);
-
-        $('html, body').animate({ scrollTop: $('body').offset().top - 100 }, 10);
-        $('#control_fancybox-overlay').hide();
-
-        control_admin('info_iobroker');
-    }).fail(function(jqXHR, textStatus)
-    {
-        console.log('ERROR control_listVideolist(): ' + textStatus);
-        $('#control_fancybox-overlay').hide();
-        control_admin('info_iobroker');
-    });    
+function control_overlayOff()
+{
+    $('#control_fancybox-overlay').hide();
 }
 
 function control_tab(tab)
 {
     $('html, body').animate({ scrollTop: $('body').offset().top - 100 }, 10);
+    $("#tooltip").hide();
 
     $('#control_tab_albums').hide();
     $('#control_tab_tracks').hide();
     $('#control_tab_playlists').hide();
     $('#control_tab_pictures').hide();
     $('#control_tab_videos').hide();
+    $('#control_tab_analytics').hide();
     $('#control_tab_home').hide();
     $('#control_tab_admin').hide();
     $('#control_tab_' + tab).show();
 
+    if (tab == 'home') {
+        control_runHome();
+    }
+
+    if (tab == 'tracks') {
+        if ($('#control_tracks').html() == '') {
+            control_overlayOn();
+
+            $.ajax({
+                url :   '/inc/ofa_ControlTracks.php'
+            }).done(function(html)
+            {
+                $('#control_tracks').html(html);
+
+                setTimeout(function() {
+                    $('#track_search').on('input', function(e) {
+                        var input = $(this);
+                        var val = input.val().toLowerCase();
+                
+                        if (input.data('lastval_t') != val) {
+                            input.data('lastval_t', val);
+                            var vals = val.split(' ');
+                            // console.log(val);
+                
+                            var elems = $('.media_track');
+                            // console.log(elems);
+                
+                            for (var i = 0; i < elems.length; i++) {
+                                var hidden = true;
+                
+                                if (val == '') {
+                                    hidden = false;
+                                } else {
+                                    var not_found = false;
+                
+                                    for (var j = 0; j < vals.length; j++) {
+                                        if (elems[i].id.includes(vals[j]) == false) {
+                                            not_found = true;
+                                            break;
+                                        }
+                                    }
+                
+                                    hidden = not_found;
+                                }
+                
+                                elems[i].hidden = hidden;
+                            }
+                
+                            if (val == '') {
+                                $('.media_track_firstletter').show();
+                                $('.tracks_sort_track_intro_firstletters').show();
+                            } else {
+                                $('.media_track_firstletter').hide();
+                                $('.tracks_sort_track_intro_firstletters').hide();
+                            }
+                        }
+                    });
+
+                    control_overlayOff();
+                }, 5000);
+            }).fail(function(jqXHR, textStatus)
+            {
+                console.log('ERROR control_tab(): ' + textStatus);
+                control_overlayOff();
+            });                
+        }
+    }
+
+    // $(this).next('dd').slideToggle('fast');
+    // $(this).children('a').toggleClass('menu_closed menu_open');
+
     if (tab == 'albums' || tab == 'tracks' || tab == 'playlists') {
-        $('#control_left_music').show();
-    } else {
-        $('#control_left_music').hide();
+		$('#menu_control_music_content').show();
+		$('#menu_control_music_link').toggleClass('menu_closed menu_open');
     }
 
     if (tab == 'pictures') {
-        $('#control_left_pictures').show();
-    } else {
-        $('#control_left_pictures').hide();
+		$('#menu_control_pictures_content').show();
+		$('#menu_control_pictures_link').toggleClass('menu_closed menu_open');
     }
 
     if (tab == 'videos') {
-        $('#control_left_video').show();
-    } else {
-        $('#control_left_video').hide();
+		$('#menu_control_videos_content').show();
+		$('#menu_control_videos_link').toggleClass('menu_closed menu_open');
     }
 }

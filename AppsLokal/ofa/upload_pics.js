@@ -7,7 +7,7 @@ let Client          = require('ssh2-sftp-client');
 var colors          = require('colors');
 var ArgumentParser  = require('argparse').ArgumentParser;
 var database        = require('../libs/lib_database.js');
-var config          = require('../../configs/ofa_config.json');
+var config          = require('../configs/ofa_config.json');
 
 
 const PFAD_SOURCE_MAIN = config.apps.convert.path_source_main;
@@ -64,6 +64,30 @@ parser.add_argument(
     }
 );
 
+parser.add_argument(
+    '-r',
+    {
+        help: 'Reverse Sortierung.',
+        action: 'store_true'
+    }
+);
+
+parser.add_argument(
+    '-ohneort',
+    {
+        help: 'Kein Ort.',
+        action: 'store_true'
+    }
+);
+
+parser.add_argument(
+    '-ohneland',
+    {
+        help: 'Kein Land.',
+        action: 'store_true'
+    }
+);
+
 var args = parser.parse_args();
 
 var PFAD_SOURCE = PFAD_SOURCE_MAIN;
@@ -109,6 +133,10 @@ if (files_all == null || files_all.length < 1) {
 // console.log(files_all);
 files_all.sort();
 
+if (args.r == true) {
+    files_all.reverse();
+}
+
 var files_jpg = files_all.filter(function(a)
 {
     return !a.toUpperCase().includes(SUFFIX_Z0.toUpperCase() + '.JPG') && a.toUpperCase().includes('.JPG') && !a.includes('zz_black.jpg');
@@ -142,6 +170,18 @@ var bild_bemerkung = '';
 
 if (args.B != null) {
     bild_bemerkung = args.B;
+}
+
+var ohneort = 0;
+
+if (args.ohneort) {
+    ohneort = 1;
+
+}
+var ohneland = 0;
+
+if (args.ohneland) {
+    ohneland = 1;
 }
 
 var bild_array = [];
@@ -275,6 +315,8 @@ function check_db(file_no)
             beschreibung:   bild_beschreibung,
             bemerkung:      bild_bemerkung,
             datum:          last_datum,
+            ohneort:        ohneort,
+            ohneland:       ohneland
         };
 
         if (result == null || result.length == 0) {

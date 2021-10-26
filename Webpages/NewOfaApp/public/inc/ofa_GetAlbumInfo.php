@@ -6,8 +6,10 @@ $albumid = $_GET["albumid"];
 
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
-$sql = "SELECT DISTINCT t.albumartist, t.album, t.discnumber, t.totaldiscs, t.discsubtitle, t.year, t.originalyear, t.pic, t.path "
-    . "FROM $dbt_ofa_tracks t WHERE t.musicbrainz_albumid=\"" . $albumid . "\" ORDER BY t.discnumber";
+$sql = "SELECT DISTINCT t.albumartist, t.album, t.discnumber, t.totaldiscs, t.discsubtitle, t.year, t.originalyear, t.pic, t.path, "
+    . "a.discogs_albumid, a.genres, a.styles "
+    . "FROM ofa_tracks t LEFT JOIN ofa_albums a ON (t.musicbrainz_albumid = a.musicbrainz_albumid)"
+    . "WHERE t.musicbrainz_albumid=\"" . $albumid . "\" ORDER BY t.discnumber";
 // SELECT musicbrainz_albumid, albumartist, album, year, originalyear, COUNT(musicbrainz_recordingid) FROM `ofa_tracks` GROUP BY musicbrainz_albumid, albumartist, album, year, originalyear ORDER BY albumartist, album
 // echo $sql;
 
@@ -66,10 +68,24 @@ $albumdaten .= '<p class=\"year\">' . $jahr . '</p>';
 $albumdaten .= '<p class=\"path\">' . $path . '</p>';
 
 if (strlen($albumid) == 36) {
-    $albumdaten .= '<p class=\"mblink\"><a href=\"https://musicbrainz.org/release/' . $albumid . '\">MusicBrainz</a></p>';
+    $albumdaten .= '<p class=\"rightside_mblink\"><a href=\"https://musicbrainz.org/release/' . $albumid . '\" target=\"_blank\">MusicBrainz</a></p>';
 }
 
 $albumdaten .= '<p class=\"albumid\">' . $albumid . '</p>';
+
+if (is_null($datensatz["discogs_albumid"]) == FALSE) {
+    $albumdaten .= '<p class=\"rightside_discogs_albumid\">' . $datensatz["discogs_albumid"] . '</p>';
+}
+
+if (is_null($datensatz["genres"]) == FALSE && $datensatz["genres"] != '') {
+    $genres = preg_replace("/\|/", " | ", trim($datensatz["genres"], "|"));
+    $albumdaten .= '<p class=\"rightside_genres\">Genres: ' . $genres . '</p>';
+}
+
+if (is_null($datensatz["styles"]) == FALSE && $datensatz["styles"] != '') {
+    $styles = preg_replace("/\|/", " | ", trim($datensatz["styles"], "|"));
+    $albumdaten .= '<p class=\"rightside_styles\">Styles: ' . $styles . '</p>';
+}
 
 $bilddaten = '';
 

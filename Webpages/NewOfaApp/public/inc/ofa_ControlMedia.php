@@ -19,6 +19,14 @@ if ($type == 'audio') {
             . '&roomid=' . $_GET["roomid"]
             . '&personid=' . $_GET["personid"];
 
+        $no_compilations = 0;
+
+        if (isset($_GET["no_compilations"])) {
+            $no_compilations = $_GET["no_compilations"];
+        }
+
+        $url .= '&no_compilations=' . $no_compilations;
+
         $response = \Httpful\Request::get($url)->send();
     } else if (isset($_GET["direction"])) {
         $response = \Httpful\Request::get('localhost:8085/audio?direction=' . $_GET["direction"] . '&roomid=' . $_GET["roomid"])->send();
@@ -32,8 +40,11 @@ if ($type == 'audio') {
     if (isset($_GET["albumid"]) && isset($_GET["runtype"])) {
         // Start playing album
         $response = \Httpful\Request::get('localhost:8085/audio?albumid=' . $_GET["albumid"] . '&runtype=' . $_GET["runtype"])->send();
+    } else if (isset($_GET["albumid"]) && isset($_GET["update"])) {
+        // Updating album info (with musicbrainz and discogs data)
+        $response = \Httpful\Request::get('localhost:8085/audio?update&albumid=' . $_GET["albumid"])->send();
     } else if (isset($_GET["albumid"])) {
-        // Start playing album
+        // Getting album info
         $response = \Httpful\Request::get('localhost:8085/audio?albumid=' . $_GET["albumid"])->send();
     } else if (isset($_GET["info"])) {
         $response = \Httpful\Request::get('localhost:8085/audio?info')->send();
@@ -119,14 +130,28 @@ if ($type == 'audio') {
         $response = \Httpful\Request::get('localhost:8085/admin?reconnect_kodi')->send();
     } else if (isset($_GET["restart_kodi"])) {
         $response = \Httpful\Request::get('localhost:8085/admin?restart_kodi')->send();
+    } else if (isset($_GET["restart_echostudio"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_echostudio')->send();
+    } else if (isset($_GET["restart_echoshow"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_echoshow')->send();
     } else if (isset($_GET["restart_webhome"])) {
         $response = \Httpful\Request::get('localhost:8085/admin?restart_webhome')->send();
-    } else if (isset($_GET["restart_iobroker"])) {
-        $response = \Httpful\Request::get('localhost:8085/admin?restart_iobroker')->send();
     } else if (isset($_GET["audio_volumecheck"])) {
         $response = \Httpful\Request::get('localhost:8085/admin?audio_volumecheck')->send();
     } else if (isset($_GET["update_videolist"])) {
         $response = \Httpful\Request::get('localhost:8085/admin?update_videolist')->send();
+    } else if (isset($_GET["update_playlists"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?update_playlists')->send();
+    } else if (isset($_GET["update_analytics"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?update_analytics')->send();
+    } else if (isset($_GET["update_databases_all"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?update_databases&domain=all')->send();
+    } else if (isset($_GET["update_databases_jr"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?update_databases&domain=jr')->send();
+    } else if (isset($_GET["update_databases_eib"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?update_databases&domain=eib')->send();
+    } else if (isset($_GET["restart_iobroker"])) {
+        $response = \Httpful\Request::get('localhost:8085/admin?restart_iobroker')->send();
     } else if (isset($_GET["info_iobroker"])) {
         $response = \Httpful\Request::get('localhost:8085/admin?info_iobroker')->send();
     }

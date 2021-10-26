@@ -60,4 +60,11 @@ function ofa_replace($subject)
 
     return str_replace($search, $replace, $subject);
 }
+
+function date_mysql2german($datum)
+{
+		$d = explode("-", $datum);
+
+        return sprintf("%02d.%02d.%04d", $d[2], $d[1], $d[0]);
+}
 ?>

@@ -110,25 +110,23 @@ $("#webseriedialog").dialog({
 
 function serie_showBilder(serieid)
 {
-    var output = "";
+    var output = '';
 
     $.ajax({
-        dataType:   "json",
-        url:        "/inc/ofa_GetSerie.php?serieid=" + serieid
-    }).done(function(data)
-    {
+        dataType:   'json',
+        url:        '/inc/ofa_GetSerie.php?serieid=' + serieid
+    }).done(function(data) {
         // console.log(data);
         $('#bilderliste').empty();
         $('#bilderliste').html(data.serie_bilder);
         $('.scroll-pane').jScrollPane();
 
-        output += '<b>' + data.serie + '</b><br>\n';
-        output += data.serie_anzahl + ' Bilder\n';
+        output += data.serie_link + '\n';
+        output += '<p>' + data.serie_anzahl + ' Bilder</p>\n';
 
         $('#serieinformation').html(output);
         $('.bildergrid_wertung').hide();
-    }).fail(function(jqXHR, textStatus)
-    {
+    }).fail(function(jqXHR, textStatus) {
         console.log('serie_showBilder: ' + textStatus);
     });
 
@@ -175,24 +173,22 @@ function serie_updateBilderliste()
     }
 
     $.ajax({
-        method: "POST",
-        dataType : "text",
-        url : "/inc/ofa_UpdateSerie.php?serieid=" + g_serieid,
-        data: "bilder=" + bilder
-    }).done(function(data)
-    {
+        method:     'POST',
+        dataType:   'text',
+        url:        '/inc/ofa_UpdateSerie.php?serieid=' + g_serieid,
+        data:       'bilder=' + bilder
+    }).done(function(data) {
         serie_showBilder(parseInt(g_serieid));
-    }).fail(function(jqXHR, textStatus)
-    {
-        console.log("Database access failed: " + textStatus);
+    }).fail(function(jqXHR, textStatus) {
+        console.log('serie_updateBilderliste(): ' + textStatus);
     });
 }
 
 function serie_addToWeb(serieid)
 {
     $.ajax({
-        dataType : "json",
-        url : "/inc/ofa_GetSerie.php?serieid=" + serieid
+        dataType:   'json',
+        url:        '/inc/ofa_GetSerie.php?serieid=' + serieid
     }).done(function(data)
     {
         $('input[name=webid]').val($('select[name=webid]').val());

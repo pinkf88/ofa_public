@@ -1,5 +1,5 @@
 var mysql   = require('mysql');
-var config  = require('../../configs/ofa_config.json');
+var config  = require('../configs/ofa_config.json');
 
 
 var db_connection = null;

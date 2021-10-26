@@ -18,18 +18,16 @@ function serie_fillGrid(serieid)
     g_serieid = serieid;
 
     $.ajax({
-        dataType : "json",
-        url : "/inc/ofa_GetSerie.php?serieid=" + serieid
-    }).done(function(data)
-    {
+        dataType:   'json',
+        url:        '/inc/ofa_GetSerie.php?serieid=' + serieid
+    }).done(function(data) {
         $('#bildergrid').empty();
         $('#bildergrid').html(data.serie_bilder);
-    }).fail(function(jqXHR, textStatus)
-    {
-        console.log("Database access failed: " + textStatus);
+    }).fail(function(jqXHR, textStatus) {
+        console.log('serie_fillGrid(): ' + textStatus);
     });
 
-    $(".fancybox").fancybox();
+    $('.fancybox').fancybox();
 }
 
 function serie_updateBilderGrid()

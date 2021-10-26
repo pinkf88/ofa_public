@@ -1,8 +1,8 @@
 <?php
 $db_ofa_server = "192.168.2.227";
 $db_ofa_database = "myofa";
-$db_ofa_user = "";
-$db_ofa_password = "";
+$db_ofa_user = "root";
+$db_ofa_password = "lisboa98";
 
 $dbt_ofa_leben = "ofa_leben";
 $dbt_ofa_bild = "ofa_bild";

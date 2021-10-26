@@ -3,15 +3,20 @@ var path            = require('path');
 var dir             = require('node-dir');
 var colors          = require('colors');
 var ArgumentParser  = require('argparse').ArgumentParser;
-var config          = require('../../configs/ofa_config.json');
+var tools           = require('../libs/lib_tools.js');
+var database        = require('../libs/lib_database.js');
+var config          = require('../configs/ofa_config.json');
 
 
+const PFAD_SOURCE_MAIN = config.apps.convert.path_source_main;
 const PFAD_SERIE = config.apps.clean_dirs.path_serie;
+const PFAD_SERIE_BACKUP = config.apps.clean_dirs.path_serie_backup;
 const PFAD_OFA = config.apps.clean_dirs.path_ofa;
 const PFAD_OFA_BACKUP = config.apps.clean_dirs.path_ofa_backup;
-const PFAD_WEB_MINI = config.apps.clean_dirs.path_web_mini;
 const PFAD_WEB_PIC = config.apps.clean_dirs.path_web_pic;
 const PFAD_WEB_LARGE = config.apps.clean_dirs.path_web_large;
+const SUFFIX_Z0 = config.apps.convert.suffix_z0;
+
 
 var parser = new ArgumentParser({
     add_help: true,
@@ -21,16 +26,21 @@ var parser = new ArgumentParser({
 parser.add_argument(
     '-s',
     {
-        help: 'Start number.',
-        required: true
+        help: 'Start number.'
     }
 );
 
 parser.add_argument(
     '-e',
     {
-        help: 'End number.',
-        required: true
+        help: 'End number.'
+    }
+);
+
+parser.add_argument(
+    '--dir',
+    {
+        help: 'Verzeichnis NeueOfaPics.'
     }
 );
 
@@ -43,97 +53,205 @@ parser.add_argument(
 );
 
 var args = parser.parse_args();
-var number_start = args.s;
-var number_end = args.e;
+var number_start = -1;
+var number_end = -1;
+var pfad_source = '';
 
-if (number_start > 10000000 || number_end > 10000000) {
-    console.log('Ungültige Nummer(n).');
-    return;
+if (args.s != null) {
+    number_start = args.s;
 }
 
-var pfad_serie = PFAD_SERIE + args.serie;
+if (args.e != null) {
+    number_end = args.e;
+}
 
-cleanDirectory(pfad_serie, 'z0', 'jpg');
-cleanDirectory(pfad_serie, '_hd', 'jpg');
+if (args.dir != null) {
+    pfad_source = PFAD_SOURCE_MAIN + args.dir + '/';
+}
 
-var dirs = [];
 
-for (var number = number_start; number <= number_end; number++) {
-    var sub_path = get_subpfad(number);
+var numbers = [];
+var zeler = 0;
+var files_count = 0;
 
-    if (dirs.indexOf(sub_path) == -1) {
-        dirs.push(sub_path);
+db_connection = database.connect();
+
+if (pfad_source != '') {
+    var files_all = null;
+
+    try {
+        files_all = dir.files(pfad_source, { sync: true });
     }
-}
-
-// console.log(dirs);
-
-for (var i = 0; i < dirs.length; i++) {
-    var ofa_path = PFAD_OFA + dirs[i];
-    cleanDirectory(ofa_path, 'z0', 'jpg');
-    cleanDirectory(ofa_path, 'z0', 'gif');
-    cleanDirectory(ofa_path, 'z0', 'png');
-    cleanDirectory(ofa_path, '', 'jpg');
-    cleanDirectory(ofa_path, '', 'gif');
-    cleanDirectory(ofa_path, '', 'png');
-
-    ofa_path = PFAD_OFA_BACKUP + dirs[i];
-    cleanDirectory(ofa_path, 'z0', 'jpg');
-    cleanDirectory(ofa_path, 'z0', 'gif');
-    cleanDirectory(ofa_path, 'z0', 'png');
-    cleanDirectory(ofa_path, '', 'jpg');
-    cleanDirectory(ofa_path, '', 'gif');
-    cleanDirectory(ofa_path, '', 'png');
-}
-
-dirs.length = 0;
-
-for (var number = number_start; number <= number_end; number++) {
-    var sub_path = get_subpfad1000(number);
-
-    if (dirs.indexOf(sub_path) == -1) {
-        dirs.push(sub_path);
+    catch(err) {
+        console.log(pfad_source + ' nicht vorhanden.')
+        // console.log(err.message);
+        return;
     }
-}
 
-console.log(dirs);
+    if (files_all == null || files_all.length < 1) {
+        console.log('Keine Dateien vorhanden.');
+        return;
+    }
 
-for (var i = 0; i < dirs.length; i++) {
-    var web_path = PFAD_WEB_MINI + dirs[i];
-    cleanDirectory(web_path, '_m', 'jpg');
+    // console.log(files_all);
+    files_all.sort();
 
-    web_path = PFAD_WEB_PIC + dirs[i];
-    cleanDirectory(web_path, '', 'jpg');
-
-    web_path = PFAD_WEB_LARGE + dirs[i];
-    cleanDirectory(web_path, '', 'jpg');
-}
-
-function get_subpfad(nummer, jahr=0)
-{
-    if (nummer > 10000000)
+    var files_jpg = files_all.filter(function(a)
     {
-        // Ticket
-        return 'tickets/' + jahr + '/';
+        return a.toUpperCase().includes(SUFFIX_Z0.toUpperCase() + '.JPG');
+    });
+
+    // console.log(files_jpg);
+    console.log(files_jpg.length + ' jpg-Dateien im Verzeichnis "' + pfad_source + '".');
+
+    if (files_jpg.length < 1) {
+        console.log('Keine konvertierbaren Dateien vorhanden.');
+        return;
     }
 
-    var s1 = "" + (Math.floor(nummer / 1000) * 1000);
-    var s2 = "" + (Math.floor(nummer / 100) * 100);
+    files_count = files_jpg.length;
+
+    for (var i = 0; i < files_jpg.length; i++) {
+        var file = files_jpg[i].replace(/^.*[\\\/]/, '').replace(SUFFIX_Z0 + '.jpg', '');
+        check_db(file);
+    }
     
-    return s1.padStart(6, '0') + '/' + s2.padStart(6, '0') + '/';
+    console.log(files_jpg);
+} else {
+    if (number_start > 10000000 || number_end > 10000000) {
+        console.log('Ungültige Nummer(n).');
+        return;
+    }
+
+    console.log((number_end - number_start + 1) + ' Dateien löschen? Taste drücken. Ansonsten CTRL+c.');
+
+    process.stdin.once('data', function () {
+        clean_dirs();
+        process.exit();
+    });
+
+    for (var number = number_start; number <= number_end; number++) {
+        numbers.push(number);
+    }
 }
 
-function get_subpfad1000(nummer, jahr=0)
+function check_db(file)
 {
-    if (nummer > 10000000)
+    console.log(file);
+
+    bild_sql = '';
+    var bnummer = 0;
+
+    if (file.startsWith('dia'))
     {
-        // Ticket
-        return 'tickets/' + jahr + '/';
+        bnummer = parseInt(file.replace('dia', ''));
+        bild_sql = 'SELECT nummer, datei FROM ofa_bild WHERE nummer="' + bnummer + '" ';
+    }
+    else if (file.startsWith('scan'))
+    {
+        bnummer = parseInt(file.replace('scan', ''));
+        bild_sql = 'SELECT nummer, datei FROM ofa_bild WHERE datei="' + bnummer + '" ';
+    }
+    else
+    {
+        console.log('Ungültige Datei ' + file);
+        process.exit();
     }
 
-    var s1 = "" + (Math.floor(nummer / 1000) * 1000);
-    
-    return s1.padStart(6, '0') + '/';
+    db_connection.query(bild_sql, function (err, result) {
+        if (err) {
+            // throw err;
+            console.log('convert.js | check_db(): ERROR: ' + err.message);
+            console.log(bild_sql);
+            process.exit();
+        }
+
+        if (result == null || result.length == 0) {
+            console.log('Datei ' + file + ' NICHT in Datenbank vorhanden.');
+        } else {
+            numbers.push(result[0].nummer);
+        }
+
+        zeler++;
+        // console.log(zeler + ' / '+ files_count);
+
+        if (zeler >= files_count) {
+            console.log("In Datenbank gefundene Bilder: " + numbers.length);
+
+            if (numbers.length > 0) {
+                setTimeout( function () {
+                    clean_dirs();
+                    finish();
+                }, 10);
+            } else {
+                finish();
+            }
+        }
+    });
+
+}
+
+function clean_dirs()
+{
+    var pfad_serie = PFAD_SERIE + args.serie;
+
+    cleanDirectory(pfad_serie, 'z0', 'jpg');
+    cleanDirectory(pfad_serie, '_hd', 'jpg');
+
+    var pfad_serie_backup = PFAD_SERIE_BACKUP + args.serie;
+
+    cleanDirectory(pfad_serie_backup, 'z0', 'jpg');
+    cleanDirectory(pfad_serie_backup, '_hd', 'jpg');
+
+    var dirs = [];
+
+    for (var i = 0; i < numbers.length; i++) {
+        var sub_path = tools.get_subpfad(numbers[i]);
+
+        if (dirs.indexOf(sub_path) == -1) {
+            dirs.push(sub_path);
+        }
+    }
+
+    // console.log(dirs);
+
+    for (var i = 0; i < dirs.length; i++) {
+        var ofa_path = PFAD_OFA + dirs[i];
+        cleanDirectory(ofa_path, 'z0', 'jpg');
+        cleanDirectory(ofa_path, 'z0', 'gif');
+        cleanDirectory(ofa_path, 'z0', 'png');
+        cleanDirectory(ofa_path, '', 'jpg');
+        cleanDirectory(ofa_path, '', 'gif');
+        cleanDirectory(ofa_path, '', 'png');
+
+        ofa_path = PFAD_OFA_BACKUP + dirs[i];
+        cleanDirectory(ofa_path, 'z0', 'jpg');
+        cleanDirectory(ofa_path, 'z0', 'gif');
+        cleanDirectory(ofa_path, 'z0', 'png');
+        cleanDirectory(ofa_path, '', 'jpg');
+        cleanDirectory(ofa_path, '', 'gif');
+        cleanDirectory(ofa_path, '', 'png');
+    }
+
+    dirs.length = 0;
+
+    for (var i = 0; i < numbers.length; i++) {
+        var sub_path = tools.get_subpfad1000(numbers[i]);
+
+        if (dirs.indexOf(sub_path) == -1) {
+            dirs.push(sub_path);
+        }
+    }
+
+    console.log(dirs);
+
+    for (var i = 0; i < dirs.length; i++) {
+        var web_path = PFAD_WEB_PIC + dirs[i];
+        cleanDirectory(web_path, '', 'jpg');
+
+        web_path = PFAD_WEB_LARGE + dirs[i];
+        cleanDirectory(web_path, '', 'jpg');
+    }
 }
 
 function cleanDirectory(pfad, suffix, extension)
@@ -180,7 +298,7 @@ function cleanDirectory(pfad, suffix, extension)
     for (var i = 0; i < files_jpg.length; i++) {
         var number = parseInt(path.basename(files_jpg[i], path.extname(files_jpg[i])));
 
-        if (number >= number_start && number <= number_end) {
+        if (numbers.indexOf(number) != -1) {
             fs.removeSync(files_jpg[i]);
             console.log(colors.green(files_jpg[i] + ' gelöscht.'));
             counter++;
@@ -192,4 +310,11 @@ function cleanDirectory(pfad, suffix, extension)
     } else {
         console.log(colors.green(counter + ' Dateien mit Suffix ' + suffix + ' und Extension ' + extension + ' in ' + pfad + ' gelöscht.'));
     }
+}
+
+function finish()
+{
+    console.log('finish(): DB connection closed');
+    database.disconnect(db_connection);
+    process.exit();
 }

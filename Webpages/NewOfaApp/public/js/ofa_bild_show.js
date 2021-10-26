@@ -11,11 +11,13 @@ var g_kameras = [];
 var g_objektive = [];
 var g_bilder = [];
 
-function bild_fillGrid(bildtyp, jahr, ortid, landid, nummer_von, nummer_bis, suchtext, wertung_min, countperpage)
+function bild_fillGrid(bildtyp, jahr, ortid, landid, nummer_von, nummer_bis, suchtext, wertung_min, countperpage, serieid, serie)
 {
+    $('#bildergrid_serie').html('Serie: <b>' + serie + '</b>');
+
     var url = '/inc/ofa_GetBilder.php?bildtyp=' + bildtyp + '&jahr=' + jahr + '&ortid=' + ortid + '&landid=' + landid
         + '&nummer_von=' + nummer_von + '&nummer_bis=' + nummer_bis
-        + '&suchtext=' + suchtext + '&wertung_min=' + wertung_min + '&countperpage=' + countperpage;
+        + '&suchtext=' + suchtext + '&wertung_min=' + wertung_min + '&countperpage=' + countperpage + '&serieid=' + serieid;
 
     // console.log('url=' + url);
 
@@ -32,15 +34,18 @@ function bild_fillGrid(bildtyp, jahr, ortid, landid, nummer_von, nummer_bis, suc
             var splits = data.bilder[i].split('|');
 
             var bko = {
-                bildid:     splits[1],
-                nummer:     splits[2],
-                kamera:     splits[3],
-                objektiv:   splits[4],
-                wertung:    splits[5],
-                pfad:       splits[6],
-                extension:  splits[7]
+                bildid:         splits[1],
+                nummer:         splits[2],
+                datei:          splits[3],
+                kamera:         splits[4],
+                objektiv:       splits[5],
+                wertung:        splits[6],
+                pfad:           splits[7],
+                extension:      splits[8],
+                seriebildid:    parseInt(splits[9])
             }
 
+            // console.log('bko', bko);
             g_bilder.push(bko);
         }
 
@@ -136,9 +141,15 @@ function bild_showHideBilder()
         }
 
         if (add_bild == true) {
+            var class_nummerdatei = '';
+
+            if (g_bilder[j].seriebildid > 1) {
+                class_nummerdatei = ' class="color_red"';
+            }
+
             bildergrid += '<li id="id' + g_bilder[j].bildid + '" class="ui-state-default">'
                 + '<div class="bildergrid">'
-                + '<div>' + g_bilder[j].nummer + ' | <span id="wertung' + g_bilder[j].bildid + '">Wertung: 0</span></div>'
+                + '<div id="nummerdatei' + g_bilder[j].bildid + '"' + class_nummerdatei + '>' + g_bilder[j].nummer + ' | ' + g_bilder[j].datei + ' | <span id="wertung' + g_bilder[j].bildid + '">0</span></div>'
                 + '<div>'
                 + '<a class="fancybox" rel="group" href="' + g_bilder[j].pfad + '.jpg" title="' + g_bilder[j].nummer + '|' + g_bilder[j].bildid + '|' + g_bilder[j].wertung + '">'
                 + '<img id="img' + g_bilder[j].bildid + '" class="mini" src="' + g_bilder[j].pfad + '.' + g_bilder[j].extension + '"></a><br>'
@@ -170,7 +181,7 @@ function bild_setWertung(bildid, wertung)
         url:        '/inc/ofa_UpdateBildWertung.php?bildid=' + bildid + '&wertung=' + wertung
     }).done(function(data)
     {
-        $('#wertung' + data.bildid).html('Wertung: ' + data.wertung);
+        $('#wertung' + data.bildid).html('' + data.wertung);
 
         if ($('#rat_' + data.bildid) != undefined && $('#rat_' + data.bildid)[0] != undefined) {
             $('#rat_' + data.bildid)[0].innerHTML = '' + data.wertung;
@@ -187,12 +198,13 @@ $(document).keypress(function(event) {
         var nummer = span[0];
         var bildid = span[1];
 
-        if (event.charCode >= 48 && event.charCode <= 53) {
+        if (event.charCode >= 48 && event.charCode <= 53) { // 0 - 5
             bild_setWertung(bildid, event.charCode - 48);
             $('span.child')[0].innerHTML = nummer + '|' + bildid + '|' + (event.charCode - 48);
-        } else if (event.charCode == 112) {
+        } else if (event.charCode == 112) { // p
             parent.bild_playBild(nummer);
-        } else if (event.charCode == 115) {
+        } else if (event.charCode == 115) { // s
+            $('#nummerdatei' + bildid).addClass('color_red');
             parent.bild_addToSerie(bildid);
         }
     }
@@ -205,5 +217,6 @@ function bild_playBild(nummer)
 
 function bild_addToSerie(bildid)
 {
+    $('#nummerdatei' + bildid).addClass('color_red');
     parent.bild_addToSerie(bildid);
 }

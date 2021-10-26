@@ -214,18 +214,11 @@ class BildController extends AbstractActionController
         $this->session->offsetSet('countperpage', $countperpage);
         $this->session->offsetSet('serieid', $serieid);
 
-        if ($this->params()
-            ->fromRoute('order_by'))
-        {
-            $order_by = $this->params()
-                ->fromRoute('order_by');
-        }
-        else if ($this->session->offsetExists('order_by'))
-        {
+        if ($this->params()->fromRoute('order_by')) {
+            $order_by = $this->params()->fromRoute('order_by');
+        } else if ($this->session->offsetExists('order_by')) {
             $order_by = $this->session->offsetGet('order_by');
-        }
-        else
-        {
+        } else {
             $order_by = 'nummer';
         }
 
@@ -235,37 +228,29 @@ class BildController extends AbstractActionController
 
         $select = new Select();
 
-        if ($jahr > 0)
-        {
+        if ($jahr > 0) {
             $select->where('YEAR(ofa_bild.datum)="' . $jahr . '"');
         }
 
-        if ($bildtyp == 1) // nur Bilder
-        {
+        if ($bildtyp == 1) {
             $select->where('ticket="0"');
-        }
-        else if ($bildtyp == 2) // nur Tickets
-        {
+        } else if ($bildtyp == 2) {
             $select->where('ticket="1"');
         }
 
-        if ($ortid > 0)
-        {
+        if ($ortid > 0) {
             $select->where('ortid=' . $ortid);
         }
 
-        if ($landid > 0)
-        {
+        if ($landid > 0) {
             $select->where('landid=' . $landid);
         }
 
-        if ($wertung_min > 0)
-        {
+        if ($wertung_min > 0) {
             $select->where('wertung>=' . $wertung_min);
         }
 
-        if (strlen($suchtext) > 0)
-        {
+        if (strlen($suchtext) > 0) {
             $pos = strpos($suchtext, 'DATUM');
 
             if ($pos === false) {
@@ -312,16 +297,17 @@ class BildController extends AbstractActionController
             $select->where($where);
         }
 
-        if (strlen($nummer_von) > 0 && strlen($nummer_bis) == 0)
-        {
+        if (strlen($nummer_von) > 0 && strlen($nummer_bis) == 0) {
             $select->where('ofa_bild.nummer=' . $nummer_von);
-        }
-        else if (strlen($nummer_von) > 0 && strlen($nummer_bis) > 0)
-        {
+        } else if (strlen($nummer_von) > 0 && strlen($nummer_bis) > 0) {
             $select->where('(ofa_bild.nummer>=' . $nummer_von . ' AND ofa_bild.nummer<=' . $nummer_bis . ')');
         }
 
-        $select->order('jahr DESC')->order($order_by . ' ' . $order);
+        if ($order_by == 'nummer') {
+            $select->order('jahr DESC')->order($order_by . ' ' . $order);
+        } else {
+            $select->order($order_by . ' ' . $order);
+        }
 
         $paginator = $this->getBildTable()->fetchAll($select);
         $paginator->setCurrentPageNumber((int) $this->params()->fromQuery('page', 1));
@@ -335,63 +321,44 @@ class BildController extends AbstractActionController
             ->fetchAll(), $this->getSerieTable()
             ->fetchAll());
 
-        if ($bildtyp > 0)
-        {
-            $selectform->get('bildtyp')
-                ->setValue($bildtyp);
+        if ($bildtyp > 0) {
+            $selectform->get('bildtyp')->setValue($bildtyp);
         }
 
-        if ($jahr > 0)
-        {
-            $selectform->get('jahr')
-                ->setValue($jahr);
+        if ($jahr > 0) {
+            $selectform->get('jahr')->setValue($jahr);
         }
 
-        if ($ortid > 0)
-        {
-            $selectform->get('ortid')
-                ->setValue($ortid);
+        if ($ortid > 0) {
+            $selectform->get('ortid')->setValue($ortid);
         }
 
-        if ($landid > 0)
-        {
-            $selectform->get('landid')
-                ->setValue($landid);
+        if ($landid > 0) {
+            $selectform->get('landid')->setValue($landid);
         }
 
-        if (strlen($nummer_von) > 0)
-        {
-            $selectform->get('nummer_von')
-                ->setValue($nummer_von);
+        if (strlen($nummer_von) > 0) {
+            $selectform->get('nummer_von')->setValue($nummer_von);
         }
 
-        if (strlen($nummer_bis) > 0)
-        {
-            $selectform->get('nummer_bis')
-            ->setValue($nummer_bis);
+        if (strlen($nummer_bis) > 0) {
+            $selectform->get('nummer_bis')->setValue($nummer_bis);
         }
 
-        if (strlen($suchtext) > 0)
-        {
-            $selectform->get('suchtext')
-            ->setValue($suchtext);
+        if (strlen($suchtext) > 0) {
+            $selectform->get('suchtext')->setValue($suchtext);
         }
 
-        $selectform->get('wertung_min')
-            ->setValue($wertung_min);
+        $selectform->get('wertung_min')->setValue($wertung_min);
 
-        $selectform->get('countperpage')
-            ->setValue($countperpage);
+        $selectform->get('countperpage')->setValue($countperpage);
 
-        if ($serieid > 0)
-        {
-            $selectform->get('serieid')
-                ->setValue($serieid);
+        if ($serieid > 0) {
+            $selectform->get('serieid')->setValue($serieid);
         }
 
         $key = 'bildinfo';
-        $bildinfo = $this->getInfoTable()
-            ->getValue($key);
+        $bildinfo = $this->getInfoTable()->getValue($key);
 
         return new ViewModel(array(
                 'paginator' => $paginator,
@@ -402,106 +369,73 @@ class BildController extends AbstractActionController
 
     public function addAction()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->addAction()');
-        // $firephp->trace('Trace Label');
-
         $session = $this->session;
 
-        $form = new BildForm($this->getOrtTable()
-            ->fetchAll());
+        $form = new BildForm($this->getOrtTable()->fetchAll());
 
-        $form->get('submit1')
-            ->setValue('Ok');
+        $form->get('submit1')->setValue('Ok');
 
-        $form->get('submit2')
-            ->setValue('Ok / Neu');
+        $form->get('submit2')->setValue('Ok / Neu');
 
-        if ($session->offsetExists('input_nummer'))
-        {
-            $form->get('nummer')
-                ->setValue(intval($session->offsetGet('input_nummer')) + 1);
+        if ($session->offsetExists('input_nummer')) {
+            $form->get('nummer')->setValue(intval($session->offsetGet('input_nummer')) + 1);
         }
 
-        if ($session->offsetExists('input_datei'))
-        {
-            if ($session->offsetGet('input_datei') != '0')
-                $form->get('datei')
-                    ->setValue(intval($session->offsetGet('input_datei')) + 1);
+        if ($session->offsetExists('input_datei')) {
+            if ($session->offsetGet('input_datei') != '0') {
+                $form->get('datei')->setValue(intval($session->offsetGet('input_datei')) + 1);
+            }
         }
 
-        if ($session->offsetExists('input_datum'))
-        {
-            $form->get('datum')
-                ->setValue($session->offsetGet('input_datum'));
+        if ($session->offsetExists('input_datum')) {
+            $form->get('datum')->setValue($session->offsetGet('input_datum'));
         }
 
-        if ($session->offsetExists('input_jahrflag'))
-        {
-            $form->get('jahrflag')
-                ->setValue($session->offsetGet('input_jahrflag'));
+        if ($session->offsetExists('input_jahrflag')) {
+            $form->get('jahrflag')->setValue($session->offsetGet('input_jahrflag'));
         }
 
-        if ($session->offsetExists('input_ortid'))
-        {
-            $form->get('ortid')
-                ->setValue($session->offsetGet('input_ortid'));
+        if ($session->offsetExists('input_ortid')) {
+            $form->get('ortid')->setValue($session->offsetGet('input_ortid'));
         }
 
-        if ($session->offsetExists('input_beschreibung'))
-        {
-            $form->get('beschreibung')
-                ->setValue($session->offsetGet('input_beschreibung'));
+        if ($session->offsetExists('input_beschreibung')) {
+            $form->get('beschreibung')->setValue($session->offsetGet('input_beschreibung'));
         }
 
-        if ($session->offsetExists('input_bemerkung'))
-        {
-            $form->get('bemerkung')
-                ->setValue($session->offsetGet('input_bemerkung'));
+        if ($session->offsetExists('input_bemerkung')) {
+            $form->get('bemerkung')->setValue($session->offsetGet('input_bemerkung'));
         }
 
-        if ($session->offsetExists('input_wertung'))
-        {
-            $form->get('wertung')
-                ->setValue(intval($session->offsetGet('input_wertung')));
+        if ($session->offsetExists('input_wertung')) {
+            $form->get('wertung')->setValue(intval($session->offsetGet('input_wertung')));
         }
 
-        if ($session->offsetExists('input_panorama'))
-        {
-            $form->get('panorama')
-                ->setValue($session->offsetGet('input_panorama'));
+        if ($session->offsetExists('input_panorama')) {
+            $form->get('panorama')->setValue($session->offsetGet('input_panorama'));
         }
 
-        if ($session->offsetExists('input_ticket'))
-        {
-            $form->get('ticket')
-                ->setValue($session->offsetGet('input_ticket'));
+        if ($session->offsetExists('input_ticket')) {
+            $form->get('ticket')->setValue($session->offsetGet('input_ticket'));
         }
 
-        if ($session->offsetExists('input_ohneort'))
-        {
-            $form->get('ohneort')
-                ->setValue($session->offsetGet('input_ohneort'));
+        if ($session->offsetExists('input_ohneort')) {
+            $form->get('ohneort')->setValue($session->offsetGet('input_ohneort'));
         }
 
-        if ($session->offsetExists('input_ohneland'))
-        {
-            $form->get('ohneland')
-                ->setValue($session->offsetGet('input_ohneland'));
+        if ($session->offsetExists('input_ohneland')) {
+            $form->get('ohneland')->setValue($session->offsetGet('input_ohneland'));
         }
 
         $request = $this->getRequest();
 
-        if ($request->isPost())
-        {
-            $bild = new Bild($this->getServiceLocator()
-                ->get('Zend\Db\Adapter\Adapter'));
+        if ($request->isPost()) {
+            $bild = new Bild($this->getServiceLocator()->get('Zend\Db\Adapter\Adapter'));
 
             $form->setInputFilter($bild->getInputFilter());
             $form->setData($request->getPost());
 
-            if ($form->isValid())
-            {
+            if ($form->isValid()) {
                 $bild->exchangeArray($form->getData());
 
                 $session->offsetSet('input_nummer', $bild->nummer);
@@ -517,32 +451,22 @@ class BildController extends AbstractActionController
                 $session->offsetSet('input_ohneort', $bild->ohneort);
                 $session->offsetSet('input_ohneland', $bild->ohneland);
 
-                $id = $this->getBildTable()
-                    ->saveBild($bild);
+                $id = $this->getBildTable()->saveBild($bild);
 
-                if ($request->getPost('submit1'))
-                {
+                if ($request->getPost('submit1')) {
                     $page = '1';
 
-                    if ($this->session->offsetExists('page'))
-                    {
+                    if ($this->session->offsetExists('page')) {
                         $page = $this->session->offsetGet('page') . '#' . $id;
                     }
 
-                    return $this->redirect()
-                        ->toUrl('/bild?page=' . $page);
+                    return $this->redirect()->toUrl('/bild?page=' . $page);
                 }
 
-                $form->get('nummer')
-                    ->setValue(intval($form->get('nummer')
-                    ->getValue()) + 1);
+                $form->get('nummer')->setValue(intval($form->get('nummer')->getValue()) + 1);
 
-                if ($form->get('datei')
-                    ->getValue() != '')
-                {
-                    $form->get('datei')
-                        ->setValue(intval($form->get('datei')
-                        ->getValue()) + 1);
+                if ($form->get('datei') ->getValue() != '') {
+                    $form->get('datei')->setValue(intval($form->get('datei')->getValue()) + 1);
                 }
             }
         }
@@ -554,18 +478,12 @@ class BildController extends AbstractActionController
 
     public function editAction()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->editAction()');
-
         $session = $this->session;
 
-        $id = (int) $this->params()
-            ->fromRoute('id', 0);
+        $id = (int) $this->params()->fromRoute('id', 0);
 
-        if (! $id)
-        {
-            return $this->redirect()
-                ->toRoute('bild', array(
+        if (! $id) {
+            return $this->redirect()->toRoute('bild', array(
                     'action' => 'add'
             ));
         }
@@ -574,50 +492,36 @@ class BildController extends AbstractActionController
 
         // Get the Bild with the specified id. An exception is thrown
         // if it cannot be found, in which case go to the index page.
-        try
-        {
-            $bild = $this->getBildTable()
-                ->getBild($id);
+        try {
+            $bild = $this->getBildTable()->getBild($id);
         }
-        catch (\Exception $ex)
-        {
+        catch (\Exception $ex) {
             // $firephp->error('BildController->editAction()');
 
-            return $this->redirect()
-                ->toRoute('bild', array(
+            return $this->redirect()->toRoute('bild', array(
                     'action' => 'index'
             ));
         }
 
-        // $firephp->log('BildController->editAction(). $nummer=' . $bild->nummer . '. $ortid=' . $bild->ortid . '. $landid=' . $bild->landid);
-        $form = new BildForm($this->getOrtTable()
-            ->fetchAll());
+        $form = new BildForm($this->getOrtTable()->fetchAll());
 
         $form->bind($bild);
-        $form->get('submit1')
-            ->setValue('Ändern');
-        $form->get('submit2')
-            ->setValue('');
-        $form->get('ortid')
-            ->setValue($bild->ortid);
+        $form->get('submit1')->setValue('Ändern');
+        $form->get('submit2')->setValue('');
+        $form->get('ortid')->setValue($bild->ortid);
 
         $request = $this->getRequest();
 
-        if ($request->isPost())
-        {
-            // $firephp->log('isPost -> BildController->editAction()');
-
+        if ($request->isPost()) {
             $form->setInputFilter($bild->getInputFilter());
             $form->setData($request->getPost());
 
-            if ($form->isValid())
-            {
-                // $firephp->log('isValid -> BildController->editAction()');
-
+            if ($form->isValid()) {
                 $session->offsetSet('input_nummer', $bild->nummer);
 
-                if ($bild->datei == '0')
+                if ($bild->datei == '0') {
                     $bild->datei = 'null';
+                }
 
                 $session->offsetSet('input_datei', $bild->datei);
                 $session->offsetSet('input_datum', $bild->datum);
@@ -631,75 +535,55 @@ class BildController extends AbstractActionController
                 $session->offsetSet('input_ohneort', $bild->ohneort);
                 $session->offsetSet('input_ohneland', $bild->ohneland);
 
-                $this->getBildTable()
-                    ->saveBild($bild);
+                $this->getBildTable()->saveBild($bild);
 
                 $page = '1';
 
-                if ($this->session->offsetExists('page'))
-                {
+                if ($this->session->offsetExists('page')) {
                     $page = $this->session->offsetGet('page') . '#' . $id;
                 }
 
-                return $this->redirect()
-                    ->toUrl('/bild?page=' . $page);
+                return $this->redirect()->toUrl('/bild?page=' . $page);
             }
-
-            // $firephp->warn('isValid=false -> BildController->editAction()');
         }
 
         return array(
-                'id' => $id,
-                'form' => $form
+            'id' => $id,
+            'form' => $form
         );
     }
 
     public function deleteAction()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->deleteAction()');
+        $id = (int) $this->params()->fromRoute('id', 0);
 
-        $id = (int) $this->params()
-            ->fromRoute('id', 0);
-
-        if (! $id)
-        {
-            return $this->redirect()
-                ->toRoute('bild');
+        if (!$id) {
+            return $this->redirect()->toRoute('bild');
         }
 
         $request = $this->getRequest();
 
-        if ($request->isPost())
-        {
+        if ($request->isPost()) {
             $del = $request->getPost('del', 'Nein');
 
-            if ($del == 'Ja')
-            {
+            if ($del == 'Ja') {
                 $id = (int) $request->getPost('id');
-                $this->getBildTable()
-                    ->deleteBild($id);
+                $this->getBildTable()->deleteBild($id);
             }
 
             // Redirect to list of bilds
-            return $this->redirect()
-                ->toRoute('bild');
+            return $this->redirect()->toRoute('bild');
         }
 
         return array(
-                'id' => $id,
-                'bild' => $this->getBildTable()
-                    ->getBild($id)
+            'id' => $id,
+            'bild' => $this->getBildTable()->getBild($id)
         );
     }
 
     public function getBildTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getBildTable()');
-
-        if (! $this->bildTable)
-        {
+        if (!$this->bildTable) {
             $sm = $this->getServiceLocator();
             $this->bildTable = $sm->get('Bild\Model\BildTable');
         }
@@ -709,11 +593,7 @@ class BildController extends AbstractActionController
 
     public function getSerieTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getSerieTable()');
-
-        if (! $this->serieTable)
-        {
+        if (!$this->serieTable) {
             $sm = $this->getServiceLocator();
             $this->serieTable = $sm->get('Bild\Model\SerieTable');
         }
@@ -723,11 +603,7 @@ class BildController extends AbstractActionController
 
     public function getOrtTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getOrtTable()');
-
-        if (! $this->ortTable)
-        {
+        if (!$this->ortTable) {
             $sm = $this->getServiceLocator();
             $this->ortTable = $sm->get('Bild\Model\OrtTable');
         }
@@ -737,11 +613,7 @@ class BildController extends AbstractActionController
 
     public function getLandTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getLandTable()');
-
-        if (! $this->landTable)
-        {
+        if (!$this->landTable) {
             $sm = $this->getServiceLocator();
             $this->landTable = $sm->get('Bild\Model\LandTable');
         }
@@ -751,11 +623,7 @@ class BildController extends AbstractActionController
 
     public function getMotivTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getMotivTable()');
-
-        if (! $this->motivTable)
-        {
+        if (!$this->motivTable) {
             $sm = $this->getServiceLocator();
             $this->motivTable = $sm->get('Bild\Model\MotivTable');
         }
@@ -765,11 +633,7 @@ class BildController extends AbstractActionController
 
     public function getBildMotivTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getBildMotivTable()');
-
-        if (! $this->bildMotivTable)
-        {
+        if (!$this->bildMotivTable) {
             $sm = $this->getServiceLocator();
             $this->bildMotivTable = $sm->get('Bild\Model\BildMotivTable');
         }
@@ -779,11 +643,7 @@ class BildController extends AbstractActionController
 
     public function getInfoTable()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->getInfoTable()');
-
-        if (! $this->infoTable)
-        {
+        if (!$this->infoTable) {
             $sm = $this->getServiceLocator();
             $this->infoTable = $sm->get('Bild\Model\InfoTable');
         }

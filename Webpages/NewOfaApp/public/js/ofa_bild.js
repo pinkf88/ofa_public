@@ -276,17 +276,19 @@ function bild_deleteGeodaten(bildid, datei)
 
 var breite = 0;
 var laenge = 0;
+var hoehe = 0;
 
-function bild_copyGeodaten(b, l)
+function bild_copyGeodaten(b, l, h)
 {
     breite = b;
     laenge = l;
+    hoehe = h;
 }
 
 function bild_updateGeodaten(bildid, datei)
 {
     $.ajax({
-        url : "/inc/ofa_UpdateGeodaten.php?datei=" + datei + "&breite=" + breite + "&laenge=" + laenge
+        url : "/inc/ofa_UpdateGeodaten.php?datei=" + datei + "&breite=" + breite + "&laenge=" + laenge + "&hoehe=" + hoehe
     }).done(function(msg)
     {
         bild_showInformation(bildid);
@@ -387,7 +389,9 @@ function bild_showBilderGrid()
         $("[name='nummer_bis']")[0].value,
         $("[name='suchtext']")[0].value,
         $("[name='wertung_min']")[0].value,
-        $("[name='countperpage']")[0].value
+        $("[name='countperpage']")[0].value,
+        $("[name='serieid']")[0].value,
+        $("[name='serieid'] option:selected" ).text()
     );
 
     $('#bild_show').height($(window).height() - 70);

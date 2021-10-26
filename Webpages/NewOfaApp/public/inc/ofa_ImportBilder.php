@@ -13,10 +13,11 @@ $nummer = $bilddaten["nummer"];
 
 for ($i = 0; $i < count($bilddaten["bilder"]); $i++)
 {
-    $sql = 'INSERT INTO ofa_bild (nummer, datei, datum, ortid, beschreibung, bemerkung) '
+    $sql = 'INSERT INTO ofa_bild (nummer, datei, datum, ortid, beschreibung, bemerkung, ohneort, ohneland) '
         . 'VALUES ("' . $nummer . '", "' . $bilddaten["bilder"][$i]["datei"] . '", '
         . '"' . $bilddaten["bilder"][$i]["datum"] . '", "' . $bilddaten["ortid"] . '", '
-        . '"' . $bilddaten["bilder"][$i]["beschreibung"] . '", "' . $bilddaten["bilder"][$i]["bemerkung"] . '");';
+        . '"' . $bilddaten["bilder"][$i]["beschreibung"] . '", "' . $bilddaten["bilder"][$i]["bemerkung"]
+        . '", "' . $bilddaten["bilder"][$i]["ohneort"] . '", "' . $bilddaten["bilder"][$i]["ohneland"] . '");';
 
     // echo $sql;
     mysqli_query($db_link, $sql);

@@ -4,7 +4,7 @@ var path            = require('path');
 var sizeOf          = require('image-size');
 var colors          = require('colors');
 var database        = require('../libs/lib_database.js');
-var config          = require('../../configs/ofa_config.json');
+var config          = require('../configs/ofa_config.json');
 
 
 var parser = new ArgumentParser({

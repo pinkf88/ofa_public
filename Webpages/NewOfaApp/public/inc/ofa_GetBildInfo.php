@@ -25,10 +25,8 @@ $geodaten = "";
 
 $sql = "SELECT nummer, datei, info, ticket, YEAR(datum) as jahr FROM $dbt_ofa_bild WHERE id=$bildid";
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows ($resultat) > 0)
-    {
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows ($resultat) > 0) {
         $datensatz = mysqli_fetch_assoc ($resultat);
         $nummer = $datensatz["nummer"];
         $datei = $datensatz["datei"];
@@ -52,14 +50,11 @@ if ($version == 1) {
 
     $sql = "SELECT m.id, m.motiv, bm.default FROM $dbt_ofa_motiv m, $dbt_ofa_bild_motiv bm WHERE bm.bildid=$bildid AND bm.motivid=m.id ORDER BY m.motiv";
 
-    if ($resultat = mysqli_query($db_link, $sql))
-    {
-        if (mysqli_num_rows ($resultat) > 0)
-        {
+    if ($resultat = mysqli_query($db_link, $sql)) {
+        if (mysqli_num_rows ($resultat) > 0) {
             $motivliste .= '| ';
 
-            while ($datensatz = mysqli_fetch_assoc ($resultat))
-            {
+            while ($datensatz = mysqli_fetch_assoc ($resultat)) {
                 if (0 + $datensatz["default"] == 1)
                     $motivliste .= '<b>' . $datensatz["motiv"] . '</b> | ';
                 else
@@ -74,15 +69,31 @@ if ($version == 1) {
 
     $serieliste = '<p class=\"serieliste\" id=\"serieliste\">';
 
-    $sql = "SELECT DISTINCT ws.titel FROM $dbt_ofa_serie_bild sb, $dbt_ofa_web_serie ws WHERE sb.bildid=$bildid AND sb.serieid=ws.serieid ORDER BY ws.titel";
+    $sql = "SELECT DISTINCT b.nummer AS bildnummer, w.nummer AS webnummer, w.web, w.pfad AS webpfad, ws.titel, ws.pfad AS seriepfad "
+        . "FROM $dbt_ofa_serie_bild sb, $dbt_ofa_web_serie ws, $dbt_ofa_web w, $dbt_ofa_bild b "
+        . "WHERE b.id=$bildid AND sb.bildid=$bildid AND sb.serieid=ws.serieid AND ws.webid=w.id ORDER BY ws.titel";
 
-    if ($resultat = mysqli_query($db_link, $sql))
-    {
-        if (mysqli_num_rows ($resultat) > 0)
-        {
-            while ($datensatz = mysqli_fetch_assoc ($resultat))
-            {
-                $serieliste .= '<b><i>' . $datensatz["titel"] . '</i></b><br>';
+    if ($resultat = mysqli_query($db_link, $sql)) {
+        if (mysqli_num_rows ($resultat) > 0) {
+            while ($datensatz = mysqli_fetch_assoc ($resultat)) {
+                $url = 'https://www.juergen-reichmann.de';
+                $url_end = '';
+                $web = $datensatz["web"] . ' | ';
+
+                if ($datensatz["webnummer"] < 0) {
+                    $url = 'https://www.19xx.de';
+                } else if (strpos($datensatz["web"], 'Highlights |') !== false) {
+                    $url = 'https://www.erde-in-bildern.de';
+                    $web = '';
+                } else {
+                    $url_end = $datensatz["bildnummer"] . '/';
+                }
+
+                $url .= str_replace('/highlights', '', $datensatz["webpfad"]) . $datensatz["seriepfad"] . '/' . $url_end;
+
+                $serieliste .= '<b><i>'
+                    . '<a href=\"' . $url . '\" target=\"_blank\">' . $web . $datensatz["titel"] . '</a>'
+                    . '</i></b><br>';
             }
         }
 
@@ -91,8 +102,7 @@ if ($version == 1) {
 
     $serieliste .= '</p>';
 
-    if ($info != "")
-    {
+    if ($info != "") {
         $zusatzinfo = '<p><i>Info: ' . $info . '</i></p>';
     }
 }
@@ -102,8 +112,7 @@ $bildinfo = ofa_getBildPfad(0 + $nummer, $ticket, $jahr);
 // print_r($bildinfo);
 
 if ($version == 1) {
-    if (strlen($bildinfo["pfad"]) > 0)
-    {
+    if (strlen($bildinfo["pfad"]) > 0) {
         $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"' . $bildinfo["pfad"] . '.jpg\">'
             . '<img class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a><br>';
     }
@@ -113,20 +122,14 @@ if ($version == 1) {
     $sql = "SELECT bd.BildNr, bd.Aufnahmedatum, bd.Kameradatum, bd.Zeit, bd.Blende, bd.ISO, bd.Brennweite, "
         . "bd.Laenge, bd.Breite, bd.Hoehe, bd.polygon, bd.locations FROM $dbt_ofa_bilddaten bd WHERE bd.BildNr=$datei";
 
-    if ($resultat = mysqli_query($db_link, $sql))
-    {
-        if (mysqli_num_rows ($resultat) > 0)
-        {
+    if ($resultat = mysqli_query($db_link, $sql)) {
+        if (mysqli_num_rows ($resultat) > 0) {
             $datensatz = mysqli_fetch_assoc ($resultat);
 
-            if ($datensatz["Aufnahmedatum"] <> "")
-            {
-                if ($datensatz["Aufnahmedatum"] == '0000-00-00 00:00:00')
-                {
+            if ($datensatz["Aufnahmedatum"] <> "") {
+                if ($datensatz["Aufnahmedatum"] == '0000-00-00 00:00:00') {
                     $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Kameradatum"] . '</p>';
-                }
-                else
-                {
+                } else {
                     $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Aufnahmedatum"] . '</p>';
                 }
 
@@ -153,17 +156,15 @@ if ($version == 1) {
 
                 $geodaten = '<p class=\"geodaten\">' . $breite . '° / ' . $laenge . '°&nbsp;&nbsp;';
                 $geodaten .= '<a class=\"geodel\" href=\"javascript:bild_deleteGeodaten(' . $bildid . ', ' . $datei . ')\">Löschen</a>&nbsp;&nbsp;';
-                $geodaten .= '<a class=\"geocopy\" href=\"javascript:bild_copyGeodaten(' . $datensatz["Breite"] . ', ' . $datensatz["Laenge"] . ')\">Kopieren</a></p>';
+                $geodaten .= '<a class=\"geocopy\" href=\"javascript:bild_copyGeodaten(' . $datensatz["Breite"] . ', ' . $datensatz["Laenge"] . ', ' . $datensatz["Hoehe"] . ')\">Kopieren</a></p>';
             } else {
                 $geodaten .= '<p class=\"geodaten\"><a class=\"geoupdate\" href=\"javascript:bild_updateGeodaten(' . $bildid . ', ' . $datei . ')\">Update Geodaten</a></p>';
             }
 
-            if ($datensatz["polygon"] != null || $datensatz["polygon"] <> "")
-            {
+            if ($datensatz["polygon"] != null || $datensatz["polygon"] <> "") {
                 $polygon = 'Polygon';
 
-                if ($datensatz["locations"] != null || $datensatz["locations"] <> "")
-                {
+                if ($datensatz["locations"] != null || $datensatz["locations"] <> "") {
                     $polygon .= ' | Locations';
                 }
             }
