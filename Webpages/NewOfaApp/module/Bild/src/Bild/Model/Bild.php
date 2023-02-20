@@ -28,21 +28,17 @@ class Bild implements InputFilterAwareInterface
     public $ohneort;
     public $ohneland;
     public $polygon;
+    public $anzahl;
     protected $inputFilter;
     protected $dbAdapter;
 
     public function __construct(Adapter $adapter)
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('Bild->__construct()');
-
         $this->dbAdapter = $adapter;
     }
 
     public function exchangeArray($data)
     {
-        // $firephp = \FirePHP::getInstance(true);
-
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->nummer = (isset($data['nummer'])) ? $data['nummer'] : null;
         $this->datei = (isset($data['datei'])) ? $data['datei'] : null;
@@ -61,6 +57,7 @@ class Bild implements InputFilterAwareInterface
         $this->ohneort = (isset($data['ohneort'])) ? $data['ohneort'] : null;
         $this->ohneland = (isset($data['ohneland'])) ? $data['ohneland'] : null;
         $this->polygon = (isset($data['polygon'])) ? $data['polygon'] : null;
+        $this->anzahl = (isset($data['anzahl'])) ? $data['anzahl'] : null;
     }
 
     public function getArrayCopy()
@@ -75,8 +72,7 @@ class Bild implements InputFilterAwareInterface
 
     public function getInputFilter()
     {
-        if (! $this->inputFilter)
-        {
+        if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
 
             $inputFilter->add(array(
@@ -91,8 +87,7 @@ class Bild implements InputFilterAwareInterface
 
             $validatorNummer = null;
 
-            if ($this->id > 0)
-            {
+            if ($this->id > 0) {
                 $validatorNummer = new NoRecordExists(array(
                     'adapter' => $this->dbAdapter,
                     'table' => 'ofa_bild',
@@ -102,9 +97,7 @@ class Bild implements InputFilterAwareInterface
                         'value' => $this->id
                     )
                 ));
-            }
-            else
-            {
+            } else {
                 $validatorNummer = new NoRecordExists(array(
                     'adapter' => $this->dbAdapter,
                     'table' => 'ofa_bild',
@@ -127,8 +120,7 @@ class Bild implements InputFilterAwareInterface
 
             $validatorDatei = null;
 
-            if ($this->id > 0)
-            {
+            if ($this->id > 0) {
                 $validatorDatei = new NoRecordExists(array(
                     'adapter' => $this->dbAdapter,
                     'table' => 'ofa_bild',
@@ -138,9 +130,7 @@ class Bild implements InputFilterAwareInterface
                         'value' => $this->id
                     )
                 ));
-            }
-            else
-            {
+            } else {
                 $validatorDatei = new NoRecordExists(array(
                     'adapter' => $this->dbAdapter,
                     'table' => 'ofa_bild',

@@ -27,6 +27,14 @@ if ($type == 'audio') {
 
         $url .= '&no_compilations=' . $no_compilations;
 
+        $rarely_played = 0;
+
+        if (isset($_GET["rarely_played"])) {
+            $rarely_played = $_GET["rarely_played"];
+        }
+
+        $url .= '&rarely_played=' . $rarely_played;
+
         $response = \Httpful\Request::get($url)->send();
     } else if (isset($_GET["direction"])) {
         $response = \Httpful\Request::get('localhost:8085/audio?direction=' . $_GET["direction"] . '&roomid=' . $_GET["roomid"])->send();

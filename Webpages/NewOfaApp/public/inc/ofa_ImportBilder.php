@@ -2,17 +2,15 @@
 include_once "ofa_DbConsts.php";
 include_once "ofa_Database.php";
 
-// var_dump($_POST["bilder"]);
+// var_dump($_POST);
 
-$bilddaten = json_decode($_POST["bilder"], true);
-// var_dump($bilddaten["bilder"]);
+$bilddaten = $_POST;
 
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
 $nummer = $bilddaten["nummer"];
 
-for ($i = 0; $i < count($bilddaten["bilder"]); $i++)
-{
+for ($i = 0; $i < count($bilddaten["bilder"]); $i++) {
     $sql = 'INSERT INTO ofa_bild (nummer, datei, datum, ortid, beschreibung, bemerkung, ohneort, ohneland) '
         . 'VALUES ("' . $nummer . '", "' . $bilddaten["bilder"][$i]["datei"] . '", '
         . '"' . $bilddaten["bilder"][$i]["datum"] . '", "' . $bilddaten["ortid"] . '", '

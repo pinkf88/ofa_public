@@ -17,16 +17,12 @@ $motive = "";
 
 $sql = "SELECT ortid, beschreibung, bemerkung FROM $dbt_ofa_bild WHERE id=$bildid";
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows($resultat) > 0)
-    {
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows($resultat) > 0) {
         $datensatz = mysqli_fetch_assoc($resultat);
         $ortid = $datensatz["ortid"];
         $suchtext = $datensatz["beschreibung"] . ' ' . $datensatz["bemerkung"];
-    }
-    else
-    {
+    } else {
         mysqli_free_result($resultat);
         mysqli_close($db_link);
         return;
@@ -35,50 +31,45 @@ if ($resultat = mysqli_query($db_link, $sql))
     mysqli_free_result($resultat);
 }
 
-$sql = "SELECT id FROM $dbt_ofa_bild_motiv WHERE bildid=$bildid";
+$sql = "SELECT bm.id, m.motiv FROM $dbt_ofa_bild_motiv bm, $dbt_ofa_motiv m WHERE bm.bildid=$bildid AND bm.motivid=m.id";
 
-if ($resultat1 = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows($resultat1) == 0)
-    {
-        $sql = "SELECT m.id, m.motiv FROM $dbt_ofa_motiv m WHERE m.ortid=$ortid ORDER BY m.motiv";
-        $resultat = mysqli_query($db_link, $sql);
+if ($resultat_bild_motive = mysqli_query($db_link, $sql)) {
+    while ($datensatz = mysqli_fetch_assoc($resultat_bild_motive)) {
+        $suchtext = str_replace($datensatz["motiv"], "", $suchtext);
+    }
+
+    $sql = "SELECT m.id, m.motiv FROM $dbt_ofa_motiv m WHERE m.ortid=$ortid ORDER BY CHAR_LENGTH(m.motiv) DESC";
+    $resultat = mysqli_query($db_link, $sql);
+    
+    if (mysqli_num_rows($resultat) > 0) {
+        $m = 1;
+        $motive = '++NEU++';
         
-        if (mysqli_num_rows($resultat) > 0)
-        {
-            $m = 1;
-            $motive = '++NEU++';
-            
-            while ($datensatz = mysqli_fetch_assoc($resultat))
-            {
-                if (strpos($suchtext, $datensatz["motiv"]) !== false)
-                {
-                    $default = 0;
-                    
-                    if ($m == 1)
-                        $default = 1;
-                    
-                    $sql = "INSERT $dbt_ofa_bild_motiv VALUES (NULL, " . $bildid . ", " . $m . ", " . $datensatz["id"] . ", " . $default . ")";
-                    mysqli_query($db_link, $sql);
-                    
-                    $m++;
-                }
+        while ($datensatz = mysqli_fetch_assoc($resultat)) {
+            if (strpos($suchtext, $datensatz["motiv"]) !== false) {
+                $default = 0;
+                
+                if ($m == 1)
+                    $default = 1;
+                
+                $sql = "INSERT $dbt_ofa_bild_motiv VALUES (NULL, " . $bildid . ", " . $m . ", " . $datensatz["id"] . ", " . $default . ")";
+                mysqli_query($db_link, $sql);
+                
+                $m++;
+                $suchtext = str_replace($datensatz["motiv"], "", $suchtext);
             }
         }
     }
-    else
-    {
+
+    if (mysqli_num_rows($resultat_bild_motive) > 0) {
         // Dialogbox wird geöffnet werden
         $motivids = array();
         
         $sql = "SELECT m.id, m.motiv, bm.default FROM $dbt_ofa_motiv m, $dbt_ofa_bild_motiv bm WHERE bm.bildid=$bildid AND bm.motivid=m.id ORDER BY m.motiv";
 
-        if ($resultat = mysqli_query($db_link, $sql))
-        {
-            if (mysqli_num_rows($resultat) > 0)
-            {
-                while ($datensatz = mysqli_fetch_assoc($resultat))
-                {
+        if ($resultat = mysqli_query($db_link, $sql)) {
+            if (mysqli_num_rows($resultat) > 0) {
+                while ($datensatz = mysqli_fetch_assoc($resultat)) {
                     $motivids[] = 0 + $datensatz["id"];
                     $bildmotive .= '<b> <a href=\"javascript:bild_motivOnClick(' . $bildid . ',' . $datensatz["id"] . ')\">' . $datensatz["motiv"] . '</a></b><br>';
                 }
@@ -91,25 +82,13 @@ if ($resultat1 = mysqli_query($db_link, $sql))
         
         $sql = "SELECT m.id, m.motiv FROM $dbt_ofa_motiv m WHERE m.ortid=$ortid ORDER BY m.motiv";
 
-        if ($resultat = mysqli_query($db_link, $sql))
-        {
-            if (mysqli_num_rows($resultat) > 0)
-            {
-                while ($datensatz = mysqli_fetch_assoc($resultat))
-                {
+        if ($resultat = mysqli_query($db_link, $sql)) {
+            if (mysqli_num_rows($resultat) > 0) {
+                while ($datensatz = mysqli_fetch_assoc($resultat)) {
                     $checked = '';
                     
-                    if (in_array($datensatz["id"], $motivids))
-                    {
+                    if (in_array($datensatz["id"], $motivids)) {
                         $checked = 'checked=\"checked\"';
-                    }
-                    else if (($search == 1) && (strpos($suchtext, $datensatz["motiv"]) !== false))
-                    {
-                        $checked = 'checked=\"checked\"';
-                        $bildmotive .= '<b>' . $datensatz["motiv"] . '</b><br>';
-                        
-                        $sql = "INSERT $dbt_ofa_bild_motiv VALUES (NULL, " . $bildid . ", 0, " . $datensatz["id"] . ", 0)";
-                        mysqli_query($db_link, $sql);
                     }
                     
                     $motive .= '<input type=\"checkbox\" name=\"motiv' . $datensatz["id"] . '\" ' . $checked . ' onclick=\"bild_motivOnClick(' . $bildid . ', 0)\"><label class=\"motiv\">' . addcslashes($datensatz["motiv"], '"') . '</label><br>';
@@ -120,7 +99,7 @@ if ($resultat1 = mysqli_query($db_link, $sql))
         }
     }
 
-    mysqli_free_result($resultat1);
+    mysqli_free_result($resultat_bild_motive);
 }
 
 // <input type="checkbox" name="motiv2623#Abflugshalle Flughafen Riem" value="1">

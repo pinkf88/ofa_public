@@ -15,6 +15,7 @@ $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_of
 
 $nummer = "0";
 $datei = "0";
+$beschreibung = "";
 $ticket = 0;
 $jahr = 0;
 $info = "";
@@ -23,13 +24,14 @@ $techdaten = "";
 $polygon = "";
 $geodaten = "";
 
-$sql = "SELECT nummer, datei, info, ticket, YEAR(datum) as jahr FROM $dbt_ofa_bild WHERE id=$bildid";
+$sql = "SELECT nummer, datei, beschreibung, info, ticket, YEAR(datum) as jahr FROM $dbt_ofa_bild WHERE id=$bildid";
 
 if ($resultat = mysqli_query($db_link, $sql)) {
     if (mysqli_num_rows ($resultat) > 0) {
         $datensatz = mysqli_fetch_assoc ($resultat);
         $nummer = $datensatz["nummer"];
         $datei = $datensatz["datei"];
+        $beschreibung = $datensatz["beschreibung"];
         $ticket = 0 + $datensatz["ticket"];
         $jahr = 0 + $datensatz["jahr"];
         $info = $datensatz["info"];
@@ -107,70 +109,101 @@ if ($version == 1) {
     }
 }
 
-$bildinfo = ofa_getBildPfad(0 + $nummer, $ticket, $jahr);
+$bildinfo = array();
 
+if (strpos($beschreibung, 'YOUTUBE=') === false) {
+    $bildinfo = ofa_getBildPfad(0 + $nummer, $ticket, $jahr);
+}
 // print_r($bildinfo);
 
 if ($version == 1) {
-    if (strlen($bildinfo["pfad"]) > 0) {
-        $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"' . $bildinfo["pfad"] . '.jpg\">'
-            . '<img class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a><br>';
+    $videoinfo = '""';
+    $youtubeid = '';
+
+    if (strpos($beschreibung, 'YOUTUBE=') === false) {
+        if (strlen($bildinfo["pfad"]) > 0) {
+            $bilddaten = '<a class=\"fancybox\" rel=\"group\" href=\"' . $bildinfo["pfad"] . '.jpg\">'
+                . '<img class=\"mini\" src=\"' . $bildinfo["pfad"] . '.' . $bildinfo["extension"] . '\"></a><br>';
+        }
     }
 
     $nummer = '<p><b>' . $nummer . '</b>';
 
-    $sql = "SELECT bd.BildNr, bd.Aufnahmedatum, bd.Kameradatum, bd.Zeit, bd.Blende, bd.ISO, bd.Brennweite, "
-        . "bd.Laenge, bd.Breite, bd.Hoehe, bd.polygon, bd.locations FROM $dbt_ofa_bilddaten bd WHERE bd.BildNr=$datei";
+    if (strpos($beschreibung, 'YOUTUBE=') === false) {
+        $sql = "SELECT bd.BildNr, bd.Aufnahmedatum, bd.Kameradatum, bd.Zeit, bd.Blende, bd.ISO, bd.Brennweite, "
+            . "bd.Laenge, bd.Breite, bd.Hoehe, bd.polygon, bd.locations FROM $dbt_ofa_bilddaten bd WHERE bd.BildNr=$datei";
 
-    if ($resultat = mysqli_query($db_link, $sql)) {
-        if (mysqli_num_rows ($resultat) > 0) {
-            $datensatz = mysqli_fetch_assoc ($resultat);
+        if ($resultat = mysqli_query($db_link, $sql)) {
+            if (mysqli_num_rows ($resultat) > 0) {
+                $datensatz = mysqli_fetch_assoc ($resultat);
 
-            if ($datensatz["Aufnahmedatum"] <> "") {
-                if ($datensatz["Aufnahmedatum"] == '0000-00-00 00:00:00') {
-                    $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Kameradatum"] . '</p>';
+                if ($datensatz["Aufnahmedatum"] <> "") {
+                    if ($datensatz["Aufnahmedatum"] == '0000-00-00 00:00:00') {
+                        $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Kameradatum"] . '</p>';
+                    } else {
+                        $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Aufnahmedatum"] . '</p>';
+                    }
+
+                    $techdaten = '<p class=\"techdaten\">' . $datensatz["Zeit"] . ' / ';
+                    
+                    if ($datensatz["Blende"] == "") {
+                        $techdaten .= '-';
+                    } else {
+                        $techdaten .= $datensatz["Blende"];
+                    }
+
+                    $techdaten .= ' / ISO ' . $datensatz["ISO"] . ' / ' . $datensatz["Brennweite"];
+                    
+                    if ($datensatz["Hoehe"] != 0 && $datensatz["Hoehe"] != '' && $datensatz["Hoehe"] != '0') {
+                        $techdaten .= ' / ' . $datensatz["Hoehe"] . ' m';
+                    }
+                    
+                    $techdaten .= '</p>';
+                }
+
+                if ($datensatz["Laenge"] <> 0 && $datensatz["Breite"] <> 0) {
+                    $breite = (float)$datensatz["Breite"] / 10000.0;
+                    $laenge = (float)$datensatz["Laenge"] / 10000.0;
+
+                    $geodaten = '<p class=\"geodaten\">';
+                    $geodaten .= '<a class=\"geodel\" href=\"https://www.openstreetmap.org/query?lat=' . $breite . '&lon=' . $laenge . '\">' . $breite . '° / ' . $laenge . '°</a>&nbsp;&nbsp;';
+                    $geodaten .= '<a class=\"geodel\" href=\"https://www.peakfinder.org/de/?lat=' . $breite . '&lng=' . $laenge . '\">Peakfinder</a>&nbsp;&nbsp;';
+                    $geodaten .= '<a class=\"geodel\" href=\"javascript:bild_deleteGeodaten(' . $bildid . ', ' . $datei . ')\">Löschen</a>&nbsp;&nbsp;';
+                    $geodaten .= '<a class=\"geocopy\" href=\"javascript:bild_copyGeodaten(' . $datensatz["Breite"] . ', ' . $datensatz["Laenge"] . ', ' . $datensatz["Hoehe"] . ')\">Kopieren</a>';
+                    $geodaten .= '</p>';
                 } else {
-                    $aufnahmedatum = '<p class=\"aufnahmedatum\">' . $datensatz["Aufnahmedatum"] . '</p>';
+                    $geodaten .= '<p class=\"geodaten\"><a class=\"geoupdate\" href=\"javascript:bild_updateGeodaten(' . $bildid . ', ' . $datei . ')\">Update Geodaten</a></p>';
                 }
 
-                $techdaten = '<p class=\"techdaten\">' . $datensatz["Zeit"] . ' / ';
-                
-                if ($datensatz["Blende"] == "") {
-                    $techdaten .= '-';
-                } else {
-                    $techdaten .= $datensatz["Blende"];
-                }
+                if ($datensatz["polygon"] != null || $datensatz["polygon"] <> "") {
+                    $polygon = 'Polygon';
 
-                $techdaten .= ' / ISO ' . $datensatz["ISO"] . ' / ' . $datensatz["Brennweite"];
-                
-                if ($datensatz["Hoehe"] != 0 && $datensatz["Hoehe"] != '' && $datensatz["Hoehe"] != '0') {
-                    $techdaten .= ' / ' . $datensatz["Hoehe"] . ' m';
+                    if ($datensatz["locations"] != null || $datensatz["locations"] <> "") {
+                        $polygon .= ' | Locations';
+                    }
                 }
-                
-                $techdaten .= '</p>';
             }
 
-            if ($datensatz["Laenge"] <> 0 && $datensatz["Breite"] <> 0) {
-                $breite = (float)$datensatz["Breite"] / 10000.0;
-                $laenge = (float)$datensatz["Laenge"] / 10000.0;
+            mysqli_free_result($resultat);
+        }
+    } else {
+        $video_arr = explode(' | ', $beschreibung);
+        $youtubeid = str_replace('YOUTUBE=', '', $video_arr[0]);
+        // print_r($video_arr);
 
-                $geodaten = '<p class=\"geodaten\">' . $breite . '° / ' . $laenge . '°&nbsp;&nbsp;';
-                $geodaten .= '<a class=\"geodel\" href=\"javascript:bild_deleteGeodaten(' . $bildid . ', ' . $datei . ')\">Löschen</a>&nbsp;&nbsp;';
-                $geodaten .= '<a class=\"geocopy\" href=\"javascript:bild_copyGeodaten(' . $datensatz["Breite"] . ', ' . $datensatz["Laenge"] . ', ' . $datensatz["Hoehe"] . ')\">Kopieren</a></p>';
-            } else {
-                $geodaten .= '<p class=\"geodaten\"><a class=\"geoupdate\" href=\"javascript:bild_updateGeodaten(' . $bildid . ', ' . $datei . ')\">Update Geodaten</a></p>';
-            }
+        if (array_key_exists(1, $video_arr)) {
+            $file = '../data/videolist_jr.json';
+            $json = file_get_contents($file);
+            $videolist_jr = json_decode($json, true);
 
-            if ($datensatz["polygon"] != null || $datensatz["polygon"] <> "") {
-                $polygon = 'Polygon';
-
-                if ($datensatz["locations"] != null || $datensatz["locations"] <> "") {
-                    $polygon .= ' | Locations';
+            for ($i = 0; $i < count($videolist_jr); $i++) {
+                if ($videolist_jr[$i]["title"] == $video_arr[1]) {
+                    // print_r($videolist_jr[$i]);
+                    $videoinfo = json_encode($videolist_jr[$i]);
+                    break;
                 }
             }
         }
-
-        mysqli_free_result($resultat);
     }
 
     $nummer .= '</p>';
@@ -184,7 +217,9 @@ if ($version == 1) {
     echo '  "techdaten": "' . $techdaten . '",';
     echo '  "geodaten": "' . $geodaten . '",';
     echo '  "bilddaten": "' . $bilddaten . '",';
-    echo '  "polygon": "' . $polygon .  '"';
+    echo '  "polygon": "' . $polygon .  '",';
+    echo '  "youtubeid": "' . $youtubeid .  '",';
+    echo '  "videoinfo": ' . $videoinfo .  '';
     echo '}';
 } else if ($version == 2) {
     $bildpath = $bildinfo["pfad"] . '.' . $bildinfo["extension"];

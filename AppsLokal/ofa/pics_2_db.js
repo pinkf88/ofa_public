@@ -40,21 +40,18 @@ var root_dir = 'E:/OfaPics/SerienHD';
 
 if (args.root != undefined && args.root != '') {
     root_dir = args.root;
-
 }
 
 var sub_dir = '';
 
 if (args.dir != undefined && args.dir != '') {
     sub_dir = '' + args.dir;
-    
 }
 
 var update = false;
 
 if (args.u != undefined && args.u != '') {
     update = args.u;
-    
 }
 
 var db_connection = database.connect();

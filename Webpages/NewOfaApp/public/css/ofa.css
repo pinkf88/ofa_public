@@ -1,6 +1,6 @@
 body {
-    padding-top: 48px;
-    padding-bottom: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
     font-size: 12px;
     line-height: 1.2;
     font-family: Arial, Helvetica, sans-serif;
@@ -20,8 +20,25 @@ body.control {
 
 a {
     color: #2a8af2;
+    text-decoration: none;
 }
 
+a:hover span {
+    text-decoration: underline;
+} 
+
+a:active {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+.navbar-collapse.in {
+    display: block !important;
+}
+  
 .bgcolor_lightyellow {
     background-color: lightyellow;
 }
@@ -32,6 +49,28 @@ a {
 
 .color_green {
     color: green;
+}
+
+.font_weight_bold {
+    font-weight: bold;
+}
+
+.links_startseite {
+    margin-top: 15px;
+}
+
+.bildinformation1 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.bildinformation2 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.navbar_control {
+    margin-left: 240px;
 }
 
 div.control_left {
@@ -82,7 +121,7 @@ div.control_album {
     margin-bottom: 10px;
 }
 
-div.control_cover {
+div.control_cover, div.home_cover {
     max-width: 160px;
     min-height: 160px;
     border: 0;
@@ -123,7 +162,7 @@ div.control_picture {
     margin-bottom: 10px;
 }
 
-img.control_cover {
+img.control_cover, img.home_cover {
     max-width: 160px;
     height: auto;
 }
@@ -136,6 +175,10 @@ img.control_picture {
 div.control_lists {
     padding-left: 250px;
     padding-top: 30px;
+}
+
+#control_tab_wohnung {
+    display: none;
 }
 
 #control_tab_albums {
@@ -181,13 +224,18 @@ div.control_search {
     margin-bottom: 10px;
 }
 
-div.control_no_compilations, div.control_search {
+div.control_search {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
 }
 
-label.no_compilations {
+div.control_no_compilations, div.control_rarely_played {
+    float: left;
+    margin-right: 20px;
+}
+
+label.no_compilations, label.rarely_played {
     font-weight: normal;
     margin-left: 10px;
     margin-bottom: -4px;
@@ -269,6 +317,10 @@ div.media_playlist, div.media_show {
     font-weight: bold;
 }
 
+.span_icon {
+    margin-right: 20px;
+}
+
 p.media_album_firstletter, p.media_album_originalyear, p.media_track_firstletter {
     margin-top: 30px;
     margin-bottom: 0px;
@@ -276,9 +328,55 @@ p.media_album_firstletter, p.media_album_originalyear, p.media_track_firstletter
     font-size: 16px;
 }
 
+span.media_album_artist {
+    display: inline-block;
+    width: 292px;
+    font-weight: bold;
+}
+
+span.media_album_originalyear {
+    display: inline-block;
+    width: 80px;
+    margin-right: 20px;
+}
+
+span.media_album_album {
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+span.media_album_year {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+span.media_album_count_tracks {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+span.media_album_genres_styles {
+    display: inline-block;
+}
+
+@media (min-width: 1800px) {
+    span.media_album_album {
+        width: 500px;
+    }
+
+    span.media_album_year {
+        width: 30px;
+    }
+
+    span.media_album_count_tracks {
+        width: 120px;
+    }
+}
+
 p.media_album_artist {
-    margin-top: 16px;
-    margin-bottom: 8px;
+    margin-top: 24px;
+    margin-bottom: 12px;
     font-size: 15px;
 }
 
@@ -294,7 +392,7 @@ p.media_video_artist {
 }
 
 .media_album, .media_track, .media_serien_serie, .media_video, .media_serien_highlight {
-    margin-top: 4px;
+    margin-top: 10px;
     margin-bottom: 1px;
     font-size: 14px;
     padding: 1px;
@@ -344,6 +442,31 @@ p.media_video_artist {
 .media_album_track, .media_video_info {
     margin-top: 8px;
     margin-bottom: 8px;
+}
+
+span.year_media_album_artist {
+    display: inline-block;
+    width: 250px;
+    margin-right: 10px;
+}
+
+span.media_album_artist_track_number {
+    display: inline-block;
+    width: 40px;
+    margin-right: 15px;
+    text-align: right;
+}
+
+span.media_album_artist_track_title {
+    display: inline-block;
+    width: 250px;
+    margin-right: 15px;
+}
+
+@media (min-width: 1800px) {
+    span.media_album_artist_track_title {
+        width: 500px;
+    }
 }
 
 p.control_admin {
@@ -546,6 +669,51 @@ h6.control {
     margin-top: 24px;
 }
 
+.echo_element {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.echo_label {
+    margin-bottom: 5px;
+}
+
+#echo_volume {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+#echo_treble {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+#echo_midrange {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+#echo_bass {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+}
+
 .navbar {
     min-height: 0;
 }
@@ -554,8 +722,7 @@ h6.control {
     margin-left: 180px;
 }
 
-.navbar-brand
-{
+.navbar-brand {
     float: left;
     font-size: 14px;
     line-height: 16px;
@@ -573,8 +740,7 @@ h6.control {
     line-height: 16px;
 }
 
-p
-{
+p {
     margin: 0 0 3px;
 }
 
@@ -629,6 +795,10 @@ td.shortnumber, th.shortnumber {
 td.number, th.number {
     text-align: right;
     width: 70px;
+}
+
+tr.secondline {
+    border-style: hidden;
 }
 
 td.secondline {
@@ -695,13 +865,12 @@ label.motiv {
 }
 
 .container {
-    margin-left: 50px;
     margin-right: 50px;
     max-width: 100%;
 }
 
 .leftside {
-    margin-right: 340px;
+    margin-right: 320px;
 }
 
 .leftside_serie, .leftside_motiv, .leftside_ort {
@@ -798,11 +967,10 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     margin-top: 10px;
 }
 
-.rightside
-{
+.rightside {
     position: fixed;
-    top: 48px;
-    right: 50px;
+    top: 70px;
+    right: 20px;
     width: 300px;
 }
 
@@ -826,7 +994,7 @@ li.artist_liste, li.album_liste, li.track_liste, li.play_liste {
     margin-top: 5px;
 }
 
-.motivliste, .serieliste {
+.motivliste, .serieliste, .videoinfo {
     margin-top: 5px;
 }
 
@@ -1227,7 +1395,7 @@ ul {
     .navbar-header {
         float: none;
     }
-    .navbar-left,.navbar-right {
+    .navbar-left, .navbar-right {
         float: none !important;
     }
     .navbar-toggle {

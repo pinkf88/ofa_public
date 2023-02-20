@@ -271,36 +271,36 @@ function album_controlTrack(todo, param = '')
         $("[name='roomid']")[0].value;
     }
     
-    var url = '/inc/ofa_ControlMedia.php?type=album&';
+    var url1 = '/inc/ofa_ControlMedia.php?type=album&';
 
     switch (todo) {
         case 'new':
-            url = '/inc/ofa_ControlMedia.php?type=manage&audio_new';
+            url1 = '/inc/ofa_ControlMedia.php?type=manage&audio_new';
             break;
 
         case 'update':
-            url = '/inc/ofa_ControlMedia.php?type=manage&audio_update';
+            url1 = '/inc/ofa_ControlMedia.php?type=manage&audio_update';
             break;
 
         case 'info':
         case 'pause':
         case 'stop':
-            url += todo;
+            url1 += todo;
             break;
 
         case 'next':
         case 'previous':
-            url += 'goto=' + todo;
+            url1 += 'goto=' + todo;
             break;
 
         case 'url':
-            url += 'goto=' + param;
+            url1 += 'goto=' + param;
             break;
 
         case 'vol_down':
         case 'vol_up':
         case 'vol_mute':
-            url = '/inc/ofa_ControlMedia.php?type=audio&direction=' + todo + '&roomid=' + roomid;
+            url1 = '/inc/ofa_ControlMedia.php?type=audio&direction=' + todo + '&roomid=' + roomid;
             break;
 
         default:
@@ -308,9 +308,8 @@ function album_controlTrack(todo, param = '')
     }
 
     $.ajax({
-        url : url
-    }).done(function(data)
-    {
+        url: url1
+    }).done(function(data) {
         if (data == 'No track running.') {
             if (album_timer) {
                 no_track_running_counter++;
@@ -333,21 +332,27 @@ function album_controlTrack(todo, param = '')
 
         if ($('#control_cover').length) {
             if ($('.running_track_title') != undefined && $('.running_track_title')[0] != undefined && $('.running_track_title')[0].id != undefined) {
+                var url2 = '/inc/ofa_GetTrackInfo.php?trackid=' + $('.running_track_title')[0].id;
+
                 $.ajax({
-                    dataType : "json",
-                    url : "/inc/ofa_GetTrackInfo.php?trackid=" + $('.running_track_title')[0].id
-                }).done(function(data)
-                {
-                    $('#control_cover').html('<img class="control_cover" src="' + data.trackdata.bildurl + '">');
-                }).fail(function(jqXHR, textStatus)
-                {
-                    console.log("Database access failed: url=" + url + ' / testStatus=' + textStatus);
+                    dataType:   'json',
+                    url:        url2
+                }).done(function(data) {
+                    // if ($('#control_cover').is(':visible') == true) {
+                        $('#control_cover').html('<img class="control_cover" src="' + data.trackdata.bildurl + '">');
+                    // }
+
+                    // if ($('#home_cover').is(':visible') == true) {
+                        $('#home_cover').html('<img class="home_cover" src="' + data.trackdata.bildurl + '">');
+                    // }
+                }).fail(function(jqXHR, textStatus) {
+                    console.log('album_controlTrack(): Ajax Fehler', url2, textStatus);
                 });
             }
         }
     }).fail(function(jqXHR, textStatus)
     {
-        console.log("Database access failed: url=" + url + ' / testStatus=' + textStatus);
+        console.log('album_controlTrack(): Ajax Fehler', url1, textStatus);
     });
 }
 
@@ -384,10 +389,21 @@ function album_showAlbumInfo(info)
                 }
             }
 
-            $('#control_cover').html('<img class="control_cover" src="' + info.image.url + '">');
+            // if ($('#control_cover').is(':visible') == true) {
+                $('#control_cover').html('<img class="control_cover" src="' + info.image.url + '">');
+            // }
+
+            // if ($('#home_cover').is(':visible') == true) {
+                $('#home_cover').html('<img class="home_cover" src="' + info.image.url + '">');
+            // }
         }
 
         $('#album_info').html(html);
+        $('#home_album_info').html(html);
+
+        if (typeof control_echo === "function") {
+            control_echo('get_all');
+        }    
     }
 }
 

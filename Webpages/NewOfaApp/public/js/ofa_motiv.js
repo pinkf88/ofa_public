@@ -18,13 +18,14 @@ var motiv_marker = null;
 function motiv_createMap()
 {
     var welt = new google.maps.LatLng(48.13, 11.57);
+
     var myOptions = {
-        zoom : 5,
-        center : welt,
-        mapTypeId : google.maps.MapTypeId.HYBRID,
-        overviewMapControl : true,
-        overviewMapControlOptions : {
-            opened : true
+        zoom:               5,
+        center:             welt,
+        mapTypeId:          google.maps.MapTypeId.HYBRID,
+        overviewMapControl: true,
+        overviewMapControlOptions: {
+            opened: true
         }
     };
 
@@ -44,50 +45,40 @@ function motiv_createMap()
     });
 
     motiv_marker = new google.maps.Marker({
-        position : welt,
-        map : motiv_map,
-        shadow : shadow,
-        icon : image,
-        clickable : true
+        position:   welt,
+        map:        motiv_map,
+        shadow:     shadow,
+        icon:       image,
+        clickable:  true
     });
 
     geocoder = new google.maps.Geocoder();
 
     google.maps.event.addListener(motiv_marker, "click", function()
     {
-        if (geocoder)
-        {
+        if (geocoder) {
             latlng = motiv_marker.getPosition();
 
             geocoder.geocode({
                 'latLng' : latlng
-            }, function(results, status)
-            {
+            }, function(results, status) {
                 var content = "";
 
-                if (status == google.maps.GeocoderStatus.OK)
-                {
-                    if (results[0])
-                    {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    if (results[0]) {
                         content = results[0].formatted_address;
                     }
 
-                    if (results[1])
-                    {
+                    if (results[1]) {
                         content = content + "<br>" + results[1].formatted_address;
                     }
 
-                    if (results[2])
-                    {
+                    if (results[2]) {
                         content = content + "<br>" + results[2].formatted_address;
                     }
-                }
-                else if (status == google.maps.GeocoderStatus.ZERO_RESULTS)
-                {
+                } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS) {
                     content = "Keine weiteren Geoinformationen verfügbar.";
-                }
-                else
-                {
+                } else {
                     content = "Keine weiteren Geoinformationen verfügbar.";
                 }
 

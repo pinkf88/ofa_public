@@ -50,11 +50,16 @@ $("#bildzusatzdialog").dialog({
     buttons : {
         "Ok" : function()
         {
-            var zusatz = $('textarea[name=seriebild_zusatz]').val().replace(new RegExp('\r?\n', 'g'), '%0D');
+            var post = {
+                serieid:    $('input[name=serieid]').val(),
+                bildid:     $('input[name=bildid]').val(),
+                zusatz:     $('textarea[name=seriebild_zusatz]').val()
+            };
 
             $.ajax({
-                url : "/inc/ofa_UpdateSerieBild.php?serieid=" + $('input[name=serieid]').val()
-                        + "&bildid=" + $('input[name=bildid]').val() + "&zusatz=" + zusatz
+                method: 'POST',
+                url:    '/inc/ofa_UpdateSerieBild.php',
+                data:   post
             }).done(function(data)
             {
             }).fail(function(jqXHR, textStatus)

@@ -13,39 +13,47 @@ module.exports = {
 
 var error_counter = 0;
 
-function send(msg_subject, msg_txt, address_from, address_to)
+async function send(msg_subject, msg_txt, address_from, address_to, attachment = [])
 {
     const mail_client = new SMTPClient({
         user:       config.mailserver.user,
         password:   config.mailserver.password,
         host:       config.mailserver.host,
         ssl:        true,
+        timeout:    60000
     });
 
     console.log('Message sending: ' + msg_subject);
 
-    mail_client.send({
-            text:       msg_txt,
-            from:       address_from,
-            to:         address_to,
-            cc:         '',
-            subject:    '[LOCAL] ' + msg_subject
-        },
-        (err, message) => {
-            if (err) {
-                console.log(err);
+    var message = {
+        text:       msg_txt,
+        from:       address_from,
+        to:         address_to,
+        cc:         '',
+        subject:    '[PI] ' + msg_subject,
+        attachment: attachment
+    };
 
-                if (error_counter > 3) {
-                    error_counter = 0;
-                } else {
-                    setTimeout( function() {
-                        error_counter++;
-                        send(msg_subject, msg_txt, address_from, address_to);
-                    }, 300000);
-                }
-            } else {
+    var error_counter = 0;
+
+    do {
+        try {
+            var ret = await mail_client.sendAsync(message);
+            // tools.log('A');
+            // console.log('sendAsync ret=', ret);
+            error_counter = 0;
+        } catch (err) {
+            // tools.log('B');
+            // console.log('sendAsync err=', err);
+            error_counter++;
+
+            if (error_counter > 3) {
                 error_counter = 0;
+            } else {
+                await tools.wait(65000);
             }
         }
-    );
+    } while (error_counter > 0);
+
+    console.log('Message sent: ' + msg_subject);
 }

@@ -1,3 +1,5 @@
+var bildimport_json = null;
+
 $(function()
 {
     $("#bildimportgrid").sortable();
@@ -67,8 +69,6 @@ $(function()
     });
 });
 
-var bildimport_json = null;
-
 function bildimport_fillGrid(serieid)
 {
     $.ajax({
@@ -136,10 +136,9 @@ function bild_hideBildImportGrid()
 function bild_saveBildImportGrid()
 {
     $.ajax({
-        method:     'POST',
-        dataType:   'text',
-        url:        '/inc/ofa_ImportBilder.php',
-        data:       'bilder=' + JSON.stringify(bildimport_json)
+        method: 'POST',
+        url:    '/inc/ofa_ImportBilder.php',
+        data:   bildimport_json
     }).done(function(data)
     {
         bild_hideBildImportGrid();

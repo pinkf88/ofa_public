@@ -10,8 +10,8 @@
 <?php
 $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_ofa_database);
 
-$sql = 'SELECT DISTINCT UPPER(LEFT(t.albumartistsort, 1)) AS firstletter '
-    . 'FROM ' . $dbt_ofa_tracks . ' t ORDER BY UPPER(LEFT(t.albumartistsort, 1))';
+$sql = 'SELECT DISTINCT UPPER(LEFT(a.albumartistsort, 1)) AS firstletter '
+    . 'FROM ofa_albums a ORDER BY UPPER(LEFT(a.albumartistsort, 1))';
 
 if ($resultat = mysqli_query($db_link, $sql))
 {
@@ -40,44 +40,86 @@ function getHtmlMediaAlbum($datensatz, $prefix_tab)
 {
     global $PREFIX_TAB_ARTIST;
     global $PREFIX_TAB_YEAR;
-   
-    $jahr = "";
+
     $originalyear = $datensatz["originalyear"];
 
     if ($datensatz["originalyear"] == 0) {
         $originalyear = $datensatz["year"];
     }
 
-    if ($datensatz["year"] != $datensatz["originalyear"]) {
-        $jahr = " ("  . $datensatz["year"] . ")";
+    if ($prefix_tab == $PREFIX_TAB_YEAR) {
+        $extra_info = "<span class=\"media_album_year\">";
+
+        if ($datensatz["year"] != $datensatz["originalyear"]) {
+            $extra_info .= $datensatz["year"];
+        }
+
+        $extra_info .= "</span>";
     }
 
-    $pref_text = $originalyear;
-    $pref_id = "artist_";
+    $extra_info .= "<span class=\"media_album_count_tracks\">" . $datensatz["count_tracks"] . " Tracks ("
+        . $datensatz["count_played"] . ")</span>";
+
+    $genres = "";
+    $styles = "";
+
+    if (is_null($datensatz["genres"]) == FALSE && $datensatz["genres"] != '') {
+        $genres = preg_replace("/\|/", " | ", trim($datensatz["genres"], "|"));
+    }
+
+    if (is_null($datensatz["styles"]) == FALSE && $datensatz["styles"] != '') {
+        $styles = preg_replace("/\|/", " | ", trim($datensatz["styles"], "|"));
+    }
+
+    if ($genres != "") {
+        $extra_info .= "<span class=\"media_album_genres_styles\">" . $genres;
+
+        if ($styles != "") {
+            $extra_info .= " / " . $styles;
+        }
+
+        $extra_info .= "</span>";
+    }
+
+    $pref_text = "";
+    $pref_id = "";
 
     if ($prefix_tab == $PREFIX_TAB_YEAR) {
-        $pref_text = $datensatz["albumartist"];
+        $pref_text = "<span class=\"year_media_album_artist\">" . urldecode($datensatz["albumartist"]) . "</span>";
         $pref_id = "year_";
-     } 
+    } else {
+        $pref_text = "<span class=\"media_album_originalyear\">" . $originalyear;
+            
+        if ($datensatz["year"] != $datensatz["originalyear"]) {
+            $pref_text .= " (" . $datensatz["year"] . ")";
+        }
+
+        $pref_text .= "</span>";
+        $pref_id = "artist_";
+    }
 
     return "<div id=\"" . $pref_id . "media_album_" . $datensatz["musicbrainz_albumid"] . "\" class=\"media_album\">"
-        . "<p><a href=\"javascript:album_playAlbum('" . $datensatz["musicbrainz_albumid"] . "', 1);\"><span class=\"ui-icon ui-icon-play\"></span></a> | "
-        . "<a href=\"javascript:album_playAlbum('" . $datensatz["musicbrainz_albumid"] . "', 2);\"><span class=\"ui-icon ui-icon-arrowthick-1-e\"></span></a> | "
-        . "<a href=\"javascript:control_addToRunningTracks(1, '" . $datensatz["musicbrainz_albumid"] . "');\"><span class=\"ui-icon ui-icon-plusthick\"></span></a> | "
-        . "<a href=\"javascript:control_flagAlbum('" . $datensatz["musicbrainz_albumid"] . "');\"><span id=\"" . $pref_id . "flag_" . $datensatz["musicbrainz_albumid"] . "\" class=\"ui-icon ui-icon-flag\"></span></a> | "
-        . "<a href=\"javascript:control_starAlbum('" . $datensatz["musicbrainz_albumid"] . "', " . $originalyear . ");\"><span id=\"" . $pref_id . "star_" . $datensatz["musicbrainz_albumid"] . "\" class=\"ui-icon ui-icon-star\"></span></a>&nbsp;&nbsp;&nbsp;"
+        . "<p>"
+        . "<span class=\"span_icon\"><a href=\"javascript:album_playAlbum('" . $datensatz["musicbrainz_albumid"] . "', 1);\"><span class=\"ui-icon ui-icon-play\"></span></a></span>"
+        . "<span class=\"span_icon\"><a href=\"javascript:album_playAlbum('" . $datensatz["musicbrainz_albumid"] . "', 2);\"><span class=\"ui-icon ui-icon-arrowthick-1-e\"></span></a></span>"
+        . "<span class=\"span_icon\"><a href=\"javascript:control_addToRunningTracks(1, '" . $datensatz["musicbrainz_albumid"] . "');\"><span class=\"ui-icon ui-icon-plusthick\"></span></a></span>"
+        . "<span class=\"span_icon\"><a href=\"javascript:control_flagAlbum('" . $datensatz["musicbrainz_albumid"] . "');\"><span id=\"" . $pref_id . "flag_" . $datensatz["musicbrainz_albumid"] . "\" class=\"ui-icon ui-icon-flag\"></span></a></span>"
+        . "<span class=\"span_icon\"><a href=\"javascript:control_starAlbum('" . $datensatz["musicbrainz_albumid"] . "', " . $originalyear . ");\"><span id=\"" . $pref_id . "star_" . $datensatz["musicbrainz_albumid"] . "\" class=\"ui-icon ui-icon-star\"></span></a></span>&nbsp;&nbsp;&nbsp;"
         . "<a href=\"javascript:control_showTracks('" . $pref_id . "tracks_" . $datensatz["musicbrainz_albumid"] . "');\">"
-        . $pref_text . '&nbsp;&nbsp;&nbsp;<b>' . $datensatz["album"] . "</b>" . $jahr . "</a></p></div>"
+        . $pref_text . "<span class=\"media_album_album\">" . strtoupper(urldecode($datensatz["album"])) . "</span>" . $extra_info . "</a></p></div>"
         . "<div class=\"media_album_tracks\" id=\"" . $pref_id . "tracks_" . $datensatz["musicbrainz_albumid"] . "\"></div>\n";
 }
 
-$sql = 'SELECT DISTINCT t.album, t.albumartist, t.albumartistsort, t.musicbrainz_albumartistid, UPPER(LEFT(t.albumartistsort, 1)) AS firstletter, t.musicbrainz_albumid, t.year, t.originalyear '
-    . 'FROM ' . $dbt_ofa_tracks . ' t ORDER BY t.albumartistsort, t.albumartist, t.originalyear, t.album, t.year, t.musicbrainz_albumid';
+$sql = 'SELECT DISTINCT a.album, a.albumartist, a.albumartistsort, a.musicbrainz_albumartistid, UPPER(LEFT(a.albumartistsort, 1)) AS firstletter, '
+    . 'a.musicbrainz_albumid, a.year, a.originalyear, a.genres, a.styles, a.count_tracks, ROUND(a.count_play / a.count_tracks, 2) AS count_played '
+    . 'FROM ofa_albums a '
+    . 'WHERE a.album IS NOT NULL '
+    . 'ORDER BY a.albumartistsort, a.albumartist, a.originalyear, a.album, a.year, a.musicbrainz_albumid ';
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows ($resultat) > 0)
-    {
+// echo $sql;
+
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows ($resultat) > 0) {
         $artist = '';
         $firstletter = '';
 
@@ -97,8 +139,12 @@ if ($resultat = mysqli_query($db_link, $sql))
 
                 $artist = $datensatz["albumartist"];
 
+                // if (str_contains($artist, "%%") == true) {
+                //     $artist = urldecode($artist);
+                // }
+
                 echo '<div id="' . strtolower($artist) . '" class="media_album_artist_albums">' . "\n";
-                echo '<p class="media_album_artist"><b>' . $datensatz["albumartist"] . '</b>&nbsp;&nbsp;&nbsp;';
+                echo '<p class="media_album_artist"><span class="media_album_artist">' . $artist . '</span>';
                 echo '<a href="javascript:control_showAlbums(\'' . $datensatz["musicbrainz_albumartistid"] . '\', 1);">Show</a> | ';
                 echo '<a href="javascript:album_playArtist(\'' . $datensatz["musicbrainz_albumartistid"] . '\', 1);">Play</a> | ';
                 echo '<a href="javascript:album_playArtist(\'' . $datensatz["musicbrainz_albumartistid"] . '\', 2);">Play random</a>';
@@ -118,12 +164,10 @@ if ($resultat = mysqli_query($db_link, $sql))
 <div id="alben_sort_year">
 <div id="alben_sort_year_intro" class="alben_sort_year_intro">
 <?php
-$sql = 'SELECT DISTINCT t.originalyear FROM ' . $dbt_ofa_tracks . ' t ORDER BY t.originalyear DESC';
+$sql = 'SELECT DISTINCT a.originalyear FROM ofa_albums a ORDER BY a.originalyear DESC';
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows ($resultat) > 0)
-    {
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows ($resultat) > 0) {
         $originalyears = "| ";
 
         while ($datensatz = mysqli_fetch_assoc ($resultat)) {
@@ -137,13 +181,16 @@ if ($resultat = mysqli_query($db_link, $sql))
 </div>
 
 <?php
-$sql = 'SELECT DISTINCT t.album, t.albumartist, t.albumartistsort, t.musicbrainz_albumartistid, t.musicbrainz_albumid, t.year, t.originalyear '
-    . 'FROM ' . $dbt_ofa_tracks . ' t ORDER BY t.originalyear DESC, t.albumartistsort, t.albumartist, t.album, t.year, t.musicbrainz_albumid';
+$sql = 'SELECT DISTINCT a.album, a.albumartist, a.albumartistsort, a.musicbrainz_albumartistid, UPPER(LEFT(a.albumartistsort, 1)) AS firstletter, '
+    . 'a.musicbrainz_albumid, a.year, a.originalyear, a.genres, a.styles, a.count_tracks, ROUND(a.count_play / a.count_tracks, 2) AS count_played '
+    . 'FROM ofa_albums a '
+    . 'WHERE a.album IS NOT NULL '
+    . 'ORDER BY a.originalyear DESC, a.albumartistsort, a.albumartist, a.album, a.year, a.musicbrainz_albumid';
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows ($resultat) > 0)
-    {
+// echo $sql;
+
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows ($resultat) > 0) {
         $artist = '';
         $originalyear = '';
 

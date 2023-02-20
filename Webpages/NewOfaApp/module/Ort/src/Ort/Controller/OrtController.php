@@ -21,32 +21,32 @@ class OrtController extends AbstractActionController
     {
         $firephp = \FirePHP::getInstance(true);
         $firephp->log('OrtController->__construct().');
-        
+
         $this->session = new Container('ofa_ort');
     }
 
     public function indexAction()
     {
         $firephp = \FirePHP::getInstance(true);
-        
+
         $landid = 0;
         $countperpage = 250;
-        
+
         if ($this->session->offsetExists('landid'))
         {
             $landid = intval($this->session->offsetGet('landid'));
         }
-        
+
         if ($this->session->offsetExists('countperpage'))
         {
             $countperpage = intval($this->session->offsetGet('countperpage'));
         }
-        
+
         if ($this->getRequest())
         {
             $firephp->log('OrtController->indexAction(). getRequest(): isPost=' . $this->getRequest()
                 ->isPost());
-            
+
             if ($this->getRequest()
                 ->isPost())
             {
@@ -62,7 +62,7 @@ class OrtController extends AbstractActionController
                 {
                     $landid = 0;
                 }
-                
+
                 if ($this->getRequest()
                     ->getPost('countperpage'))
                 {
@@ -77,40 +77,40 @@ class OrtController extends AbstractActionController
                 }
             }
         }
-        
+
         $this->session->offsetSet('landid', $landid);
         $this->session->offsetSet('countperpage', $countperpage);
-        
+
         $select = new Select();
-        
+
         $select->order('ort ' . Select::ORDER_ASCENDING);
-        
+
         if ($landid > 0)
         {
             $select->where('landid=' . $landid);
         }
-        
+
         $paginator = $this->getOrtTable()
             ->fetchAll($select);
         $paginator->setCurrentPageNumber((int) $this->params()
             ->fromQuery('page', 1));
         $paginator->setItemCountPerPage($countperpage);
-        
+
         $this->session->offsetSet('page', $this->params()
             ->fromQuery('page', 1));
-        
+
         $selectform = new OrtSelectForm($this->getLandTable()
             ->fetchAll());
-        
+
         if ($landid > 0)
         {
             $selectform->get('landid')
                 ->setValue($landid);
         }
-        
+
         $selectform->get('countperpage')
             ->setValue($countperpage);
-        
+
         return new ViewModel(array(
                 'paginator' => $paginator,
                 'selectform' => $selectform
@@ -122,13 +122,13 @@ class OrtController extends AbstractActionController
         $firephp = \FirePHP::getInstance(true);
         $firephp->log('OrtController->addAction()');
         // $firephp->trace('Trace Label');
-        
+
         $form = new OrtForm($this->getLandTable()
             ->fetchAll());
-        
+
         $form->get('submit')
             ->setValue('Hinzufügen');
-        
+
         if ($this->session->offsetExists('input_landid'))
         {
             $form->get('landid')
@@ -142,32 +142,32 @@ class OrtController extends AbstractActionController
                     ->setValue($this->session->offsetGet('landid'));
             }
         }
-        
+
         $request = $this->getRequest();
-        
+
         if ($request->isPost())
         {
             $ort = new Ort($this->getServiceLocator()
                 ->get('Zend\Db\Adapter\Adapter'));
-            
+
             $form->setInputFilter($ort->getInputFilter());
             $form->setData($request->getPost());
-            
+
             if ($form->isValid())
             {
                 $ort->exchangeArray($form->getData());
-                
+
                 $this->session->offsetSet('input_landid', $ort->landid);
-                
+
                 $this->getOrtTable()
                     ->saveOrt($ort);
-                
+
                 // Redirect to list of orts
                 return $this->redirect()
                     ->toRoute('ort');
             }
         }
-        
+
         return array(
                 'form' => $form
         );
@@ -175,79 +175,58 @@ class OrtController extends AbstractActionController
 
     public function editAction()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('OrtController->editAction()');
-        
-        $id = (int) $this->params()
-            ->fromRoute('id', 0);
-        
-        if (! $id)
-        {
+        $id = (int) $this->params()->fromRoute('id', 0);
+
+        if (! $id) {
             return $this->redirect()
                 ->toRoute('ort', array(
                     'action' => 'add'
             ));
         }
-        
+
         $ort = '';
-        
+
         try
         {
-            $ort = $this->getOrtTable()
-                ->getOrt($id);
+            $ort = $this->getOrtTable()->getOrt($id);
         }
         catch (\Exception $ex)
         {
-            $firephp->error('OrtController->editAction()');
-            
             return $this->redirect()
                 ->toRoute('ort', array(
                     'action' => 'index'
             ));
         }
-        
-        $firephp->log('OrtController->editAction(). $ort=' . $ort->ort . '. $landid=' . $ort->landid);
-        $form = new OrtForm($this->getLandTable()
-            ->fetchAll());
+
+        $form = new OrtForm($this->getLandTable()->fetchAll());
         $form->bind($ort);
-        $form->get('submit')
-            ->setValue('Ändern');
-        $form->get('landid')
-            ->setValue($ort->landid);
-        
+        $form->get('submit')->setValue('Ändern');
+        $form->get('landid')->setValue($ort->landid);
+
         $request = $this->getRequest();
-        
-        if ($request->isPost())
-        {
-            $firephp->log('isPost -> OrtController->editAction()');
-            
+
+        if ($request->isPost()) {
             $form->setInputFilter($ort->getInputFilter());
             $form->setData($request->getPost());
-            
+
             if ($form->isValid())
             {
-                $firephp->log('isValid -> OrtController->editAction()');
-                
                 $this->session->offsetSet('input_landid', $ort->landid);
-                
-                $this->getOrtTable()
-                    ->saveOrt($ort);
-                
+
+                $this->getOrtTable()->saveOrt($ort);
+
                 $page = '1';
-                
+
                 // Redirect to list of orts
-                if ($this->session->offsetExists('page'))
-                {
+                if ($this->session->offsetExists('page')) {
                     $page = $this->session->offsetGet('page') . '#' . $id;
                 }
-                
+
                 return $this->redirect()
                     ->toUrl('/ort?page=' . $page);
             }
-            
-            $firephp->warn('isValid=false -> OrtController->editAction()');
         }
-        
+
         return array(
                 'id' => $id,
                 'form' => $form
@@ -258,34 +237,34 @@ class OrtController extends AbstractActionController
     {
         $firephp = \FirePHP::getInstance(true);
         $firephp->log('OrtController->deleteAction()');
-        
+
         $id = (int) $this->params()
             ->fromRoute('id', 0);
-        
+
         if (! $id)
         {
             return $this->redirect()
                 ->toRoute('ort');
         }
-        
+
         $request = $this->getRequest();
-        
+
         if ($request->isPost())
         {
             $del = $request->getPost('del', 'Nein');
-            
+
             if ($del == 'Ja')
             {
                 $id = (int) $request->getPost('id');
                 $this->getOrtTable()
                     ->deleteOrt($id);
             }
-            
+
             // Redirect to list of orts
             return $this->redirect()
                 ->toRoute('ort');
         }
-        
+
         return array(
                 'id' => $id,
                 'ort' => $this->getOrtTable()
@@ -297,13 +276,13 @@ class OrtController extends AbstractActionController
     {
         $firephp = \FirePHP::getInstance(true);
         $firephp->log('OrtController->getOrtTable()');
-        
+
         if (! $this->ortTable)
         {
             $sm = $this->getServiceLocator();
             $this->ortTable = $sm->get('Ort\Model\OrtTable');
         }
-        
+
         return $this->ortTable;
     }
 
@@ -311,13 +290,13 @@ class OrtController extends AbstractActionController
     {
         $firephp = \FirePHP::getInstance(true);
         $firephp->log('OrtController->getLandTable()');
-        
+
         if (! $this->landTable)
         {
             $sm = $this->getServiceLocator();
             $this->landTable = $sm->get('Ort\Model\LandTable');
         }
-        
+
         return $this->landTable;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Bild\Model;
 
 use Zend\Db\TableGateway\AbstractTableGateway;
@@ -16,9 +15,6 @@ class BildTable extends AbstractTableGateway
 
     public function __construct(Adapter $adapter)
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildTable->__construct()');
-
         $this->adapter = $adapter;
         $this->resultSetPrototype = new ResultSet();
         $this->resultSetPrototype->setArrayObjectPrototype(new Bild($adapter));
@@ -28,11 +24,9 @@ class BildTable extends AbstractTableGateway
 
     public function fetchAll(Select $select = null)
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildTable->fetchAll()');
-
-        if (null === $select)
+        if (null === $select) {
             $select = new Select();
+        }
 
         $select->from($this->table)
             ->columns(array(
@@ -49,14 +43,16 @@ class BildTable extends AbstractTableGateway
                 'panorama',
                 'ticket',
                 'ohneort',
-                'ohneland'
-        ))
+                'ohneland',
+                'anzahl' => new Expression('COUNT(ofa_bild_motiv.bildid)')
+            ))
             ->join('ofa_ort', 'ofa_bild.ortid = ofa_ort.id', 'ort')
             ->join('ofa_land', 'ofa_ort.landid = ofa_land.id', 'land')
-            ->join('ofa_bilddaten', 'ofa_bilddaten.BildNr = ofa_bild.datei', 'polygon', $select::JOIN_LEFT);
+            ->join('ofa_bilddaten', 'ofa_bilddaten.BildNr = ofa_bild.datei', 'polygon', $select::JOIN_LEFT)
+            ->join('ofa_bild_motiv', 'ofa_bild_motiv.bildid = ofa_bild.id', array(), $select::JOIN_LEFT)
+            ->group(array('ofa_bild.id'));
 
-
-        // $firephp->log('BildTable->fetchAll(): ' . $select->getSqlString());
+        // echo 'BildTable->fetchAll(): ' . $select->getSqlString();
         $paginatorAdapter = new DbSelect($select, $this->adapter, $this->resultSetPrototype);
 
         $paginator = new Paginator($paginatorAdapter);
@@ -71,7 +67,7 @@ class BildTable extends AbstractTableGateway
             ->quantifier('DISTINCT')
             ->columns(array(
                 'jahr' => new Expression('YEAR(datum)')
-        ))
+            ))
             ->order('jahr DESC');
 
         $resultSet = $this->selectWith($select);
@@ -83,13 +79,14 @@ class BildTable extends AbstractTableGateway
     public function getBild($id)
     {
         $id = (int) $id;
+
         $rowset = $this->select(array(
-                'id' => $id
+            'id' => $id
         ));
+
         $row = $rowset->current();
 
-        if (! $row)
-        {
+        if (!$row) {
             throw new \Exception("Could not find row $id");
         }
 
@@ -99,13 +96,14 @@ class BildTable extends AbstractTableGateway
     public function getOrtID($id)
     {
         $id = (int) $id;
+
         $rowset = $this->select(array(
             'id' => $id
         ));
+
         $row = $rowset->current();
 
-        if (! $row)
-        {
+        if (!$row) {
             throw new \Exception("Could not find row $id");
         }
 
@@ -114,44 +112,36 @@ class BildTable extends AbstractTableGateway
 
     public function saveBild(Bild $bild)
     {
-        if ($bild->datei == '0')
+        if ($bild->datei == '0') {
             $bild->datei = '';
+        }
 
         $data = array(
-                'nummer' => $bild->nummer,
-                'datei' => $bild->datei,
-                'datum' => $bild->datum,
-                'jahrflag' => $bild->jahrflag,
-                'ortid' => $bild->ortid,
-                'beschreibung' => $bild->beschreibung,
-                'bemerkung' => $bild->bemerkung,
-                'wertung' => $bild->wertung,
-                'panorama' => $bild->panorama,
-                'ticket' => $bild->ticket,
-                'ohneort' => $bild->ohneort,
-                'ohneland' => $bild->ohneland,
+            'nummer' => $bild->nummer,
+            'datei' => $bild->datei,
+            'datum' => $bild->datum,
+            'jahrflag' => $bild->jahrflag,
+            'ortid' => $bild->ortid,
+            'beschreibung' => $bild->beschreibung,
+            'bemerkung' => $bild->bemerkung,
+            'wertung' => $bild->wertung,
+            'panorama' => $bild->panorama,
+            'ticket' => $bild->ticket,
+            'ohneort' => $bild->ohneort,
+            'ohneland' => $bild->ohneland,
         );
 
         $id = (int) $bild->id;
 
-        // $firephp->log('BildTable->saveBild(). ' . $id . "/" . $bild->nummer . "/" . $bild->datei . "/" . $bild->datum);
-
-        if ($id == 0)
-        {
+        if ($id == 0) {
             $this->insert($data);
             $id = $this->lastInsertValue;
-        }
-        else
-        {
-            if ($this->getBild($id))
-            {
+        } else {
+            if ($this->getBild($id)) {
                 $this->update($data, array(
                         'id' => $id
                 ));
-            }
-            else
-            {
-                // $firephp->error('BildTable->saveBild(). Bild id does not exist');
+            } else {
                 throw new \Exception('Bild id does not exist');
             }
         }
@@ -161,11 +151,8 @@ class BildTable extends AbstractTableGateway
 
     public function deleteBild($id)
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildTable->deleteBild()');
-
         $this->delete(array(
-                'id' => (int) $id
+            'id' => (int) $id
         ));
     }
 }

@@ -49,22 +49,23 @@ function control_showTracks(albumid, doit = false)
 
             for (var i = 0; i < tracks.length; i++) {
                 html += '<p class="media_album_track">'
-                    + '<a href="javascript:album_playTrack(\'' + tracks[i].musicbrainz_trackid + '\', 0);"><span class="ui-icon ui-icon-play ui-icon-blue"></span></a> | '
-                    + '<a href="javascript:album_playTrack(\'' + tracks[i].musicbrainz_trackid + '\', 1);"><span class="ui-icon ui-icon-seek-end ui-icon-blue"></span></a> | '
-                    + '<a href="javascript:control_addToRunningTracks(2, \'' + tracks[i].musicbrainz_trackid + '\');\"><span class="ui-icon ui-icon-plus ui-icon-blue"></span></a>'
-                    + '&nbsp;&nbsp;&nbsp;<a href="javascript:album_playTrack(\'' + tracks[i].musicbrainz_trackid + '\', 0);">'
-                    + tracks[i].list_no + ' | ' + tracks[i].title;
+                    + '<span class=\"span_icon\"><a href="javascript:album_playTrack(\'' + tracks[i].musicbrainz_trackid + '\', 0);"><span class="ui-icon ui-icon-play ui-icon-blue"></span></a></span>'
+                    + '<span class=\"span_icon\"><a href="javascript:album_playTrack(\'' + tracks[i].musicbrainz_trackid + '\', 1);"><span class="ui-icon ui-icon-seek-end ui-icon-blue"></span></a></span>'
+                    + '<span class=\"span_icon\"><a href="javascript:control_addToRunningTracks(2, \'' + tracks[i].musicbrainz_trackid + '\');\"><span class="ui-icon ui-icon-plus ui-icon-blue"></span></a></span>'
+                    + '<a href="javascript:album_playTrack(\'' + tracks[i].musicbrainz_trackid + '\', 0);">'
+                    + '<span class="media_album_artist_track_number">' + tracks[i].list_no + '</span>'
+                    + '<span class="media_album_artist_track_title">' + tracks[i].title;
                     
                 if (tracks[i].artist != undefined && tracks[i].artist != '' && tracks[i].artist != tracks[i].albumartist) {
                     html += ' (' + tracks[i].artist + ')';
                 }
                     
-                html += ' | ' + tracks[i].duration + '</a></p>';
+                html += '</span>' + tracks[i].duration + '</a></p>';
             }
 
             var info = tracks_info.info;
 
-            if (info != null && info != undefined) {
+            if (info != null && info != undefined && info.genres != undefined && info.genres != null) {
                 html += '<p id="track_more_' + musicbrainz_albumid + '" class="media_album_track_more">'
                     + '<a href="javascript:control_showTracksMore(\'' + musicbrainz_albumid + '\')">Mehr Infos</a>&nbsp;&nbsp;&nbsp;'
                     + '<a href="javascript:control_updateAlbum(\'' + albumid + '\', \'' + musicbrainz_albumid + '\')">Update Album</a>'
@@ -72,8 +73,13 @@ function control_showTracks(albumid, doit = false)
 
                 html += '<div id="track_info_' + musicbrainz_albumid + '" class="media_album_track_info">'
 
-                html += '<p class="media_album_track_more_genres"><b>Genres:</b> ' + info.genres.slice(1, -1).replace(/\|/g, " | ") + '</p>';
-                html += '<p class="media_album_track_more_styles"><b>Style:</b> ' + info.styles.slice(1, -1).replace(/\|/g, " | ") + '</p>';
+                if (info.genres != undefined && info.genres != null) {
+                    html += '<p class="media_album_track_more_genres"><b>Genres:</b> ' + info.genres.slice(1, -1).replace(/\|/g, " | ") + '</p>';
+                }
+
+                if (info.styles != undefined && info.styles != null) {
+                    html += '<p class="media_album_track_more_styles"><b>Style:</b> ' + info.styles.slice(1, -1).replace(/\|/g, " | ") + '</p>';
+                }
 
                 html += '<p class="media_album_track_more_extraartists">';
                 
@@ -223,6 +229,12 @@ function control_playMusic(runtype)
         no_compilations = 1;
     }
 
+    var rarely_played = 0;
+
+    if ($('#rarely_played').is(':checked')) {
+        rarely_played = 1;
+    }
+
     var url = "/inc/ofa_ControlMedia.php?type=audio"
         + "&roomid=" + $("#control_room").val()
         + "&personid=" + $("#control_person").val()
@@ -231,7 +243,8 @@ function control_playMusic(runtype)
         + "&runtype=" + runtype
         + "&year_from=" + year_from
         + "&year_to=" + year_to
-        + "&no_compilations=" + no_compilations;
+        + "&no_compilations=" + no_compilations
+        + "&rarely_played=" + rarely_played;
 
     $.ajax({
         url: url

@@ -6,42 +6,35 @@ use Zend\Form\Form;
 
 class LebenSelectForm extends Form
 {
-
     public function __construct($resultSetJahre, $resultSetOrte, $resultSetLaender)
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('LebenSelectForm->__construct().');
-        
         parent::__construct();
-        
+
         $selectDataJahre = array();
-        
         $selectDataJahre['0'] = 'Alle Jahre';
-        
+
         foreach ($resultSetJahre as $res)
         {
             // $firephp->log('LebenSelectForm->__construct(). jahr=' . $res->jahr);
             $selectDataJahre[$res->jahr] = $res->jahr;
         }
-        
+
         $selectDataOrte = array();
-        
         $selectDataOrte['0'] = 'Alle Orte';
-        
+
         foreach ($resultSetOrte as $res)
         {
             $selectDataOrte[$res->id] = $res->ort;
         }
-        
+
         $selectDataLaender = array();
-        
         $selectDataLaender['0'] = 'Alle Länder';
-        
+
         foreach ($resultSetLaender as $res)
         {
             $selectDataLaender[$res->id] = $res->land;
         }
-        
+
         $this->add(array(
             'name' => 'jahr',
             'type' => 'Zend\Form\Element\Select',
@@ -52,7 +45,7 @@ class LebenSelectForm extends Form
         		'class' => 'mittel',
         	),
         ));
-        
+
         $this->add(array(
             'name' => 'ortid',
             'type' => 'Zend\Form\Element\Select',
@@ -63,7 +56,7 @@ class LebenSelectForm extends Form
         		'class' => 'lang',
         	),
         ));
-        
+
         $this->add(array(
             'name' => 'landid',
             'type' => 'Zend\Form\Element\Select',
@@ -82,7 +75,7 @@ class LebenSelectForm extends Form
                 'class' => 'lang',
             ),
         ));
-        
+
         $this->add(array(
             'name' => 'countperpage',
             'type' => 'Zend\Form\Element\Select',
@@ -97,7 +90,7 @@ class LebenSelectForm extends Form
         		'class' => 'mittel',
         	),
         ));
-        
+
         $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',

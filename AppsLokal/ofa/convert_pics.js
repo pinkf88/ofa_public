@@ -13,6 +13,9 @@ const PFAD_OFA_BU = config.apps.convert.path_ofa_backup;
 const PFAD_HD = config.apps.convert.path_hd;
 const SUFFIX_Z0 = config.apps.convert.suffix_z0;
 
+var db_connection = null;
+
+
 const args = process.argv;
 // console.log(args);
 
@@ -34,12 +37,12 @@ try {
 catch(err) {
     console.log(PFAD_SOURCE + ' nicht vorhanden.')
     // console.log(err.message);
-    return;
+    shutdown();
 }
 
 if (files_all == null || files_all.length < 1) {
     console.log('Keine Dateien vorhanden.');
-    return;
+    shutdown();
 }
 
 // console.log(files_all);
@@ -55,7 +58,7 @@ console.log(files_jpg.length + ' jpg-Dateien im Verzeichnis "' + PFAD_SOURCE + '
 
 if (files_jpg.length < 1) {
     console.log('Keine konvertierbaren Dateien vorhanden.');
-    return;
+    shutdown();
 }
 
 var zeler = 0;
@@ -77,10 +80,11 @@ function check_db(file)
         p20 = true;
     }
 
-    var datei = file_temp.replace(SUFFIX_Z0 + '.jpg', '').replace('5dii', '').replace('6dii', '')
-        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '').replace('p20','').replace(/_/g, '');
+    var datei = file_temp.replace(SUFFIX_Z0 + '.jpg', '').replace('5dii', '').replace('6dii', '').replace('r6ii', '')
+        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '')
+        .replace('p20','').replace('p6','').replace(/_/g, '');
     // console.log(datei);
-    
+
     var bild_sql = '';
     var bnummer = 0;
 
@@ -116,7 +120,7 @@ function check_db(file)
         } else {
             var nummer = '' + result[0].nummer;
             nummer = nummer.padStart(6, '0');
-            
+
             // Datensatz existiert bereits
             var bild = {
                 file: file,
@@ -138,7 +142,7 @@ function check_db(file)
                     convert_bild(0);
                 }, 10);
             } else {
-                finish();
+                shutdown();
             }
         }
     });
@@ -192,7 +196,7 @@ function scale_bild(bild_no, file, nummer, scale_type)
                             convert_bild(bild_no + 1);
                         }, 10);
                     } else {
-                        finish();
+                        shutdown();
                     }
                 });
         }
@@ -246,12 +250,12 @@ function readDatabase(path, bild_no, file, nummer)
             // throw err;
             console.log(colors.yellow('update_pics | readDatabase(): ERROR: ' + err.message));
             console.log(bild_sql);
-            finish();
+            shutdown();
         }
 
         if (result == null || result.length == 0) {
             console.log(colors.yellow('update_pics | readDatabase(): Datei ' + file_list[file_no] + ' NICHT in Datenbank vorhanden.'));
-            finish();
+            shutdown();
         } else {
             var date_original = result[0].datum + ' 12:00:00';
 
@@ -278,36 +282,36 @@ function updateExif(path, bild_no, file, nummer, date_original)
         var update1 = false;
 
         try {
-        
+
             if (exif.Exif[piexif.ExifIFD.DateTimeOriginal] != date_original.replace(/-/g, ":")) {
-                update1 = true;            
+                update1 = true;
             }
         } catch (e) {
             update1 = true;
         }
-        
+
         // console.log (exif.Exif[piexif.ExifIFD.DateTimeOriginal], date_original.replace(/-/g, ":"), update1);
-        
+
         if (update1 == true) {
             exif.Exif[piexif.ExifIFD.DateTimeOriginal] = date_original.replace(/-/g, ":");  // "2010:10:10";
         }
-        
+
         var update2 = false;
-        
+
         try {
             if (exif['0th'][piexif.ImageIFD.DateTime] != date_original.replace(/-/g, ":")) {
-                update2 = true;            
+                update2 = true;
             }
         } catch (e) {
             update2 = true;
         }
-        
+
         // console.log(exif['0th'][piexif.ImageIFD.DateTime], date_original.replace(/-/g, ":"), update2);
-        
+
         if (update2 == true) {
             exif['0th'][piexif.ImageIFD.DateTime] = date_original.replace(/-/g, ":");         // "2010:10:10";
         }
-        
+
         // console.log(exif);
 
         if (update1 == true || update2 == true) {
@@ -324,15 +328,18 @@ function updateExif(path, bild_no, file, nummer, date_original)
     }, 1);
 }
 
-function finish()
-{
-    console.log('finish(): DB connection closed');
-    database.disconnect(db_connection);
-    process.exit();
-}
-
 for (var i = 0; i < files_jpg.length; i++) {
     var file = files_jpg[i].replace(/^.*[\\\/]/, '');
 
     check_db(file);
+}
+
+function shutdown()
+{
+    if (db_connection != null) {
+        console.log('finish(): DB connection closed');
+        database.disconnect(db_connection);
+    }
+
+    process.exit();
 }

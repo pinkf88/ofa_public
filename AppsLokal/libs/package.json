@@ -7,10 +7,9 @@
     "colors": "^1.4.0",
     "dataformat": "^1.0.0",
     "dateformat": "^4.5.1",
-    "emailjs": "^3.4.0",
+    "emailjs": "^3.8.1",
     "mysql": "^2.18.1"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

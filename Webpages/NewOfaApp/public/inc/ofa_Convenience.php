@@ -13,24 +13,18 @@ function ofa_getBildPfad($nummer, $ticket, $jahr)
     $subpfad = '';
     $ret = array();
 
-    if ($ticket == 1)
-    {
+    if ($ticket == 1) {
         $subpfad = 'tickets/' . $jahr . '/' . $nummer;
-    }
-    else if ($nummer >= 1000000)
-    {
+    } else if ($nummer >= 1000000) {
         $subpfad = (floor($nummer / 1000) * 1000) . '/' . (floor($nummer / 100) * 100) . '/' . $nummer;
-    }
-    else
-    {
+    } else {
         $subpfad = str_pad('' . (floor($nummer / 1000) * 1000), 6, '0', STR_PAD_LEFT) . '/' . str_pad('' . (floor($nummer / 100) * 100), 6, '0', STR_PAD_LEFT) . '/' . str_pad('' . $nummer, 6, '0', STR_PAD_LEFT);
     }
 
     $ret["filepfad"] = ofa_getRootPfadBilder() . $subpfad . '.gif';
     $ret['extension'] = 'gif';
 
-    if (file_exists(ofa_getRootPfadBilder() . $subpfad . '.png') || file_exists(ofa_getRootPfadBilder() . $subpfad . '.gif'))
-    {
+    if (file_exists(ofa_getRootPfadBilder() . $subpfad . '.png') || file_exists(ofa_getRootPfadBilder() . $subpfad . '.gif')) {
         if (file_exists(ofa_getRootPfadBilder() . $subpfad . '.png')) {
             $ret["filepfad"] = ofa_getRootPfadBilder() . $subpfad . '.png';
             $ret['extension'] = 'png';
@@ -42,9 +36,7 @@ function ofa_getBildPfad($nummer, $ticket, $jahr)
         $ret["breite"] = $imginfo[0];
         $ret["hoehe"] = $imginfo[1];
 */
-    }
-    else
-    {
+    } else {
         $ret["pfad"] = ''; // ofa_getRootPfadBilder() . $subpfad . '.gif';
     }
 

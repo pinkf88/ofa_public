@@ -8,14 +8,11 @@ function bild_mouseenter(id)
 {
     $("#" + id).addClass("hasFocus");
 
-    if (last_bildid != id)
-    {
+    if (last_bildid != id) {
         last_bildid = id;
 
-        setTimeout(function()
-        {
-            if ($("#" + last_bildid).hasClass("hasFocus"))
-            {
+        setTimeout(function() {
+            if ($("#" + last_bildid).hasClass("hasFocus")) {
                 bild_showInformation(last_bildid);
             }
         }, 800);
@@ -24,8 +21,7 @@ function bild_mouseenter(id)
 
 function bild_mouseleave(id)
 {
-    if (id != last_bildid)
-    {
+    if (id != last_bildid) {
         $("#" + id).removeClass("hasFocus");
     }
 }
@@ -79,12 +75,12 @@ $("tr.secondline").hover(function()
 });
 
 $("#bildmotivedialog").dialog({
-    autoOpen : false,
-    height : 600,
-    width : 1000,
-    modal : true,
-    buttons : {
-        "Ok" : function()
+    autoOpen:   false,
+    height:     600,
+    width:      1000,
+    modal:      true,
+    buttons:    {
+        "Ok": function()
         {
             var motive = '';
 
@@ -97,21 +93,22 @@ $("#bildmotivedialog").dialog({
                 }
             });
 
+            var url = '/inc/ofa_UpdateBildMotive.php?bildid=' + $('input[name=bildid]').val() + '&motive=' + motive;
+
             $.ajax({
-                url : "/inc/ofa_UpdateBildMotive.php?bildid=" + $('input[name=bildid]').val()
-                        + "&motive=" + motive
+                url: url
             }).done(function(data)
             {
                 var b = parseInt($('input[name=bildid]').val());
                 bild_showInformation(b);
             }).fail(function(jqXHR, textStatus)
             {
-                console.log("Database access failed: " + textStatus);
+                console.log("bildmotivedialog: Ajax Error bei", url, textStatus);
             });
 
             $(this).dialog("close");
         },
-        Cancel : function()
+        Cancel: function()
         {
             $(this).dialog("close");
         }
@@ -157,29 +154,89 @@ $("#bildinfodialog").dialog({
     }
 });
 
-function bild_showInformation(bildid)
+function numberWithPoints(x)
 {
-    var output = "";
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
 
+function bild_playVideo(url)
+{
     $.ajax({
-        dataType : "json",
-        url : "/inc/ofa_GetBildInfo.php?id=" + bildid
+        type: 'GET',
+        url : '/inc/ofa_ControlMedia.php?type=videolist&play&url=' + url
     }).done(function(data)
     {
+    }).fail(function(jqXHR, textStatus)
+    {
+        console.log('ERROR control_playVideo(): ' + textStatus);
+    });
+}
+
+function bild_showInformation(bildid)
+{
+    var output = '';
+    var url = '/inc/ofa_GetBildInfo.php?id=' + bildid;
+
+    $.ajax({
+        dataType:   'json',
+        url:        url
+    }).done(function(data) {
+        // console.log('data', data);
+
         output += data.nummer + '\n';
         output += data.bilddaten + '\n';
         output += data.aufnahmedatum + '\n';
         output += data.techdaten + '\n';
         output += data.geodaten + '\n';
         output += '<i>' + data.polygon + '</i>\n';
+
+        if ((data.youtubeid != undefined && data.youtubeid != '') || (data.videoinfo.title != undefined && data.videoinfo.title != '')) {
+            // console.log('youtubeid', data.youtubeid);
+
+            if (data.videoinfo != undefined && data.videoinfo != '') {
+                output += '<p class="videoinfo"><b>' +  data.videoinfo.title + '</b></p>\n';
+            }
+
+            if (data.youtubeid != undefined && data.youtubeid != '') {
+                output += '<p class="videoinfo">'
+                    + '<a href="https://www.youtube.com/watch?v=' + data.youtubeid + '?rel=0&hd=1"><span class="ui-icon ui-icon-play"></span> '
+                    + '<a href="https://www.youtube.com/watch?v=' + data.youtubeid + '?rel=0&hd=1">Video auf Youtube</a>'
+                    + '</p>\n';
+            }
+            
+            if (data.videoinfo != undefined && data.videoinfo != '') {
+                // console.log('videoinfo', data.videoinfo);
+                output += '<p class="videoinfo"><a href="javascript:bild_playVideo(\'' + data.videoinfo.url + '\');"><span class="ui-icon ui-icon-play"></span> Video TV</a></p>\n';
+                var extension = (data.videoinfo.url.substring(data.videoinfo.url.lastIndexOf('.') + 1, data.videoinfo.url.length) || data.videoinfo.url).toLowerCase();
+
+                if (extension == 'mp4' || extension == 'mov') {
+                    output += '<p class="videoinfo"><a href="' + data.videoinfo.url + '"><span class="ui-icon ui-icon-play"></span> Video lokal</a></p>\n';
+                }
+
+                var kbit_per_seconds = '-1';
+            
+                try {
+                    var a = data.videoinfo.duration.split(':');
+                    var seconds = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+                    kbit_per_seconds = Math.round((data.videoinfo.size) * 8 / 1024 / seconds);
+                } catch(err) {
+                    console.log('bild_showInformation(): title=' + data.videoinfo.title + ' / duration=' + data.videoinfo.duration);
+                }
+
+                output += '<p class="videoinfo">' + data.videoinfo.duration + ' | ' + kbit_per_seconds + ' kBit/s | ' + extension + ' | ' + data.videoinfo.resolution + ' Pixel | '
+                    + numberWithPoints(data.videoinfo.size) + ' Bytes</p>\n';
+            }
+
+            output += '</p>\n';
+        }
+
         output += data.motivliste + '\n';
         output += data.serieliste + '\n';
         output += data.zusatzinfo + '\n';
 
         $("#bildinformation").html(output);
-    }).fail(function(jqXHR, textStatus)
-    {
-        console.log("bild_showInformation: Database access failed: " + textStatus);
+    }).fail(function(jqXHR, textStatus) {
+        console.log("bild_showInformation(): Ajax access failed: ", url, textStatus);
     });
 
     $(".fancybox").fancybox();
@@ -187,25 +244,25 @@ function bild_showInformation(bildid)
 
 function bild_editMotive(bildid)
 {
+    var url = '/inc/ofa_GetBildMotive.php?bildid=' + bildid + '&search=1';
+
     $.ajax({
-        dataType : "json",
-        url : "/inc/ofa_GetBildMotive.php?bildid=" + bildid + "&search=1"
+        dataType:   'json',
+        url:        url
     }).done(function(data)
     {
-        if (data.motive == '++NEU++')
-        {
+        if (data.motive == '++NEU++') {
             bild_showInformation(bildid);
-        }
-        else
-        {
+            $('#motiv' + bildid).addClass('font_weight_bold');
+        } else {
             $('input[name=bildid]').val(bildid);
             $('#bildmotive').html(data.bildmotive);
             $('#motive').html(data.motive);
-            $("#bildmotivedialog").dialog("open");
+            $('#bildmotivedialog').dialog('open');
         }
     }).fail(function(jqXHR, textStatus)
     {
-        console.log("bild_editMotive: Database access failed: " + textStatus);
+        console.log('bild_editMotive: Ajax Error: ', url, textStatus);
     });
 }
 

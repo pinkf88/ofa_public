@@ -1,12 +1,15 @@
 <?php
-// $firephp = \FirePHP::getInstance(true);
-// $firephp->log('Bild/view/bild/bild/edit.phtml');
-
 echo $this->partial('partial/inputform.phtml', array(
-		'form' => $this->form,
-		'title' => 'Bild bearbeiten',
-		'url' => 'bild',
-		'action' => 'edit',
-		'id' => $this->id,
+	'form' => $this->form,
+	'title' => 'Bild bearbeiten',
+	'url' => 'bild',
+	'action' => 'edit',
+	'id' => $this->id,
+	'polygon' => $this->polygon
 ));
+
+require_once(realpath(__DIR__ . '/../../../../private/ofa_Local.php'));
+$this->headScript()->appendFile($google_maps_api);
+$this->headScript()->appendFile($this->basePath() . '/js/geolib.js');
+$this->headScript()->appendFile($this->basePath() . '/js/ofa_bild_edit.js');
 ?>

@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <title>CONTROL - OneForAll</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
-<link href="/css/bootstrap-theme.min.css" media="screen" rel="stylesheet" type="text/css">
+<link href="/css/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/jquery-ui.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/jquery-ui.theme.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/js/fancybox/jquery.fancybox.css" media="screen" rel="stylesheet" type="text/css">
@@ -13,47 +12,67 @@
 <link href="/css/ofa.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
 <script type="text/javascript" src="/js/jquery.min.js"></script>
-<script type="text/javascript" src="/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/ofa.js"></script>
+<script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/js/js.cookie.js"></script>
 <script type="text/javascript" src="/js/fancybox/jquery.fancybox.js"></script>                
 <script type="text/javascript" src="/js/jquery.dropdown.js"></script>
 <script type="text/javascript" src="/js/jquery.flot.js"></script>
+<script type="text/javascript" src="/js/ofa.js"></script>
 <script type="text/javascript" src="/js/ofa_album.js"></script>
 <script type="text/javascript" src="/js/ofa_control.js"></script>
+<script type="text/javascript" src="/js/ofa_control_home.js"></script>
+<script type="text/javascript" src="/js/ofa_control_wohnung.js"></script>
 <script type="text/javascript" src="/js/ofa_control_music.js"></script>
 <script type="text/javascript" src="/js/ofa_control_picture.js"></script>
 <script type="text/javascript" src="/js/ofa_control_video.js"></script>
-<script type="text/javascript" src="/js/ofa_control_home.js"></script>
 <script type="text/javascript" src="/js/ofa_control_analytics.js"></script>
 <script type="text/javascript" src="/js/ofa_control_admin.js"></script>
 <script type="text/javascript" src="/js/ofa_serie.js"></script>
 </head>
 <body class="control">
 <div id="control_fancybox-overlay" class="fancybox-overlay fancybox-overlay-fixed" style="display: block; width: auto; height: auto;"></div>
-<nav class="navbar navbar-inverse navbar-fixed-top navbar-control" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/control/">CONTROL</a>
+<nav class="navbar navbar-expand-lg bg-light fixed-top">
+    <div class="container-fluid navbar_control">
+        <a class="navbar-brand" href="/">OneForAll</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="javascript:control_tab('home')">Home</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('wohnung')">Wohnung</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('albums')">Alben</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('tracks')">Tracks</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('playlists')">Playlisten</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('pictures')">Bilder</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('videos')">Videos</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('analytics')">Analytics</a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="javascript:control_tab('admin')">Admin</a>
+        </li>
+        </ul>
+        <span class="navbar-text">
+            Willkommen!
+        </span>
         </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="javascript:control_tab('home')">Home</a></li>
-                <li><a href="javascript:control_tab('albums')">Alben</a></li>
-                <li><a href="javascript:control_tab('tracks')">Tracks</a></li>
-                <li><a href="javascript:control_tab('playlists')">Playlisten</a></li>
-                <li><a href="javascript:control_tab('pictures')">Bilder</a></li>
-                <li><a href="javascript:control_tab('videos')">Videos</a></li>
-                <li><a href="javascript:control_tab('analytics')">Analytics</a></li>
-                <li><a href="javascript:control_tab('admin')">Admin</a></li>
-            </ul>
-        </div><!--/.nav-collapse -->
     </div>
 </nav>
 <div class="control_left">
@@ -70,6 +89,15 @@
             <p class="control_left_menu_admin"><a href="javascript:control_admin('restart_webmedia');">Restart Webmedia</a></p>
             <p class="control_left_menu_admin"><a href="javascript:control_admin('restart_webhome');">Restart Webhome</a></p>
             <p class="control_left_menu_admin"><a href="javascript:control_admin('restart_iobroker');">Restart ioBroker</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('home')">Home</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('wohnung')">Wohnung</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('albums')">Alben</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('tracks')">Tracks</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('playlists')">Playlisten</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('pictures')">Bilder</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('videos')">Videos</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('analytics')">Analytics</a></p>
+            <p class="control_left_menu_admin"><a href="javascript:control_tab('admin')">Admin</a></p></p>
         </dd>
         <dt class="control_left_menu"><a id="menu_control_music_link" href="#" class="dimgray menu_closed">Musik</a></dt>
         <dd id="menu_control_music_content" class="control_left_menu">
@@ -156,6 +184,7 @@ include_once "../inc/ofa_Database.php";
 <div class="control_lists">
 <?php
 include_once "./control_home.php";
+include_once "./control_wohnung.php";
 include_once "./control_albums.php";
 include_once "./control_tracks.php";
 include_once "./control_playlists.php";

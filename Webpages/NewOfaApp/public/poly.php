@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <!-- Le styles -->
-        <link href="/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="/css/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/bootstrap-theme.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/style.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/jquery-ui.css" media="screen" rel="stylesheet" type="text/css">
@@ -15,7 +15,7 @@
 <link href="/img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
 <script type="text/javascript" src="/js/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
 <?php
 include_once "inc/ofa_DbConsts.php";
 include_once "inc/ofa_Database.php";
@@ -30,10 +30,8 @@ $db_link = ofa_db_connect($db_ofa_server, $db_ofa_user, $db_ofa_password, $db_of
 $sql = "SELECT nummer, datei, YEAR(datum) as jahr FROM $dbt_ofa_bild WHERE id=$bildid";
 // echo $sql;
 
-if ($resultat = mysqli_query($db_link, $sql))
-{
-    if (mysqli_num_rows ($resultat) > 0)
-    {
+if ($resultat = mysqli_query($db_link, $sql)) {
+    if (mysqli_num_rows ($resultat) > 0) {
         $datensatz = mysqli_fetch_assoc ($resultat);
         $nummer = $datensatz["nummer"];
         $datei = $datensatz["datei"];
@@ -118,12 +116,12 @@ mysqli_close($db_link);
             <div class="container">
                 <div class="row margin0">
                     <div class="col-md-5">
-                        <canvas id="canvas" width="700" height="700" style="border: 1px solid red;"></canvas><br>
+                        <canvas id="canvas" width="1000" height="1000" style="border: 1px solid red;"></canvas><br>
                         <button id="clockwise" onclick="drawRotated(90)">Rotate right</button>
                         <button id="counterclockwise" onclick="drawRotated(-90)">Rotate left</button>
                     </div>
                     <div class="col-md-7">
-                        <div id="jr_map" class="bild_map" style="height: 700px;"></div>
+                        <div id="jr_map" class="bild_map" style="height: 1000px;"></div>
                         <div class="vspace_klein"></div>
                         <div style="float: left; margin-right: 20px;">
                             <textarea id="info" style="height: 100px; width: 500px; color: black;"></textarea>

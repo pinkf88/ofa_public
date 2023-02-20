@@ -13,7 +13,7 @@ var database        = require('../libs/lib_database.js');
 
 
 const db_tbl_bilddaten = 'ofa_bilddaten';
-
+var db_connection = null;
 
 var parser = new ArgumentParser({
     add_help: true,
@@ -65,10 +65,10 @@ console.log(args);
 
 var kameratyp = args.cam;
 
-if (kameratyp != '5dii' && kameratyp != '6dii' && kameratyp != 'g7x' && kameratyp != 'g12' && kameratyp != 'ma') {
+if (kameratyp != '5dii' && kameratyp != '6dii' && kameratyp != 'r6ii' && kameratyp != 'g7x' && kameratyp != 'g12' && kameratyp != 'ma') {
     console.log("Unbekannter Kameratyp");
     console.log("node readexif.js --cam [5dii|6dii|g7x|g12|ma] --year jahr --block [1|2|3] --date datum");
-    return;
+    shutdown();
 }
 
 var aufnahmejahr = 0;
@@ -114,9 +114,13 @@ if (kameratyp == '5dii') {
     bildnrpraefix += '4' + blocknr;
     kameramodell = 'FC2103';
     picsdirectory += 'MavicAir/';
+} else if (kameratyp == 'r6ii') {
+    bildnrpraefix += '6' + blocknr;
+    kameramodell = 'Canon EOS R6m2';
+    picsdirectory += 'EOSR6II/';
 } else {
     console.log('Unbekannte Kamera: ' + kameratyp);
-    return;
+    shutdown();
 }
 
 if (aufnahmejahr > 0) {
@@ -136,7 +140,7 @@ try {
 catch(err) {
     console.log(picsdirectory + ' nicht vorhanden.')
     console.log(err.message);
-    return;
+    shutdown();
 }
 
 // console.log(files_all);
@@ -150,10 +154,10 @@ var files_jpg = files_all.filter(function(a)
 // console.log(files_jpg);
 console.log(files_jpg.length + ' jpg-Dateien im Verzeichnis "' + picsdirectory + '".');
 
-var db_connection = database.connect();
+db_connection = database.connect();
 
 String.prototype.replaceAt = function(index, replacement) {
-    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+    return this.substring(0, index) + replacement + this.substring(index + 1);
 }
 
 var bildnr_exif_lfdnr = 0;
@@ -162,13 +166,13 @@ var pic_anzahl = files_jpg.length;
 if (pic_anzahl > 0 ) {
     read_exif(0);
 } else {
-    finish();
+    shutdown();
 }
 
 function read_exif(pic_no)
 {
     if (pic_no >= pic_anzahl) {
-        finish();
+        shutdown();
         return;
     }
 
@@ -225,6 +229,8 @@ function read_exif(pic_no)
                 kamera = 'DJI Mavic Air';
                 brennweite35mm = '24 mm';
                 objektiv = '24 mm f/2.8 (KB)';
+            } else if (kamera == 'Canon EOS R6m2') {
+                kamera = 'Canon EOS R6 Mark II';
             }
 
             // Aufnahmedatum
@@ -362,12 +368,14 @@ function read_exif(pic_no)
         });
     } else {
         console.log(bildnr + ' | ' + exif_data_1.tags.Model + ' falsch.');
-        finish();
+        shutdown();
     }
 }
 
-function finish()
+function shutdown()
 {
-    console.log('finish(): DB connection closed');
-    database.disconnect(db_connection);
+    if (db_connection != null) {
+        console.log('shutdown(): DB connection closed');
+        database.disconnect(db_connection);
+    }
 }

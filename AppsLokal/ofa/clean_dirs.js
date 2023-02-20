@@ -4,11 +4,9 @@ var dir             = require('node-dir');
 var colors          = require('colors');
 var ArgumentParser  = require('argparse').ArgumentParser;
 var tools           = require('../libs/lib_tools.js');
-var database        = require('../libs/lib_database.js');
 var config          = require('../configs/ofa_config.json');
 
 
-const PFAD_SOURCE_MAIN = config.apps.convert.path_source_main;
 const PFAD_SERIE = config.apps.clean_dirs.path_serie;
 const PFAD_SERIE_BACKUP = config.apps.clean_dirs.path_serie_backup;
 const PFAD_OFA = config.apps.clean_dirs.path_ofa;
@@ -38,157 +36,64 @@ parser.add_argument(
 );
 
 parser.add_argument(
-    '--dir',
+    '--serie',
     {
-        help: 'Verzeichnis NeueOfaPics.'
+        help: 'Verzeichnis Serie.'
     }
 );
 
 parser.add_argument(
-    '--serie',
+    '-test',
     {
-        help: 'Verzeichnis Serie.',
-        required: true
+        help: 'Test.',
+        action: 'store_true'
     }
 );
 
 var args = parser.parse_args();
 var number_start = -1;
 var number_end = -1;
-var pfad_source = '';
+var pfad_serie = '';
 
-if (args.s != null) {
-    number_start = args.s;
+if (args.test == null || args.test == false) {
+    if (args.s != null) {
+        number_start = parseInt(args.s);
+    }
+
+    if (args.e != null) {
+        number_end = parseInt(args.e);
+    }
+
+    if (args.dir != null) {
+        pfad_serie = args.serie;
+    }
+} else {
+    number_start = 2106841;
+    number_end = 2106841;
+    args.serie = '2021/2021_LigurienToskanaGardasee/';
 }
-
-if (args.e != null) {
-    number_end = args.e;
-}
-
-if (args.dir != null) {
-    pfad_source = PFAD_SOURCE_MAIN + args.dir + '/';
-}
-
 
 var numbers = [];
-var zeler = 0;
-var files_count = 0;
 
-db_connection = database.connect();
+if (number_start > 10000000 || number_end > 10000000) {
+    console.log('Ungültige Nummer(n).');
+    process.exit();
+}
 
-if (pfad_source != '') {
-    var files_all = null;
+for (var number = number_start; number <= number_end; number++) {
+    numbers.push(number);
+}
 
-    try {
-        files_all = dir.files(pfad_source, { sync: true });
-    }
-    catch(err) {
-        console.log(pfad_source + ' nicht vorhanden.')
-        // console.log(err.message);
-        return;
-    }
-
-    if (files_all == null || files_all.length < 1) {
-        console.log('Keine Dateien vorhanden.');
-        return;
-    }
-
-    // console.log(files_all);
-    files_all.sort();
-
-    var files_jpg = files_all.filter(function(a)
-    {
-        return a.toUpperCase().includes(SUFFIX_Z0.toUpperCase() + '.JPG');
-    });
-
-    // console.log(files_jpg);
-    console.log(files_jpg.length + ' jpg-Dateien im Verzeichnis "' + pfad_source + '".');
-
-    if (files_jpg.length < 1) {
-        console.log('Keine konvertierbaren Dateien vorhanden.');
-        return;
-    }
-
-    files_count = files_jpg.length;
-
-    for (var i = 0; i < files_jpg.length; i++) {
-        var file = files_jpg[i].replace(/^.*[\\\/]/, '').replace(SUFFIX_Z0 + '.jpg', '');
-        check_db(file);
-    }
-    
-    console.log(files_jpg);
-} else {
-    if (number_start > 10000000 || number_end > 10000000) {
-        console.log('Ungültige Nummer(n).');
-        return;
-    }
-
+if (args.test == null || args.test == false) {
     console.log((number_end - number_start + 1) + ' Dateien löschen? Taste drücken. Ansonsten CTRL+c.');
 
     process.stdin.once('data', function () {
         clean_dirs();
         process.exit();
     });
-
-    for (var number = number_start; number <= number_end; number++) {
-        numbers.push(number);
-    }
-}
-
-function check_db(file)
-{
-    console.log(file);
-
-    bild_sql = '';
-    var bnummer = 0;
-
-    if (file.startsWith('dia'))
-    {
-        bnummer = parseInt(file.replace('dia', ''));
-        bild_sql = 'SELECT nummer, datei FROM ofa_bild WHERE nummer="' + bnummer + '" ';
-    }
-    else if (file.startsWith('scan'))
-    {
-        bnummer = parseInt(file.replace('scan', ''));
-        bild_sql = 'SELECT nummer, datei FROM ofa_bild WHERE datei="' + bnummer + '" ';
-    }
-    else
-    {
-        console.log('Ungültige Datei ' + file);
-        process.exit();
-    }
-
-    db_connection.query(bild_sql, function (err, result) {
-        if (err) {
-            // throw err;
-            console.log('convert.js | check_db(): ERROR: ' + err.message);
-            console.log(bild_sql);
-            process.exit();
-        }
-
-        if (result == null || result.length == 0) {
-            console.log('Datei ' + file + ' NICHT in Datenbank vorhanden.');
-        } else {
-            numbers.push(result[0].nummer);
-        }
-
-        zeler++;
-        // console.log(zeler + ' / '+ files_count);
-
-        if (zeler >= files_count) {
-            console.log("In Datenbank gefundene Bilder: " + numbers.length);
-
-            if (numbers.length > 0) {
-                setTimeout( function () {
-                    clean_dirs();
-                    finish();
-                }, 10);
-            } else {
-                finish();
-            }
-        }
-    });
-
+} else {
+    clean_dirs();
+    process.exit();
 }
 
 function clean_dirs()
@@ -310,11 +215,4 @@ function cleanDirectory(pfad, suffix, extension)
     } else {
         console.log(colors.green(counter + ' Dateien mit Suffix ' + suffix + ' und Extension ' + extension + ' in ' + pfad + ' gelöscht.'));
     }
-}
-
-function finish()
-{
-    console.log('finish(): DB connection closed');
-    database.disconnect(db_connection);
-    process.exit();
 }

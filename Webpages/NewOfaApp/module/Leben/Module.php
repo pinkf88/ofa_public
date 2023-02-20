@@ -18,9 +18,6 @@ class Module
 
     public function getAutoloaderConfig()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('Leben\Module->getAutoloaderConfig()');
-        
         return array(
                 'Zend\Loader\ClassMapAutoloader' => array(
                         __DIR__ . '/autoload_classmap.php'
@@ -35,17 +32,11 @@ class Module
 
     public function getConfig()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('Leben\Module->getConfig()');
-        
         return include __DIR__ . '/config/module.config.php';
     }
 
     public function getServiceConfig()
     {
-        $firephp = \FirePHP::getInstance(true);
-        $firephp->log('Leben\Module->getServiceConfig()');
-        
         return array(
                 'factories' => array(
                         'Leben\Model\LebenTable' => function ($sm)

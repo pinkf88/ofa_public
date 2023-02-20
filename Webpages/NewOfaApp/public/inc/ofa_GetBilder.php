@@ -104,8 +104,20 @@ if (strlen($suchtext) > 0) {
             $where_suchtext .= ")";
         }
     } else {
-        $datum = explode("-", substr($suchtext, 5));
-        $where_suchtext .= "DAY(ofa_bild.datum)='" . $datum[0] . "' AND MONTH(ofa_bild.datum)='" . $datum[1] . "'";
+        $datum_text = substr($suchtext, 5);
+        $datum = explode('-', $datum_text);
+
+        if (count($datum) < 2) {
+            $datum = explode('.', $datum_text);
+        }
+
+        if (count($datum) >= 2) {
+            $where_suchtext .= 'DAY(datum)="' . $datum[0] . '" AND MONTH(datum)="' . $datum[1] . '"';
+
+            if (count($datum) == 3) {
+                $where_suchtext .= ' AND YEAR(datum)="' . $datum[2] . '"';
+            }
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 const VIDEOID_KONZERTE = '44$13200';
 const VIDEOID_SPIELFILME = '44$13412';
 const VIDEOID_SERIEN = '44$13434';
-const VIDEOID_DOKUMENTATIONEN = '44$13269';
+const VIDEOID_DOKUMENTATIONEN = '44$15638';
 const VIDEOID_COMEDY = '44$13433';
 const VIDEOID_SPORT = '44$13461';
 const VIDEOID_JRFILME = '44$13190';
@@ -10,7 +10,7 @@ const VIDEOID_TEMP = '44$13464';
 
 function getHtmlId(text)
 {
-    return text.toLowerCase().replace(/ /g, '_').replace(/:/g, '').replace(/\//g, '').replace(/&/g, '');
+    return 'video_' + text.toLowerCase().replace(/ /g, '_').replace(/:/g, '').replace(/\//g, '').replace(/&/g, '');
 }
 
 function control_listVideolist()
@@ -21,14 +21,14 @@ function control_listVideolist()
     {
         var videolist = JSON.parse(data);
         // console.log(videolist);
-        
+
         var konzerte = findNode(VIDEOID_KONZERTE, videolist);
         var title_old = '';
-        var html = '<h5 id="Konzerte" class="control">Konzerte</h5><hr class="control">';
+        var html = '<h5 id="Konzerte" class="control video_caption">Konzerte</h5><hr class="control video_caption">';
         var contents = '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Konzerte\')">Konzerte</a></p>';
 
         for (var i = 0; i < konzerte.children.length; i++) {
-            html += '<div id="' + getHtmlId(konzerte.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="' + getHtmlId(konzerte.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + '<b>' + konzerte.children[i].title + '</b> <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'' + getHtmlId(konzerte.children[i].title) + '\')">' + konzerte.children[i].title + '</a></p>';
@@ -43,11 +43,11 @@ function control_listVideolist()
         }
 
         var spielfilme = findNode(VIDEOID_SPIELFILME, videolist);
-        html += '<h5 id="Spielfilme" class="control">Spielfilme</h5><hr class="control">';
+        html += '<h5 id="Spielfilme" class="control video_caption">Spielfilme</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Spielfilme\')">Spielfilme</a></p>';
 
         for (var i = 0; i < spielfilme.children.length; i++) {
-            html += '<div id="' + getHtmlId(spielfilme.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="' + getHtmlId(spielfilme.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + '<b>' + spielfilme.children[i].title + '</b> <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'' + getHtmlId(spielfilme.children[i].title) + '\')">' + spielfilme.children[i].title + '</a></p>';
@@ -62,11 +62,11 @@ function control_listVideolist()
         }
 
         var serien = findNode(VIDEOID_SERIEN, videolist);
-        html += '<h5 id="Serien" class="control">Serien</h5><hr class="control">';
+        html += '<h5 id="Serien" class="control video_caption">Serien</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Serien\')">Serien</a></p>';
 
         for (var i = 0; i < serien.children.length; i++) {
-            html += '<div id="' + getHtmlId(serien.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="' + getHtmlId(serien.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + serien.children[i].title + ' <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'' + getHtmlId(serien.children[i].title) + '\')">' + serien.children[i].title + '</a></p>';
@@ -86,7 +86,7 @@ function control_listVideolist()
                     title_old = title;
 
                     if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
+                        html += '<p class="media_video_subcaption video_caption">' + title + '</p>';
                     }
                 }
 
@@ -97,11 +97,11 @@ function control_listVideolist()
         }
 
         var dokumentationen = findNode(VIDEOID_DOKUMENTATIONEN, videolist);
-        html += '<h5 id="Dokumentationen" class="control">Dokumentationen</h5><hr class="control">';
+        html += '<h5 id="Dokumentationen" class="control video_caption">Dokumentationen</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Dokumentationen\')">Dokumentationen</a></p>';
 
         for (var i = 0; i < dokumentationen.children.length; i++) {
-            html += '<div id="' + getHtmlId(dokumentationen.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="' + getHtmlId(dokumentationen.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + dokumentationen.children[i].title + ' <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'' + getHtmlId(dokumentationen.children[i].title) + '\')">' + dokumentationen.children[i].title + '</a></p>';
@@ -121,7 +121,7 @@ function control_listVideolist()
                     title_old = title;
 
                     if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
+                        html += '<p class="media_video_subcaption video_caption">' + title + '</p>';
                     }
                 }
 
@@ -132,11 +132,11 @@ function control_listVideolist()
         }
 
         var comedy = findNode(VIDEOID_COMEDY, videolist);
-        html += '<h5 id="Comedy" class="control">Comedy</h5><hr class="control">';
+        html += '<h5 id="Comedy" class="control video_caption">Comedy</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Comedy\')">Comedy</a></p>';
 
         for (var i = 0; i < comedy.children.length; i++) {
-            html += '<div id="' + getHtmlId(comedy.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="' + getHtmlId(comedy.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + comedy.children[i].title + ' <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'' + getHtmlId(comedy.children[i].title) + '\')">' + comedy.children[i].title + '</a></p>';
@@ -156,7 +156,7 @@ function control_listVideolist()
                     title_old = title;
 
                     if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
+                        html += '<p class="media_video_subcaption video_caption">' + title + '</p>';
                     }
                 }
 
@@ -167,11 +167,11 @@ function control_listVideolist()
         }
 
         var sport = findNode(VIDEOID_SPORT, videolist);
-        html += '<h5 id="Sport" class="control">Sport</h5><hr class="control">';
+        html += '<h5 id="Sport" class="control video_caption">Sport</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Sport\')">Sport</a></p>';
 
         for (var i = 0; i < sport.children.length; i++) {
-            html += '<div id="' + getHtmlId(sport.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="' + getHtmlId(sport.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + sport.children[i].title + ' <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'' + getHtmlId(sport.children[i].title) + '\')">' + sport.children[i].title + '</a></p>';
@@ -191,7 +191,7 @@ function control_listVideolist()
                     title_old = title;
 
                     if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
+                        html += '<p class="media_video_subcaption video_caption">' + title + '</p>';
                     }
                 }
 
@@ -202,11 +202,11 @@ function control_listVideolist()
         }
 
         var jrfilme = findNode(VIDEOID_JRFILME, videolist);
-        html += '<h5 id="JR-Filme" class="control">JR-Filme</h5><hr class="control">';
+        html += '<h5 id="JR-Filme" class="control video_caption">JR-Filme</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'JR-Filme\')">JR-Filme</a></p>';
 
         for (var i = 0; i < jrfilme.children.length; i++) {
-            html += '<div id="jr_' + getHtmlId(jrfilme.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist">'
+            html += '<div id="jr_' + getHtmlId(jrfilme.children[i].title) + '" class="media_video_artist_videos"><p class="media_video_artist video_caption">'
                 + jrfilme.children[i].title + ' <a href="javascript:control_scrollToCaption();"><span class="ui-icon ui-icon-arrowthick-1-n"></span></a></p>';
 
             contents += '<p class="media_video_captionsub1"><a href="javascript:control_scrollToCaption(\'jr_' + getHtmlId(jrfilme.children[i].title) + '\')">' + jrfilme.children[i].title + '</a></p>';
@@ -226,7 +226,7 @@ function control_listVideolist()
                     title_old = title;
 
                     if (title != '') {
-                        html += '<p class="media_video_subcaption">' + title + '</p>';
+                        html += '<p class="media_video_subcaption video_caption">' + title + '</p>';
                     }
                 }
 
@@ -237,7 +237,7 @@ function control_listVideolist()
         }
 
         var temp = findNode(VIDEOID_TEMP, videolist);
-        html += '<h5 id="Temp" class="control">Temp</h5><hr class="control">';
+        html += '<h5 id="Temp" class="control video_caption">Temp</h5><hr class="control video_caption">';
         contents += '<p class="media_video_caption"><a href="javascript:control_scrollToCaption(\'Temp\')">Temp</a></p>';
 
         for (var i = 0; i < temp.children.length; i++) {
@@ -250,13 +250,10 @@ function control_listVideolist()
 
         $('html, body').animate({ scrollTop: $('body').offset().top - 100 }, 10);
         control_overlayOff();
-
-        control_admin('info_iobroker');
     }).fail(function(jqXHR, textStatus)
     {
         console.log('ERROR control_listVideolist(): ' + textStatus);
-        control_admin('info_iobroker');
-    });    
+    });
 }
 
 function findNode(id, node)
@@ -307,7 +304,7 @@ function getTitle(node, node_root)
         }
 
         getTitle(node_parent, node_root, title);
-    } 
+    }
 }
 
 function numberWithPoints(x)
@@ -337,7 +334,7 @@ function getVideoLink(url, title, duration, resolution, size)
     } catch(err) {
         console.log('getVideoLink(): title=' + title + ' / duration=' + duration);
     }
-        
+
     video_link += '&nbsp;&nbsp;&nbsp;<a href="javascript:control_playVideo(\'' + url + '\');">'
         + '<b>' + title + '</b></a> (' + duration + ' / '  + kbit_per_seconds + ' kBit/s / '+ extension + ' / ' + resolution + ' Pixel / ' + numberWithPoints(size) + ' Bytes)</div>';
 

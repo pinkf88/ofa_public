@@ -13,8 +13,7 @@ class BildSelectForm extends Form
 
         $selectDataJahre['0'] = 'Alle Jahre';
 
-        foreach ($resultSetJahre as $res)
-        {
+        foreach ($resultSetJahre as $res) {
             $selectDataJahre[$res->jahr] = $res->jahr;
         }
 
@@ -22,8 +21,7 @@ class BildSelectForm extends Form
 
         $selectDataOrte['0'] = 'Alle Orte';
 
-        foreach ($resultSetOrte as $res)
-        {
+        foreach ($resultSetOrte as $res) {
             $selectDataOrte[$res->id] = $res->ort;
         }
 
@@ -31,20 +29,13 @@ class BildSelectForm extends Form
 
         $selectDataLaender['0'] = 'Alle Länder';
 
-        foreach ($resultSetLaender as $res)
-        {
+        foreach ($resultSetLaender as $res) {
             $selectDataLaender[$res->id] = $res->land;
         }
 
         $selectDataSerien = array();
 
-        foreach ($resultSetSerien as $res)
-        {
-            /*
-            if (strlen($res->serie) > 48)
-                $selectDataSerien[$res->id] = substr($res->serie, 0, 48) . '...';
-            else
-            */
+        foreach ($resultSetSerien as $res) {
             $selectDataSerien[$res->id] = $res->serie;
         }
 
@@ -56,6 +47,7 @@ class BildSelectForm extends Form
                     '0' => 'Alle',
                     '1' => 'Nur Bilder',
                     '2' => 'Nur Tickets',
+                    '3' => 'Nur Videos',
                 ),
             ),
             'attributes' => array(

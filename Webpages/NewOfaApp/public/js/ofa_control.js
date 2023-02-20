@@ -106,8 +106,10 @@ $(function() {
 
         if (val.length > 0) {
             $('.media_videocontents').hide();
+            $('.video_caption').hide();
         } else {
             $('.media_videocontents').show();
+            $('.video_caption').show();
         }
     });
 
@@ -211,6 +213,7 @@ function control_tab(tab)
     $('html, body').animate({ scrollTop: $('body').offset().top - 100 }, 10);
     $("#tooltip").hide();
 
+    $('#control_tab_wohnung').hide();
     $('#control_tab_albums').hide();
     $('#control_tab_tracks').hide();
     $('#control_tab_playlists').hide();
@@ -221,7 +224,7 @@ function control_tab(tab)
     $('#control_tab_admin').hide();
     $('#control_tab_' + tab).show();
 
-    if (tab == 'home') {
+    if (tab == 'wohnung') {
         control_runHome();
     }
 

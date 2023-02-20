@@ -3,13 +3,13 @@ use Zend\Session\Container;
 
 function date_mysql2german($bild)
 {
-		$d = explode("-", $bild->datum);
+	$d = explode("-", $bild->datum);
 
-		if ($bild->jahrflag) {
-				return sprintf("%04d", $d[0]);
-		} else {
-				return sprintf("%02d.%02d.%04d", $d[2], $d[1], $d[0]);
-		}
+	if ($bild->jahrflag) {
+		return sprintf("%04d", $d[0]);
+	} else {
+		return sprintf("%02d.%02d.%04d", $d[2], $d[1], $d[0]);
+	}
 }
 
 $title = 'Bilder';
@@ -47,8 +47,7 @@ echo $this->form()->closeTag();
 &nbsp;&nbsp;&nbsp;<a href="javascript:bild_showBildImportGrid()">Bilder importieren</a></p>
 <p><a class="newinfo" href="javascript:bild_editInfo()">Neue Info</a>
 <?php
-if ($this->bildinfo != '')
-{
+if ($this->bildinfo != '') {
     echo '<span id="bildinfo">(' . $this->bildinfo . ')</span>';
 }
 ?>
@@ -151,7 +150,18 @@ if ($bild->polygon != "") {
 ?>
 <a href="javascript:bild_playBild('<?php echo $this->escapeHtml($bild->nummer);?>');">Play</a>
 <a href="javascript:bild_addToSerie('<?php echo $bild->id;?>');">Serie</a>
-<a href="javascript:bild_editMotive('<?php echo $bild->id;?>');">Motive</a>
+<?php
+if ($bild->anzahl > 0) {
+    echo '<b>';
+}
+
+echo '<span id="motiv' . $bild->id . '"><a href="javascript:bild_editMotive(' . $bild->id . ');">Motive</a></span>' . "\n";
+
+if ($bild->anzahl > 0) {
+    echo '</b>';
+}
+?>
+
 </td>
 </tr>
 <?php

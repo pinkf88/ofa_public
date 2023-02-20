@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>CONTROL - OfaPics</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="/css/bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+<link href="/css/bootstrap.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/bootstrap-theme.min.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/jquery-ui.css" media="screen" rel="stylesheet" type="text/css">
 <link href="/css/jquery-ui.theme.min.css" media="screen" rel="stylesheet" type="text/css">

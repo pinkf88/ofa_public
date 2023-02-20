@@ -25,19 +25,14 @@ class BildController extends AbstractActionController
 
     public function __construct()
     {
-        // $firephp = \FirePHP::getInstance(true);
-        // $firephp->log('BildController->__construct().');
-
         $this->session = new Container('ofa_bild');
     }
 
     public function indexAction()
     {
-        // $firephp = \FirePHP::getInstance(true);
-
         $order_by = 'nummer';
-        $bildtyp = 0; // 0: alle, 1: nur Bilder, 2: nur Tickets
-        $jahr = 0;
+        $bildtyp = 0; // 0: alle, 1: nur Bilder, 2: nur Tickets, 3: nur Videos
+        $jahr = date('Y');
         $ortid = 0;
         $landid = 0;
         $nummer_von = '';
@@ -47,157 +42,105 @@ class BildController extends AbstractActionController
         $countperpage = 250;
         $serieid = 0;
 
-        if ($this->session->offsetExists('bildtyp'))
-        {
+        if ($this->session->offsetExists('bildtyp')) {
             $bildtyp = intval($this->session->offsetGet('bildtyp'));
         }
 
-        if ($this->session->offsetExists('jahr'))
-        {
+        if ($this->session->offsetExists('jahr')) {
             $jahr = intval($this->session->offsetGet('jahr'));
         }
 
-        if ($this->session->offsetExists('ortid'))
-        {
+        if ($this->session->offsetExists('ortid')) {
             $ortid = intval($this->session->offsetGet('ortid'));
         }
 
-        if ($this->session->offsetExists('landid'))
-        {
+        if ($this->session->offsetExists('landid')) {
             $landid = intval($this->session->offsetGet('landid'));
         }
 
-        if ($this->session->offsetExists('nummer_von'))
-        {
+        if ($this->session->offsetExists('nummer_von')) {
             $nummer_von = $this->session->offsetGet('nummer_von');
         }
 
-        if ($this->session->offsetExists('nummer_bis'))
-        {
+        if ($this->session->offsetExists('nummer_bis')) {
             $nummer_bis = $this->session->offsetGet('nummer_bis');
         }
 
-        if ($this->session->offsetExists('suchtext'))
-        {
+        if ($this->session->offsetExists('suchtext')) {
             $suchtext = $this->session->offsetGet('suchtext');
         }
 
-        if ($this->session->offsetExists('wertung_min'))
-        {
+        if ($this->session->offsetExists('wertung_min')) {
             $wertung_min = intval($this->session->offsetGet('wertung_min'));
         }
 
-        if ($this->session->offsetExists('countperpage'))
-        {
+        if ($this->session->offsetExists('countperpage')) {
             $countperpage = intval($this->session->offsetGet('countperpage'));
         }
 
-        if ($this->session->offsetExists('serieid'))
-        {
+        if ($this->session->offsetExists('serieid')) {
             $serieid = intval($this->session->offsetGet('serieid'));
         }
 
-        if ($this->getRequest())
-        {
-            // $firephp->log('BildController->indexAction(). getRequest(): isPost=' . $this->getRequest()->isPost());
-
-            if ($this->getRequest()->isPost())
-            {
-                if ($this->getRequest()->getPost('bildtyp'))
-                {
-                    // $firephp->log('BildController->indexAction(). bildtyp=' . $this->getRequest()->getPost('bildtyp'));
+        if ($this->getRequest()) {
+            if ($this->getRequest()->isPost()) {
+                if ($this->getRequest()->getPost('bildtyp')) {
                     $bildtyp = intval($this->getRequest()->getPost('bildtyp'));
-                }
-                else
-                {
+                } else {
                     $bildtyp = 0;
                 }
 
-                if ($this->getRequest()->getPost('jahr'))
-                {
-                    // $firephp->log('BildController->indexAction(). jahr=' . $this->getRequest()->getPost('jahr'));
+                if ($this->getRequest()->getPost('jahr')) {
                     $jahr = intval($this->getRequest()->getPost('jahr'));
-                }
-                else
-                {
+                } else {
                     $jahr = 0;
                 }
 
-                if ($this->getRequest()->getPost('ortid'))
-                {
-                    // $firephp->log('BildController->indexAction(). ortid=' . $this->getRequest()->getPost('ortid'));
+                if ($this->getRequest()->getPost('ortid')) {
                     $ortid = intval($this->getRequest()->getPost('ortid'));
-                }
-                else
-                {
+                } else {
                     $ortid = 0;
                 }
 
-                if ($this->getRequest()->getPost('landid'))
-                {
-                    // $firephp->log('BildController->indexAction(). landid=' . $this->getRequest()->getPost('landid'));
+                if ($this->getRequest()->getPost('landid')) {
                     $landid = intval($this->getRequest()->getPost('landid'));
-                }
-                else
-                {
+                } else {
                     $landid = 0;
                 }
 
-                if ($this->getRequest()->getPost('nummer_von'))
-                {
-                    // $firephp->log('BildController->indexAction(). nummer_von=' . $this->getRequest()->getPost('nummer_von'));
+                if ($this->getRequest()->getPost('nummer_von')) {
                     $nummer_von = $this->getRequest()->getPost('nummer_von');
-                }
-                else
-                {
+                } else {
                     $nummer_von = "";
                 }
 
-                if ($this->getRequest()->getPost('nummer_bis'))
-                {
-                    // $firephp->log('BildController->indexAction(). nummer_bis=' . $this->getRequest()->getPost('nummer_bis'));
+                if ($this->getRequest()->getPost('nummer_bis')) {
                     $nummer_bis = $this->getRequest()->getPost('nummer_bis');
-                }
-                else
-                {
+                } else {
                     $nummer_bis = "";
                 }
 
-                if ($this->getRequest()->getPost('suchtext'))
-                {
-                    // $firephp->log('BildController->indexAction(). suchtext=' . $this->getRequest()->getPost('suchtext'));
+                if ($this->getRequest()->getPost('suchtext')) {
                     $suchtext = $this->getRequest()->getPost('suchtext');
-                }
-                else
-                {
+                } else {
                     $suchtext = "";
                 }
 
-                if ($this->getRequest()->getPost('wertung_min'))
-                {
+                if ($this->getRequest()->getPost('wertung_min')) {
                     $wertung_min = intval($this->getRequest()->getPost('wertung_min'));
-                }
-                else
-                {
+                } else {
                     $wertung_min = 0;
                 }
 
-                if ($this->getRequest()->getPost('countperpage'))
-                {
+                if ($this->getRequest()->getPost('countperpage')) {
                     $countperpage = intval($this->getRequest()->getPost('countperpage'));
-                }
-                else
-                {
+                } else {
                     $countperpage = 250;
                 }
 
-                if ($this->getRequest()->getPost('serieid'))
-                {
-                    // $firephp->log('BildController->indexAction(). serieid=' . $this->getRequest()->getPost('serieid'));
+                if ($this->getRequest()->getPost('serieid')) {
                     $serieid = intval($this->getRequest()->getPost('serieid'));
-                }
-                else
-                {
+                } else {
                     $serieid = 0;
                 }
             }
@@ -236,6 +179,8 @@ class BildController extends AbstractActionController
             $select->where('ticket="0"');
         } else if ($bildtyp == 2) {
             $select->where('ticket="1"');
+        } else if ($bildtyp == 3) {
+            $select->where('beschreibung LIKE "YOUTUBE=%"');
         }
 
         if ($ortid > 0) {
@@ -252,6 +197,7 @@ class BildController extends AbstractActionController
 
         if (strlen($suchtext) > 0) {
             $pos = strpos($suchtext, 'DATUM');
+            $where = '';
 
             if ($pos === false) {
                 $pos = strpos($suchtext, ' AND ');
@@ -264,15 +210,15 @@ class BildController extends AbstractActionController
                     } else {
                         $splits = explode(' OR ', $suchtext);
                         $where = '(';
-    
+
                         for ($i = 0; $i < count($splits); $i++) {
                             if ($i > 0) {
                                 $where .= ' OR ';
                             }
-    
+
                             $where .= 'beschreibung LIKE "%' . $splits[$i] . '%" OR bemerkung LIKE "%' . $splits[$i] . '%" OR info LIKE "%' . $splits[$i] . '%"';
                         }
-    
+
                         $where .= ')';
                     }
                 } else {
@@ -290,11 +236,25 @@ class BildController extends AbstractActionController
                     $where .= ')';
                 }
             } else {
-                $datum = explode('-', substr($suchtext, 5));
-                $where = 'DAY(ofa_bild.datum)="' . $datum[0] . '" AND MONTH(ofa_bild.datum)="' . $datum[1] . '"';
+                $datum_text = substr($suchtext, 5);
+                $datum = explode('-', $datum_text);
+
+                if (count($datum) < 2) {
+                    $datum = explode('.', $datum_text);
+                }
+
+                if (count($datum) >= 2) {
+                    $where = 'DAY(ofa_bild.datum)="' . $datum[0] . '" AND MONTH(ofa_bild.datum)="' . $datum[1] . '"';
+
+                    if (count($datum) == 3) {
+                        $where .= ' AND YEAR(ofa_bild.datum)="' . $datum[2] . '"';
+                    }
+                }
             }
 
-            $select->where($where);
+            if ($where != '') {
+                $select->where($where);
+            }
         }
 
         if (strlen($nummer_von) > 0 && strlen($nummer_bis) == 0) {
@@ -472,7 +432,7 @@ class BildController extends AbstractActionController
         }
 
         return array(
-                'form' => $form
+            'form' => $form
         );
     }
 
@@ -482,24 +442,19 @@ class BildController extends AbstractActionController
 
         $id = (int) $this->params()->fromRoute('id', 0);
 
-        if (! $id) {
+        if (!$id) {
             return $this->redirect()->toRoute('bild', array(
-                    'action' => 'add'
+                'action' => 'add'
             ));
         }
 
         $bild = '';
 
-        // Get the Bild with the specified id. An exception is thrown
-        // if it cannot be found, in which case go to the index page.
         try {
             $bild = $this->getBildTable()->getBild($id);
-        }
-        catch (\Exception $ex) {
-            // $firephp->error('BildController->editAction()');
-
+        } catch (\Exception $ex) {
             return $this->redirect()->toRoute('bild', array(
-                    'action' => 'index'
+                'action' => 'index'
             ));
         }
 
@@ -548,8 +503,9 @@ class BildController extends AbstractActionController
         }
 
         return array(
-            'id' => $id,
-            'form' => $form
+            'id'        => $id,
+            'form'      => $form,
+            'polygon'   => '$bild->polygon'
         );
     }
 

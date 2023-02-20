@@ -11,19 +11,18 @@ class BildForm extends Form
 
         $selectData = array();
 
-        foreach ($resultSet as $res)
-        {
+        foreach ($resultSet as $res) {
         	$selectData[$res->id] = $res->ort;
         }
 
         $this->add(array(
-                'name' => 'id',
-                'type' => 'Hidden',
-            ));
+			'name' => 'id',
+			'type' => 'Hidden',
+		));
 
         $this->add(array(
-                'name' => 'bildmotive',
-                'type' => 'Hidden',
+			'name' => 'bildmotive',
+			'type' => 'Hidden',
         ));
 
         $this->add(array(
@@ -35,27 +34,27 @@ class BildForm extends Form
         	'attributes' => array(
 				'autofocus' => 'autofocus',
         		'class' => 'number',
-            	),
-            ));
+			),
+		));
 
         $this->add(array(
         	'name' => 'datei',
         	'type' => 'Text',
         	'options' => array(
        			'label' => 'Datei',
-        		),
+			),
         	'attributes' => array(
         		'class' => 'number',
             	),
         	));
 
         $this->add(array(
-        		'name' => 'datum',
-			    'type' => 'Zend\Form\Element\Date',
-        		'options' => array(
-        			'label' => 'Datum',
-             		// 'format' => 'd.m.Y',
-        		),
+			'name' => 'datum',
+			'type' => 'Zend\Form\Element\Date',
+			'options' => array(
+				'label' => 'Datum',
+				// 'format' => 'd.m.Y',
+			),
         ));
 
         $this->add(array(
@@ -135,25 +134,25 @@ class BildForm extends Form
         ));
 
         $this->add(array(
-                'type' => 'Zend\Form\Element\Checkbox',
-                'name' => 'ohneort',
-                'options' => array(
-                        'label' => 'Ohne Ort',
-                        'use_hidden_element' => true,
-                        'checked_value' => '1',
-                        'unchecked_value' => '0'
-                )
+			'type' => 'Zend\Form\Element\Checkbox',
+			'name' => 'ohneort',
+			'options' => array(
+					'label' => 'Ohne Ort',
+					'use_hidden_element' => true,
+					'checked_value' => '1',
+					'unchecked_value' => '0'
+			)
         ));
 
         $this->add(array(
-                'type' => 'Zend\Form\Element\Checkbox',
-                'name' => 'ohneland',
-                'options' => array(
-                        'label' => 'Ohne Land',
-                        'use_hidden_element' => true,
-                        'checked_value' => '1',
-                        'unchecked_value' => '0'
-                )
+			'type' => 'Zend\Form\Element\Checkbox',
+			'name' => 'ohneland',
+			'options' => array(
+					'label' => 'Ohne Land',
+					'use_hidden_element' => true,
+					'checked_value' => '1',
+					'unchecked_value' => '0'
+			)
         ));
 
         $this->add(array(

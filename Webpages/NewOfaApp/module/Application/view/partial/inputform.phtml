@@ -1,19 +1,21 @@
 <?php
 $this->headTitle($this->title);
 
-echo '<h3>' . $this->escapeHtml($title) . '</h3>';
+if ($this->title == "Bild bearbeiten") {
+	echo '<div class="row">' . "\n";
+	echo '<div class="col-md-5">' . "\n";
+}
 
-if ($this->action == 'add')
-{
+echo '<h3>' . $this->escapeHtml($title) . '</h3>' . "\n";
+
+if ($this->action == 'add') {
 	$this->form->setAttribute('action', $this->url(
 		$this->url,
 		array(
 			'action' => $this->action,
 		)
 	));
-}
-else
-{	
+} else {	
 	$form->setAttribute('action', $this->url(
 		$this->url,
 		array(
@@ -26,38 +28,45 @@ else
 $this->form->prepare();
 
 echo $this->form()->openTag($form);
+echo "\n";
 
 foreach ($form as $element) :
-
-	if ($element->getAttribute('type') != 'hidden')
-	{
+	if ($element->getAttribute('type') != 'hidden') {
 		print ('<div class="control-group ');
 	
-		if ($this->formElementErrors($element))
+		if ($this->formElementErrors($element)) {
 			print ('error');
+		}
 	
-		print ('">');
+		echo '">';
 	
-		if ($element->getLabel() != "")
+		if ($element->getLabel() != "") {
 			echo '<label class="control-label">' . $element->getLabel() . '</label>';
+		}
+
+		echo "\n";
 	}
 	
-	if (!(($element->getAttribute('name') == 'submit2' || $element->getAttribute('name') == 'submit3') && $this->action == 'edit'))
-	{
+	if (!(($element->getAttribute('name') == 'submit2' || $element->getAttribute('name') == 'submit3') && $this->action == 'edit')) {
 		echo '<div class="controls">';
 		echo $this->formElement($element);
 		
-		if ($this->formElementErrors($element))
+		if ($this->formElementErrors($element)) {
 			echo '<span class="help-inline">' . $this->formElementErrors($element) . '</span>';
-		echo '</div>';
+		}
+
+		echo '</div>' . "\n";
 	}
 		
-	if ($element->getAttribute('type') != 'hidden')
-	{
-		echo '</div>';
+	if ($element->getAttribute('type') != 'hidden') {
+		echo '</div>' . "\n";
 	}
-
 endforeach;
 
 echo $this->form()->closeTag();
-echo '<a href="/' . $this->url . '">Abbrechen</a>';
+echo '<a href="/' . $this->url . '">Abbrechen</a>' . "\n";
+
+if ($this->title == "Bild bearbeiten") {
+	include_once "inputform_bild.php";
+}
+?>

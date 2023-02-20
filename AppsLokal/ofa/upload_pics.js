@@ -14,13 +14,17 @@ const PFAD_SOURCE_MAIN = config.apps.convert.path_source_main;
 const SUFFIX_Z0 = config.apps.convert.suffix_z0;
 const MAX_ANZAHL = 100000;
 
+var db_connection = null;
+let sftp_client = null;
+
+
 var parser = new ArgumentParser({
     add_help: true,
     description: 'upload'
 });
 
 parser.add_argument(
-    '-d',
+    '-dir',
     {
         help: 'Source directory.',
         required: true
@@ -32,6 +36,13 @@ parser.add_argument(
     {
         help: 'Location.',
         required: true
+    }
+);
+
+parser.add_argument(
+    '-date',
+    {
+        help: 'Date.'
     }
 );
 
@@ -92,13 +103,13 @@ var args = parser.parse_args();
 
 var PFAD_SOURCE = PFAD_SOURCE_MAIN;
 
-if (args.d != null) {
-    PFAD_SOURCE += args.d + '/';
+if (args.dir != null) {
+    PFAD_SOURCE += args.dir + '/';
 }
 
 if (fs.existsSync(PFAD_SOURCE) == false) {
     console.log(colors.yellow('Pfad ' + PFAD_SOURCE + ' existiert nicht.'));
-    return;
+    shutdown();
 }
 
 var PFAD_SOURCE_TEMP = PFAD_SOURCE_MAIN + 'temp/';
@@ -113,7 +124,13 @@ if (args.a != null) {
     anzahl = parseInt(args.a);
 }
 
+var datum = '';
 
+if (args.date != null) {
+    datum = args.date;
+}
+
+var last_datum = datum;
 var files_all = null;
 
 try {
@@ -122,12 +139,12 @@ try {
 catch(err) {
     console.log(colors.yellow('Keine Dateien in ' + PFAD_SOURCE + ' vorhanden.'));
     console.log(err.message);
-    return;
+    shutdown();
 }
 
 if (files_all == null || files_all.length < 1) {
     console.log(colors.yellow('Keine Dateien in ' + PFAD_SOURCE + ' vorhanden.'));
-    return;
+    shutdown();
 }
 
 // console.log(files_all);
@@ -147,7 +164,7 @@ console.log(files_jpg.length + ' jpg-Dateien im Verzeichnis "' + PFAD_SOURCE + '
 
 if (files_jpg.length < 1) {
     console.log(colors.yellow('Keine konvertierbaren Dateien vorhanden.'));
-    return;
+    shutdown();
 }
 
 if (anzahl == MAX_ANZAHL) {
@@ -185,8 +202,8 @@ if (args.ohneland) {
 }
 
 var bild_array = [];
-var db_connection = database.connect();
-let sftp_client = new Client();
+db_connection = database.connect();
+sftp_client = new Client();
 var pic_location = args.l;
 
 var ort_sql = 'SELECT id FROM ofa_ort WHERE ort="' + pic_location + '" ';
@@ -291,7 +308,8 @@ function check_db(file_no)
     }
 
     var bild_nr = file_temp.replace('.jpg', '').replace('5dii', '').replace('6dii', '')
-        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','').replace('gxx', '').replace('p20','').replace(/_/g, '');
+        .replace('g12', '').replace('g7x', '').replace('ma','').replace('go3','')
+        .replace('gxx', '').replace('p20','').replace('p6','').replace(/_/g, '');
     
     console.log('upload.js | check_db(): ' + file_no + ' / ' + bild_nr);
 
@@ -300,7 +318,6 @@ function check_db(file_no)
     }
 
     var bild_sql = 'SELECT Aufnahmedatum, Laenge, Breite FROM ofa_bilddaten WHERE BildNr="' + bild_nr + '" ';
-    var last_datum = '2020-01-01';
 
     db_connection.query(bild_sql, function (err, result) {
         if (err) {
@@ -391,7 +408,7 @@ function finish()
         fs.writeFile(PFAD_SOURCE_TEMP + 'bilddaten.json', JSON.stringify(bild_json, null, 4), (err) => {
             if (err) {
                 // throw err;
-                console.log(colors.yellow('upload.js | finish(): writeFile ERROR: ' + err.message));
+                console.log(colors.yellow('upload.js | shutdown(): writeFile ERROR: ' + err.message));
                 shutdown();
             }
 
@@ -405,8 +422,14 @@ function finish()
 
 function shutdown()
 {
-    console.log('shutdown(): DB connection closed');
-    database.disconnect(db_connection);
-    sftp_client.end();
+    if (db_connection != null) {
+        console.log('shutdown(): DB connection closed');
+        database.disconnect(db_connection);
+    }
+
+    if (sftp_client != null) {
+        sftp_client.end();
+    }
+
     process.exit();
 }
