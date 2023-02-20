@@ -91,7 +91,7 @@ echo '</script>' . "\n";
 
 mysqli_close($db_link);
 ?>
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCybkY-7QzpNBNVEty0l5E-x8-Wdw4cvY4"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key="></script>
 <script type="text/javascript" src="/js/ofa_bild_poly.js"></script>
     </head>
     <body>
